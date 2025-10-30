@@ -246,10 +246,10 @@ export const guest = (() => {
      * @returns {void}
      */
     const buildGoogleCalendar = () => {
-        /**
+    /*    /**
          * @param {string} d 
          * @returns {string}
-         */
+         
         const formatDate = (d) => (new Date(d.replace(' ', 'T') + ':00Z')).toISOString().replace(/[-:]/g, '').split('.').shift();
 
         const url = new URL('https://calendar.google.com/calendar/render');
@@ -263,7 +263,7 @@ export const guest = (() => {
         });
 
         url.search = data.toString();
-        document.querySelector('#home button')?.addEventListener('click', () => window.open(url, '_blank'));
+        document.querySelector('#home button')?.addEventListener('click', () => window.open(url, '_blank'));*/
     };
 
     /**
@@ -296,7 +296,7 @@ export const guest = (() => {
         showGuestName();
         modalImageClick();
         normalizeArabicFont();
-        buildGoogleCalendar();
+        //buildGoogleCalendar();
 
         if (information.has('presence')) {
             document.getElementById('form-presence').value = information.get('presence') ? '1' : '2';
