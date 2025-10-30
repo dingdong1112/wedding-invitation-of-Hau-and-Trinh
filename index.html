@@ -85,9 +85,7 @@
 <!-- It's recommended to use 'data-src' in the <img> tag -->
 <!-- <html lang="id" data-bs-theme="auto"> ['auto', 'dark', 'light'] -->
 
-<!--<body data-audio="./assets/music/pure-love-304010.mp3" data-confetti="true" data-time="2024-01-01 09:30:00">-->
-
-<body data-confetti="true" data-time="2024-01-01 09:30:00"></body>
+<body data-audio="./assets/music/pure-love-304010.mp3" data-confetti="true" data-time="2025-12-27 00:00:00">
 
 <!-- Root Invitation -->
 <div class="row m-0 p-0 opacity-0" id="root">
@@ -328,12 +326,9 @@
                         <div class="video-wrapper position-relative rounded-4 mb-2 shadow-sm">
                             <div class="video-container">
                                 <iframe id="youtube-player"
-                                     src="https://www.youtube.com/embed/neR2Lfl7jrA?autoplay=1&mute=1&loop=1&playlist=neR2Lfl7jrA&controls=0&modestbranding=1&rel=0&enablejsapi=1"
-                                    title="YouTube video player"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;
-                                    picture-in-picture"
-                                    allowfullscreen
+                                    src="https://www.youtube.com/embed/neR2Lfl7jrA?autoplay=1&mute=1&loop=1&playlist=neR2Lfl7jrA&controls=0&modestbranding=1&rel=0&enablejsapi=1"
+                                    title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;
+                                    picture-in-picture" allowfullscreen
                                     referrerpolicy="strict-origin-when-cross-origin">
                                 </iframe>
                             </div>
@@ -348,7 +343,7 @@
                                 style="opacity: 100%; background-color: unset;">
                                 <button class="btn btn-outline-auto btn-sm rounded-4 shadow-sm"
                                     onclick="undangan.guest.showStory(this.parentNode)"><i
-                                        class="fa-solid fa-heart fa-bounce me-2"></i>Lihat Story</button>
+                                        class="fa-solid fa-heart fa-bounce me-2"></i>Câu chuyện tình yêu</button>
                             </div>
 
                             <div class="overflow-y-scroll overflow-x-hidden p-2 with-scrollbar" style="height: 15rem;">
@@ -902,22 +897,42 @@
 </div>
 
 <!-- Button Group -->
+<!-- CODE MỚI ĐỂ THAY THẾ -->
+
+<!-- Nút Nhạc Cố Định Ở Đầu Trang -->
+<div id="floating-music-button-wrapper">
+    <button type="button" id="button-music"
+        class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm" aria-label="Bật/Tắt nhạc"
+        data-offline-disabled="false">
+        <i class="fa-solid fa-circle-pause spin-button"></i>
+    </button>
+</div>
+
+<!-- Nút Đổi Giao Diện (giữ lại ở vị trí cũ và ẩn đi) -->
 <div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
-    <!-- Theme Button -->
+    <button type="button" id="button-theme"
+        class="btn bg-light-dark border btn-sm rounded-circle d-none btn-transparent shadow-sm mt-3"
+        aria-label="Đổi giao diện" onclick="undangan.theme.change()">
+        <i class="fa-solid fa-circle-half-stroke"></i>
+    </button>
+</div>
+<!--
+<div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
+    --Theme Button
     <button type="button" id="button-theme"
         class="btn bg-light-dark border btn-sm rounded-circle d-none btn-transparent shadow-sm mt-3"
         aria-label="Change theme" onclick="undangan.theme.change()">
         <i class="fa-solid fa-circle-half-stroke"></i>
     </button>
 
-    <!-- Audio Button -->
+    --Audio Button
     <button type="button" id="button-music"
         class="btn bg-light-dark border btn-sm rounded-circle d-none btn-transparent shadow-sm mt-3"
         aria-label="Change audio" data-offline-disabled="false">
         <i class="fa-solid fa-circle-pause spin-button"></i>
     </button>
 </div>
-
+-->
 <!-- Loading Page -->
 <div class="loading-page bg-white-black" id="loading" style="opacity: 1;">
     <div class="d-flex justify-content-center align-items-center vh-100 overflow-y-auto">
