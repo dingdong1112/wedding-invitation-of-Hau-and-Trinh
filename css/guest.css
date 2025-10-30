@@ -117,3 +117,78 @@ svg {
 .no-gap-bottom {
     margin-bottom: -0.75rem !important;
 }
+
+/* --- BẮT ĐẦU CODE HIỆU ỨNG GỢN SÓNG --- */
+
+/* 1. Định nghĩa chuyển động lên-xuống */
+@keyframes wavy {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px); /* Chữ sẽ nhô cao lên 8px */
+  }
+}
+
+/* 2. Style cho cả cụm từ */
+.wavy-text {
+  display: flex; /* Dùng flexbox để các ký tự xếp hàng ngang */
+  justify-content: center;
+  font-family: 'Dancing Script', 'Esthetic', sans-serif; /* Giữ lại font chữ đẹp */
+  font-size: 2.5rem;
+  margin: 1.5rem 0; /* Tương đương my-4 của Bootstrap */
+  -webkit-box-reflect: below -15px linear-gradient(transparent, rgba(0,0,0,0.2)); /* Hiệu ứng phản chiếu mờ ảo (tùy chọn) */
+}
+
+/* 3. Style và áp dụng animation cho từng ký tự */
+.wavy-text span {
+  position: relative;
+  display: inline-block;
+  color: #ffffff; /* Đảm bảo chữ màu trắng */
+  /*text-transform: uppercase; /* Chuyển thành chữ hoa nếu muốn */
+  animation: wavy 2.5s ease-in-out infinite; /* Áp dụng animation */
+  animation-delay: calc(0.1s * var(--i)); /* Đây là phép màu tạo độ trễ */
+}
+
+/* 4. Gán độ trễ lần lượt cho từng ký tự */
+.wavy-text span:nth-child(1) { --i: 1; }
+.wavy-text span:nth-child(2) { --i: 2; }
+.wavy-text span:nth-child(3) { --i: 3; }
+.wavy-text span:nth-child(4) { --i: 4; } /* Dấu cách */
+.wavy-text span:nth-child(5) { --i: 5; }
+.wavy-text span:nth-child(6) { --i: 6; }
+.wavy-text span:nth-child(7) { --i: 7; }
+.wavy-text span:nth-child(8) { --i: 8; } /* Dấu cách */
+.wavy-text span:nth-child(9) { --i: 9; } /* & */
+.wavy-text span:nth-child(10) { --i: 10; } /* Dấu cách */
+.wavy-text span:nth-child(11) { --i: 11; }
+.wavy-text span:nth-child(12) { --i: 12; }
+.wavy-text span:nth-child(13) { --i: 13; }
+.wavy-text span:nth-child(14) { --i: 14; }
+.wavy-text span:nth-child(15) { --i: 15; } /* Dấu cách */
+.wavy-text span:nth-child(16) { --i: 16; }
+.wavy-text span:nth-child(17) { --i: 17; }
+.wavy-text span:nth-child(18) { --i: 18; }
+.wavy-text span:nth-child(19) { --i: 19; }
+.wavy-text span:nth-child(20) { --i: 20; }
+
+/* --- KẾT THÚC CODE HIỆU ỨNG GỢN SÓNG --- */
+
+/* --- CSS CHO VIDEO YOUTUBE RESPONSIVE --- */
+.video-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 56.25%; /* Tỷ lệ 16:9 (chiều cao / chiều rộng) */
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
