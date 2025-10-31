@@ -434,7 +434,7 @@ export const guest = (() => {
     };
     // --- KẾT THÚC CODE TẠO LINK LỊCH ---
 
-    // --- BẮT ĐẦU CODE ĐIỀU KHIỂN HIỆU ỨNG RƠI (PHIÊN BẢN TÁI CẤU TRÚC) ---
+// --- BẮT ĐẦU CODE ĐIỀU KHIỂN HIỆU ỨNG RƠI (PHIÊN BẢN TÁI CẤU TRÚC) ---
 const setupParticleControls = () => {
     // === Phần 1: Lấy các element cần thiết ===
     const toggleButton = document.getElementById('particle-toggle-button');
@@ -461,47 +461,30 @@ const setupParticleControls = () => {
         const density = parseInt(densitySlider.value);
         
         let confettiOptions = {
-            particleCount: density / 5,
+            particleCount: density / 5, // Bắn một lượng nhỏ mỗi lần
             angle: 90,
             spread: 180,
             origin: { x: Math.random(), y: Math.random() - 0.2 },
             scalar: size,
+            flat: true,
             gravity: 0.5,
             drift: Math.random() * 0.5 - 0.25,
-            flat: true,
-            disableForReducedMotion: true,
-            shapes: shapes // Thêm shapes vào options
+            disableForReducedMotion: true
         };
         
         const emojiVariation = '\uFE0F';
 
-        // Tạo shapes array để chứa các hình dạng cho mỗi particle
-        let shapes = [];
-        
         switch (shape) {
             case 'hearts':
-                // Sử dụng shapeFromText để tạo hình trái tim
-                shapes = [window.confetti.shapeFromText({
-                    text: '❤️',
-                    scalar: size * 1.5
-                })];
+                confettiOptions.symbols = ['❤️' + emojiVariation];
+                confettiOptions.colors = undefined; 
+                confettiOptions.scalar = size * 1.5;
                 confettiOptions.gravity = 0.3;
                 break;
-            case 'doubleHearts':
-                // Sử dụng shapeFromText để tạo hình trái tim đôi
-                shapes = [window.confetti.shapeFromText({
-                    text: '💕',
-                    scalar: size * 1.8
-                })];
-                confettiOptions.gravity = 0.25;
-                confettiOptions.drift = Math.random() * 0.3 - 0.15;
-                break;
             case 'snow':
-                // Sử dụng shapeFromText để tạo hình bông tuyết
-                shapes = [window.confetti.shapeFromText({
-                    text: '❄️',
-                    scalar: size * 1.2
-                })];
+                confettiOptions.symbols = ['❄️' + emojiVariation];
+                confettiOptions.colors = undefined; 
+                confettiOptions.scalar = size * 1.2;
                 confettiOptions.drift = Math.random() * 0.7 - 0.35;
                 break;
             case 'stars':
@@ -509,15 +492,9 @@ const setupParticleControls = () => {
                 confettiOptions.colors = undefined;
                 confettiOptions.scalar = size * 1.3;
                 break;
-            default: // confetti (hình vuông và tròn)
-                shapes = ['square', 'circle'];
-                confettiOptions.colors = [
-                    '#ff61d8', // pink
-                    '#ff99e6', // light pink
-                    '#ff0066', // dark pink
-                    '#ff4d94', // medium pink
-                    '#ff1a75'  // bright pink
-                ];
+            default: // confetti (hình vuông)
+                confettiOptions.shapes = ['square'];
+                confettiOptions.colors = undefined; 
                 break;
         }
         
