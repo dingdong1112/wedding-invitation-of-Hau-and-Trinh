@@ -246,24 +246,24 @@ export const guest = (() => {
      * @returns {void}
      */
     const buildGoogleCalendar = () => {
-    /*    /**
-         * @param {string} d 
-         * @returns {string}
-         
-        const formatDate = (d) => (new Date(d.replace(' ', 'T') + ':00Z')).toISOString().replace(/[-:]/g, '').split('.').shift();
-
-        const url = new URL('https://calendar.google.com/calendar/render');
-        const data = new URLSearchParams({
-            action: 'TEMPLATE',
-            text: 'The Wedding of Wahyu and Riski',
-            dates: `${formatDate('2023-03-15 10:00')}/${formatDate('2023-03-15 11:00')}`,
-            details: 'Tanpa mengurangi rasa hormat, kami mengundang Anda untuk berkenan menghadiri acara pernikahan kami. Terima kasih atas perhatian dan doa restu Anda, yang menjadi kebahagiaan serta kehormatan besar bagi kami.',
-            location: 'RT 10 RW 02, Desa Pajerukan, Kec. Kalibagor, Kab. Banyumas, Jawa Tengah 53191.',
-            ctz: config.get('tz'),
-        });
-
-        url.search = data.toString();
-        document.querySelector('#home button')?.addEventListener('click', () => window.open(url, '_blank'));*/
+        /*    /**
+             * @param {string} d 
+             * @returns {string}
+             
+            const formatDate = (d) => (new Date(d.replace(' ', 'T') + ':00Z')).toISOString().replace(/[-:]/g, '').split('.').shift();
+    
+            const url = new URL('https://calendar.google.com/calendar/render');
+            const data = new URLSearchParams({
+                action: 'TEMPLATE',
+                text: 'The Wedding of Wahyu and Riski',
+                dates: `${formatDate('2023-03-15 10:00')}/${formatDate('2023-03-15 11:00')}`,
+                details: 'Tanpa mengurangi rasa hormat, kami mengundang Anda untuk berkenan menghadiri acara pernikahan kami. Terima kasih atas perhatian dan doa restu Anda, yang menjadi kebahagiaan serta kehormatan besar bagi kami.',
+                location: 'RT 10 RW 02, Desa Pajerukan, Kec. Kalibagor, Kab. Banyumas, Jawa Tengah 53191.',
+                ctz: config.get('tz'),
+            });
+    
+            url.search = data.toString();
+            document.querySelector('#home button')?.addEventListener('click', () => window.open(url, '_blank'));*/
     };
 
     /**
@@ -380,6 +380,50 @@ export const guest = (() => {
         }
     };
 
+
+    // --- BẮT ĐẦU CODE TẠO LINK LỊCH ---
+    const initializeCalendarLinks = () => {
+        // Vô hiệu hóa hàm cũ để tránh xung đột
+        const oldCalendarButton = document.querySelector('#home button.dropdown-toggle');
+        if (oldCalendarButton) {
+            // Đây là một cách "mạnh tay" để gỡ bỏ mọi event listener cũ
+            const newButton = oldCalendarButton.cloneNode(true);
+            oldCalendarButton.parentNode.replaceChild(newButton, oldCalendarButton);
+            // Kích hoạt lại tính năng dropdown của Bootstrap cho nút mới
+            new bootstrap.Dropdown(newButton);
+        }
+
+        const eventTitle = "Lễ Cưới Duy Hậu & Diễm Trinh";
+        const eventDescription = "Trân trọng kính mời bạn đến tham dự lễ thành hôn của chúng tôi. Sự hiện diện của bạn là niềm vinh hạnh cho gia đình chúng tôi.";
+        const eventLocation = "Địa chỉ tổ chức sự kiện, ABC, XYZ";
+        const eventDurationHours = 4;
+
+        const startTimeString = document.body.getAttribute('data-time');
+        if (!startTimeString) return;
+
+        const startTime = new Date(startTimeString.replace(/-/g, '/'));
+        const endTime = new Date(startTime.getTime() + eventDurationHours * 60 * 60 * 1000);
+
+        // Tạo link Google Calendar
+        const formatGoogleDate = (date) => date.toISOString().replace(/-|:|\.\d+/g, '');
+        const googleLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${formatGoogleDate(startTime)}/${formatGoogleDate(endTime)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}`;
+        document.getElementById('google-calendar-link')?.setAttribute('href', googleLink);
+
+        // Tạo Data URI cho các lịch khác
+        window.ics.addEvent(eventTitle, eventDescription, eventLocation, startTime, endTime);
+        const dataUri = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(window.ics.build());
+
+        const icsLinkElements = document.querySelectorAll('#ics-calendar-link, #outlook-calendar-link, #yahoo-calendar-link');
+        const fileName = "dam-cuoi.ics";
+
+        icsLinkElements.forEach(element => {
+            element.setAttribute('href', dataUri);
+            element.setAttribute('download', fileName);
+        });
+        console.log("DEBUG: Đã gán link lịch thành công từ trong file app/guest/guest.js!");
+    };
+    // --- KẾT THÚC CODE TẠO LINK LỊCH ---
+
     /**
      * @returns {object}
      */
@@ -403,6 +447,8 @@ export const guest = (() => {
                 'libs',
                 'gif',
             ]);
+            // CHẠY HÀM TẠO LỊCH CỦA CHÚNG TA SAU KHI MỌI THỨ ĐÃ TẢI XONG
+            initializeCalendarLinks();
         });
 
         return {
