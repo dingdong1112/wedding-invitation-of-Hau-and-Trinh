@@ -218,7 +218,7 @@ export const guest = (() => {
         }
 
         //confetti.tapTapAnimation(div, 100);
-         if (typeof window.confetti === 'function') {
+        if (typeof window.confetti === 'function') {
             window.confetti({
                 particleCount: 50,
                 spread: 70,
@@ -469,41 +469,52 @@ export const guest = (() => {
             }
 
             const frame = () => {
-                // Đảm bảo window.confetti đã tồn tại
                 if (typeof window.confetti !== 'function') return;
 
                 const shape = shapeSelect.value;
                 const size = parseFloat(sizeSlider.value);
                 const density = parseInt(densitySlider.value);
 
-                let shapes;
-                switch (shape) {
-                    case 'hearts':
-                        // SỬA LỖI TẠI ĐÂY: Thư viện này không có shapeFromText, chúng ta dùng emoji
-                        shapes = ['❤️'];
-                        break;
-                    case 'snow':
-                        shapes = ['❄️'];
-                        break;
-                    case 'stars':
-                        shapes = ['✨'];
-                        break;
-                    default:
-                        shapes = ['square'];
-                }
-                confetti({
+                // Chuẩn bị các tùy chọn cho confetti
+                let confettiOptions = {
                     particleCount: density / 5,
                     angle: 90,
                     spread: 180,
                     origin: { x: Math.random(), y: Math.random() - 0.2 },
-                    scalar: size,
-                    shapes: shapes,
+                    scalar: size, // Scalar hoạt động tốt nhất với các hình cơ bản
                     flat: true,
                     gravity: 0.5,
                     drift: Math.random() * 0.5 - 0.25,
-                    disableForReducedMotion: true,
-                    colors: (shape === 'snow') ? ['#ffffff', '#f0f0f0', '#e0e0e0'] : undefined
-                });
+                    disableForReducedMotion: true
+                };
+
+                // Tùy chỉnh các tùy chọn dựa trên hình dạng đã chọn
+                switch (shape) {
+                    case 'hearts':
+                        // SỬA LỖI: Dùng 'symbols' thay cho 'shapes' và xóa 'scalar'
+                        confettiOptions.symbols = ['❤️'];
+                        confettiOptions.scalar = size * 1.5; // Emoji có thể cần to hơn một chút
+                        confettiOptions.gravity = 0.3; // Tim rơi chậm hơn
+                        break;
+                    case 'snow':
+                        // SỬA LỖI: Dùng 'symbols'
+                        confettiOptions.symbols = ['❄️'];
+                        confettiOptions.scalar = size * 1.2;
+                        confettiOptions.colors = ['#ffffff', '#f0f0f0', '#e0e0e0'];
+                        confettiOptions.drift = Math.random() * 0.7 - 0.35; // Tuyết bay lượn nhiều hơn
+                        break;
+                    case 'stars':
+                        // SỬA LỖI: Dùng 'symbols'
+                        confettiOptions.symbols = ['✨'];
+                        confettiOptions.scalar = size * 1.3;
+                        break;
+                    default: // confetti (hình vuông)
+                        confettiOptions.shapes = ['square'];
+                        // Tùy chọn `colors` mặc định sẽ được sử dụng
+                        break;
+                }
+                // Gọi hàm confetti với các tùy chọn đã được cấu hình
+                window.confetti(confettiOptions);
             };
 
             const intervalTime = Math.max(25000 / parseInt(densitySlider.value), 200);
@@ -529,7 +540,7 @@ export const guest = (() => {
                 setTimeout(checkForConfettiAndRun, 100);
             }
         }
-        
+
         checkForConfettiAndRun();
 
     };
