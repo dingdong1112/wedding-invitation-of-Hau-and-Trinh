@@ -55,67 +55,70 @@ import { guest } from './app/guest/guest.js';
     // --- BẮT ĐẦU CODE TẠO LINK LỊCH ---
 
     // Đợi cho toàn bộ nội dung trang được tải xong rồi mới chạy code
-    document.addEventListener('DOMContentLoaded', function () {
-
+    document.addEventListener('DOMContentLoaded', function() {
+    
         // ===================================================================
         // VUI LÒNG CHỈNH SỬA THÔNG TIN SỰ KIỆN CỦA BẠN TẠI ĐÂY
         // ===================================================================
         const eventTitle = "Lễ Cưới Duy Hậu & Diễm Trinh";
         const eventDescription = "Trân trọng kính mời bạn đến tham dự lễ thành hôn của chúng tôi. Sự hiện diện của bạn là niềm vinh hạnh cho gia đình chúng tôi.";
-        const eventLocation = "Địa chỉ tổ chức sự kiện, ABC, XYZ"; // Thay bằng địa chỉ của bạn
-        const eventDurationHours = 4; // Sự kiện kéo dài trong bao nhiêu giờ
+        const eventLocation = "Địa chỉ tổ chức sự kiện, ABC, XYZ";
+        const eventDurationHours = 4;
         // ===================================================================
 
-        // Lấy thời gian bắt đầu từ thuộc tính data-time của thẻ body
         const startTimeString = document.body.getAttribute('data-time');
-        if (!startTimeString) return; // Dừng lại nếu không có data-time
+        if (!startTimeString) return;
 
         const startTime = new Date(startTimeString.replace(/-/g, '/'));
         const endTime = new Date(startTime.getTime() + eventDurationHours * 60 * 60 * 1000);
 
-        // --- Hàm định dạng ngày giờ cho Google Calendar ---
+        // --- Tạo link cho Google Calendar (giữ nguyên) ---
         function formatGoogleDate(date) {
             return date.toISOString().replace(/-|:|\.\d+/g, '');
         }
-
-        // --- Tạo link cho Google Calendar ---
         const googleLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${formatGoogleDate(startTime)}/${formatGoogleDate(endTime)}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}`;
         const googleCalendarElement = document.getElementById('google-calendar-link');
         if (googleCalendarElement) {
             googleCalendarElement.href = googleLink;
         }
 
-        // --- Tạo file .ics cho các lịch khác (Apple, Outlook, Yahoo) ---
+        // --- PHẦN SỬA LỖI CHO CÁC LỊCH CÒN LẠI ---
+
+        // 1. Tạo sẵn nội dung file .ics một lần duy nhất để tối ưu
         const cal = ics();
         cal.addEvent(eventTitle, eventDescription, eventLocation, startTime, endTime);
-
-        // Gán link tải file .ics cho các nút còn lại
-        const icsLinkElement = document.getElementById('ics-calendar-link');
-        const outlookLinkElement = document.getElementById('outlook-calendar-link');
-        const yahooLinkElement = document.getElementById('yahoo-calendar-link');
-
-        // Tạo một "Blob" chứa dữ liệu file .ics
-        const icsFile = cal.build();
-        const blob = new Blob([icsFile], { type: 'text/calendar;charset=utf-8' });
-        const url = window.URL.createObjectURL(blob);
-
-        // Gán URL và thuộc tính download
-        const downloadUrl = url;
+        const icsFileContent = cal.build();
+        const blob = new Blob([icsFileContent], { type: 'text/calendar;charset=utf-8' });
         const fileName = "dam-cuoi.ics";
 
-        if (icsLinkElement) {
-            icsLinkElement.href = downloadUrl;
-            icsLinkElement.setAttribute('download', fileName);
+        // 2. Hàm để kích hoạt việc tải file
+        function handleIcsDownload(event) {
+            // Ngăn link tự động nhảy trang
+            event.preventDefault(); 
+            
+            // Sử dụng FileSaver.js hoặc cách thủ công để tương thích rộng rãi
+            // Cách thủ công: tạo 1 thẻ <a> ẩn, gán link blob, click và xóa đi
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = fileName;
+            
+            // Thêm vào body để có thể click
+            document.body.appendChild(link);
+            link.click();
+            
+            // Dọn dẹp
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
         }
-        if (outlookLinkElement) {
-            outlookLinkElement.href = downloadUrl;
-            outlookLinkElement.setAttribute('download', fileName);
-        }
-        if (yahooLinkElement) {
-            // Yahoo Calendar không hỗ trợ tải file trực tiếp, nhưng vẫn dùng .ics
-            yahooLinkElement.href = downloadUrl;
-            yahooLinkElement.setAttribute('download', fileName);
-        }
+
+        // 3. Gán sự kiện 'click' cho các link Apple, Outlook, Yahoo
+        const icsLinkElements = document.querySelectorAll('#ics-calendar-link, #outlook-calendar-link, #yahoo-calendar-link');
+        
+        icsLinkElements.forEach(element => {
+            // Quan trọng: đặt href="#" để nó vẫn là một link có thể click
+            element.setAttribute('href', '#'); 
+            element.addEventListener('click', handleIcsDownload);
+        });
     });
 
     // --- KẾT THÚC CODE TẠO LINK LỊCH ---
