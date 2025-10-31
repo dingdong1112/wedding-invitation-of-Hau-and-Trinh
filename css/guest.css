@@ -222,3 +222,50 @@ svg {
   justify-content: center;
   align-items: center;
 }
+
+/* --- CSS CHO BẢNG ĐIỀU KHIỂN HIỆU ỨNG RƠI --- */
+#particle-controller {
+  position: fixed;
+  top: 70px; /* Nằm ngay dưới nút nhạc */
+  right: 20px;
+  z-index: 1030;
+}
+
+#particle-toggle-button {
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#particle-controls {
+  display: none; /* Ẩn bảng điều khiển mặc định */
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 220px;
+  padding: 15px;
+  background-color: var(--bs-body-bg); /* Tự động đổi màu theo theme */
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+#particle-controls.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+#particle-controls .control-group {
+  margin-bottom: 10px;
+}
+
+#particle-controls .control-group label {
+  font-size: 0.8rem;
+  margin-bottom: 5px;
+}

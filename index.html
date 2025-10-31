@@ -18,8 +18,10 @@
     <meta property="og:description" content="Website Thiệp Mời Cưới Online của Hậu và Trinh">
     <meta property="og:keywords"
         content="thiệp mời, đám cưới, thiệp mời kỹ thuật số, thiệp mời online, wedding invitation">
-    <meta property="og:image" content="https://wedding-invitation-of-hau-and-chin.vercel.app/assets/images/_HIP0017.webp">
-    <meta property="og:image:secure_url" content="https://wedding-invitation-of-hau-and-chin.vercel.app/assets/images/_HIP0017.webp">
+    <meta property="og:image"
+        content="https://wedding-invitation-of-hau-and-chin.vercel.app/assets/images/_HIP0017.webp">
+    <meta property="og:image:secure_url"
+        content="https://wedding-invitation-of-hau-and-chin.vercel.app/assets/images/_HIP0017.webp">
     <meta property="og:image:type" content="image/webp">
     <meta property="og:image:alt" content="Website Thiệp Mời Cưới Online của Hậu và Trinh">
     <meta property="og:image:width" content="980">
@@ -35,9 +37,11 @@
     <meta name="theme-color" content="#000000">
     <meta name="color-scheme" content="dark light">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="canonical" href="https://ulems.my.id/">
-    <link rel="icon" type="image/png" sizes="192x192" href="https://ulems.my.id/assets/images/icon-95x95.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="https://ulems.my.id/assets/images/icon-95x95.png">
+    <link rel="canonical" href="https://wedding-invitation-of-hau-and-chin.vercel.app/">
+    <link rel="icon" type="image/png" sizes="95x95"
+        href="https://wedding-invitation-of-hau-and-chin.vercel.app/assets/images/icon-95x95.png">
+    <link rel="apple-touch-icon" sizes="95x95"
+        href="https://wedding-invitation-of-hau-and-chin.vercel.app/assets/images/icon-95x95.png">
 
     <!-- Preconnect CDN -->
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
@@ -71,6 +75,7 @@
         integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous"></script>
     <script src="./dist/guest.js"></script>
     <script src="./js/libs/ics.js"></script>
+    <script src="./js/libs/confetti.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/ics.js@0.3.1/ics.min.js"></script>-->
 </head>
 <!-- Jika tidak menggunakan komentar, hapus atribut data-key dan data-url, serta abaikan file dashboard.html. -->
@@ -1297,6 +1302,48 @@
             <i class="fa-solid fa-circle-half-stroke"></i>
         </button>
     </div>
+
+    <!-- BẮT ĐẦU BẢNG ĐIỀU KHIỂN HIỆU ỨNG RƠI -->
+    <div id="particle-controller">
+        <!-- Nút để mở/đóng bảng điều khiển -->
+        <button type="button" id="particle-toggle-button"
+            class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </button>
+
+        <!-- Bảng điều khiển (bị ẩn mặc định) -->
+        <div id="particle-controls" class="shadow-lg rounded-4 border">
+            <div class="control-group">
+                <label for="particle-shape">Biểu tượng:</label>
+                <select id="particle-shape" class="form-select form-select-sm">
+                    <option value="confetti" selected>Kim tuyến</option>
+                    <option value="hearts">Trái tim ❤️</option>
+                    <option value="snow">Tuyết ❄️</option>
+                    <option value="stars">Ngôi sao ✨</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="particle-duration">Thời gian rơi:</label>
+                <select id="particle-duration" class="form-select form-select-sm">
+                    <option value="0">Dừng lại</option>
+                    <option value="60">1 phút</option>
+                    <option value="300">5 phút</option>
+                    <option value="600">10 phút</option>
+                    <option value="-1" selected>Rơi mãi</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="particle-size">Kích thước:</label>
+                <input type="range" id="particle-size" class="form-range" min="0.5" max="2.5" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <label for="particle-density">Mật độ rơi:</label>
+                <input type="range" id="particle-density" class="form-range" min="10" max="200" step="10" value="50">
+            </div>
+        </div>
+    </div>
+    <!-- KẾT THÚC BẢNG ĐIỀU KHIỂN -->
+
     <!--
 <div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
     --Theme Button
@@ -1318,8 +1365,8 @@
     <div class="loading-page bg-white-black" id="loading" style="opacity: 1;">
         <div class="d-flex justify-content-center align-items-center vh-100 overflow-y-auto">
             <div class="d-flex flex-column width-loading text-center">
-                <img src="./assets/images/placeholder.webp" data-src="./assets/images/icon-95x95.png" fetchpriority="high"
-                    class="img-fluid mb-3 mx-auto object-fit-cover opacity-0" alt="icon"
+                <img src="./assets/images/placeholder.webp" data-src="./assets/images/icon-95x95.png"
+                    fetchpriority="high" class="img-fluid mb-3 mx-auto object-fit-cover opacity-0" alt="icon"
                     style="width: 3.5rem; height: 3.5rem;">
                 <div class="progress" role="progressbar" style="height: 0.5rem;" aria-label="progress bar">
                     <div class="progress-bar" id="progress-bar" style="width: 0%"></div>

@@ -11,7 +11,7 @@ import { storage } from '../../common/storage.js';
 import { session } from '../../common/session.js';
 import { offline } from '../../common/offline.js';
 import { comment } from '../components/comment.js';
-import * as confetti from '../../libs/confetti.js';
+//import confetti from '../../libs/confetti.js';
 import { pool } from '../../connection/request.js';
 
 export const guest = (() => {
@@ -169,8 +169,12 @@ export const guest = (() => {
         slide();
         theme.spyTop();
 
-        confetti.basicAnimation();
-        util.timeOut(confetti.openAnimation, 1500);
+        //confetti.basicAnimation();
+        //util.timeOut(confetti.openAnimation, 1500);
+        if (typeof window.confetti === 'function') {
+            window.confetti();
+            util.timeOut(window.confetti, 1500);
+        }
 
         document.dispatchEvent(new Event('undangan.open'));
         util.changeOpacity(document.getElementById('welcome'), false).then((el) => el.remove());
@@ -213,7 +217,14 @@ export const guest = (() => {
             navigator.vibrate(500);
         }
 
-        confetti.tapTapAnimation(div, 100);
+        //confetti.tapTapAnimation(div, 100);
+         if (typeof window.confetti === 'function') {
+            window.confetti({
+                particleCount: 50,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
         util.changeOpacity(div, false).then((e) => e.remove());
     };
 
@@ -423,6 +434,107 @@ export const guest = (() => {
     };
     // --- KẾT THÚC CODE TẠO LINK LỊCH ---
 
+    // --- BẮT ĐẦU CODE ĐIỀU KHIỂN HIỆU ỨNG RƠI (PHIÊN BẢN HOÀN CHỈNH) ---
+    const setupParticleControls = () => {
+        const toggleButton = document.getElementById('particle-toggle-button');
+        const controlsPanel = document.getElementById('particle-controls');
+
+        const shapeSelect = document.getElementById('particle-shape');
+        const durationSelect = document.getElementById('particle-duration');
+        const sizeSlider = document.getElementById('particle-size');
+        const densitySlider = document.getElementById('particle-density');
+
+        if (!toggleButton) return; // Dừng lại nếu không tìm thấy các nút
+
+        let effectInterval = null;
+        let durationTimeout = null;
+
+        // Hàm dừng hiệu ứng hiện tại
+        const stopCurrentEffect = () => {
+            if (effectInterval) clearInterval(effectInterval);
+            if (durationTimeout) clearTimeout(durationTimeout);
+            effectInterval = null;
+            durationTimeout = null;
+        };
+
+        // Hàm chính để áp dụng hiệu ứng
+        const applyEffect = () => {
+            stopCurrentEffect();
+
+            const duration = parseInt(durationSelect.value);
+            if (duration === 0) return; // Dừng nếu người dùng chọn "Stop"
+
+            if (duration > 0) {
+                durationTimeout = setTimeout(stopCurrentEffect, duration * 1000);
+            }
+
+            const frame = () => {
+                // Đảm bảo window.confetti đã tồn tại
+                if (typeof window.confetti !== 'function') return;
+
+                const shape = shapeSelect.value;
+                const size = parseFloat(sizeSlider.value);
+                const density = parseInt(densitySlider.value);
+
+                let shapes;
+                switch (shape) {
+                    case 'hearts':
+                        // SỬA LỖI TẠI ĐÂY: Thư viện này không có shapeFromText, chúng ta dùng emoji
+                        shapes = ['❤️'];
+                        break;
+                    case 'snow':
+                        shapes = ['❄️'];
+                        break;
+                    case 'stars':
+                        shapes = ['✨'];
+                        break;
+                    default:
+                        shapes = ['square'];
+                }
+                confetti({
+                    particleCount: density / 5,
+                    angle: 90,
+                    spread: 180,
+                    origin: { x: Math.random(), y: Math.random() - 0.2 },
+                    scalar: size,
+                    shapes: shapes,
+                    flat: true,
+                    gravity: 0.5,
+                    drift: Math.random() * 0.5 - 0.25,
+                    disableForReducedMotion: true,
+                    colors: (shape === 'snow') ? ['#ffffff', '#f0f0f0', '#e0e0e0'] : undefined
+                });
+            };
+
+            const intervalTime = Math.max(25000 / parseInt(densitySlider.value), 200);
+            effectInterval = setInterval(frame, intervalTime);
+        };
+
+        // Gắn sự kiện cho các nút điều khiển
+        toggleButton.addEventListener('click', () => {
+            controlsPanel.classList.toggle('show');
+        });
+
+        [shapeSelect, durationSelect, sizeSlider, densitySlider].forEach(el => {
+            el.addEventListener('change', () => {
+                // Thay vì gọi applyEffect trực tiếp, chúng ta gọi hàm kiểm tra
+                checkForConfettiAndRun();
+            });
+        });
+
+        function checkForConfettiAndRun() {
+            if (typeof window.confetti === 'function') {
+                applyEffect();
+            } else {
+                setTimeout(checkForConfettiAndRun, 100);
+            }
+        }
+        
+        checkForConfettiAndRun();
+
+    };
+    // --- KẾT THÚC CODE ĐIỀU KHIỂN HIỆU ỨNG RƠI ---
+
     /**
      * @returns {object}
      */
@@ -448,6 +560,7 @@ export const guest = (() => {
             ]);
             // CHẠY HÀM TẠO LỊCH CỦA CHÚNG TA SAU KHI MỌI THỨ ĐÃ TẢI XONG
             initializeCalendarLinks();
+            setupParticleControls();
         });
 
         return {
