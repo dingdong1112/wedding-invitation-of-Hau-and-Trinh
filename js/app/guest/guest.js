@@ -420,7 +420,6 @@ export const guest = (() => {
             element.setAttribute('href', dataUri);
             element.setAttribute('download', fileName);
         });
-        console.log("DEBUG: Đã gán link lịch thành công từ trong file app/guest/guest.js!");
     };
     // --- KẾT THÚC CODE TẠO LINK LỊCH ---
 
