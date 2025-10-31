@@ -434,117 +434,117 @@ export const guest = (() => {
     };
     // --- KẾT THÚC CODE TẠO LINK LỊCH ---
 
-    // --- BẮT ĐẦU CODE ĐIỀU KHIỂN HIỆU ỨNG RƠI (PHIÊN BẢN HOÀN CHỈNH) ---
-    const setupParticleControls = () => {
-        const toggleButton = document.getElementById('particle-toggle-button');
-        const controlsPanel = document.getElementById('particle-controls');
+    // --- BẮT ĐẦU CODE ĐIỀU KHIỂN HIỆU ỨNG RƠI (PHIÊN BẢN TÁI CẤU TRÚC) ---
+const setupParticleControls = () => {
+    // === Phần 1: Lấy các element cần thiết ===
+    const toggleButton = document.getElementById('particle-toggle-button');
+    const controlsPanel = document.getElementById('particle-controls');
+    
+    const shapeSelect = document.getElementById('particle-shape');
+    const durationSelect = document.getElementById('particle-duration');
+    const sizeSlider = document.getElementById('particle-size');
+    const densitySlider = document.getElementById('particle-density');
 
-        const shapeSelect = document.getElementById('particle-shape');
-        const durationSelect = document.getElementById('particle-duration');
-        const sizeSlider = document.getElementById('particle-size');
-        const densitySlider = document.getElementById('particle-density');
+    if (!toggleButton) return;
 
-        if (!toggleButton) return; // Dừng lại nếu không tìm thấy các nút
+    // === Phần 2: Khai báo các biến trạng thái ===
+    // Đặt các biến này ở phạm vi rộng hơn để chúng không bị reset
+    let effectInterval = null;
+    let durationTimeout = null;
 
-        let effectInterval = null;
-        let durationTimeout = null;
+    // === Phần 3: Hàm chính để bắn confetti MỘT LẦN ===
+    const fireConfetti = () => {
+        if (typeof window.confetti !== 'function') return;
 
-        // Hàm dừng hiệu ứng hiện tại
-        const stopCurrentEffect = () => {
-            if (effectInterval) clearInterval(effectInterval);
-            if (durationTimeout) clearTimeout(durationTimeout);
-            effectInterval = null;
-            durationTimeout = null;
+        const shape = shapeSelect.value;
+        const size = parseFloat(sizeSlider.value);
+        const density = parseInt(densitySlider.value);
+        
+        let confettiOptions = {
+            particleCount: density / 5, // Bắn một lượng nhỏ mỗi lần
+            angle: 90,
+            spread: 180,
+            origin: { x: Math.random(), y: Math.random() - 0.2 },
+            scalar: size,
+            flat: true,
+            gravity: 0.5,
+            drift: Math.random() * 0.5 - 0.25,
+            disableForReducedMotion: true
         };
+        
+        const emojiVariation = '\uFE0F';
 
-        // Hàm chính để áp dụng hiệu ứng
-        const applyEffect = () => {
-            stopCurrentEffect();
+        switch (shape) {
+            case 'hearts':
+                confettiOptions.symbols = ['❤️' + emojiVariation];
+                confettiOptions.colors = undefined; 
+                confettiOptions.scalar = size * 1.5;
+                confettiOptions.gravity = 0.3;
+                break;
+            case 'snow':
+                confettiOptions.symbols = ['❄️' + emojiVariation];
+                confettiOptions.colors = undefined; 
+                confettiOptions.scalar = size * 1.2;
+                confettiOptions.drift = Math.random() * 0.7 - 0.35;
+                break;
+            case 'stars':
+                confettiOptions.symbols = ['✨' + emojiVariation];
+                confettiOptions.colors = undefined;
+                confettiOptions.scalar = size * 1.3;
+                break;
+            default: // confetti (hình vuông)
+                confettiOptions.shapes = ['square'];
+                confettiOptions.colors = undefined; 
+                break;
+        }
+        
+        window.confetti(confettiOptions);
+    };
 
-            const duration = parseInt(durationSelect.value);
-            if (duration === 0) return; // Dừng nếu người dùng chọn "Stop"
+    // === Phần 4: Hàm để Bắt đầu hoặc Cập nhật hiệu ứng ===
+    const startOrUpdateEffect = () => {
+        // LUÔN LUÔN dọn dẹp hiệu ứng cũ trước khi làm bất cứ điều gì
+        if (effectInterval) clearInterval(effectInterval);
+        if (durationTimeout) clearTimeout(durationTimeout);
 
-            if (duration > 0) {
-                durationTimeout = setTimeout(stopCurrentEffect, duration * 1000);
-            }
+        const duration = parseInt(durationSelect.value);
+        if (duration === 0) return; // Nếu chọn "Dừng lại", chỉ cần dọn dẹp là đủ
 
-            const frame = () => {
-                if (typeof window.confetti !== 'function') return;
-
-                const shape = shapeSelect.value;
-                const size = parseFloat(sizeSlider.value);
-                const density = parseInt(densitySlider.value);
-
-                // Chuẩn bị các tùy chọn cho confetti
-                let confettiOptions = {
-                    particleCount: density / 5,
-                    angle: 90,
-                    spread: 180,
-                    origin: { x: Math.random(), y: Math.random() - 0.2 },
-                    scalar: size, // Scalar hoạt động tốt nhất với các hình cơ bản
-                    flat: true,
-                    gravity: 0.5,
-                    drift: Math.random() * 0.5 - 0.25,
-                    disableForReducedMotion: true
-                };
-
-                // Tùy chỉnh các tùy chọn dựa trên hình dạng đã chọn
-                switch (shape) {
-                    case 'hearts':
-                        // SỬA LỖI: Dùng 'symbols' thay cho 'shapes' và xóa 'scalar'
-                        confettiOptions.symbols = ['❤️'];
-                        confettiOptions.scalar = size * 1.5; // Emoji có thể cần to hơn một chút
-                        confettiOptions.gravity = 0.3; // Tim rơi chậm hơn
-                        break;
-                    case 'snow':
-                        // SỬA LỖI: Dùng 'symbols'
-                        confettiOptions.symbols = ['❄️'];
-                        confettiOptions.scalar = size * 1.2;
-                        confettiOptions.colors = ['#ffffff', '#f0f0f0', '#e0e0e0'];
-                        confettiOptions.drift = Math.random() * 0.7 - 0.35; // Tuyết bay lượn nhiều hơn
-                        break;
-                    case 'stars':
-                        // SỬA LỖI: Dùng 'symbols'
-                        confettiOptions.symbols = ['✨'];
-                        confettiOptions.scalar = size * 1.3;
-                        break;
-                    default: // confetti (hình vuông)
-                        confettiOptions.shapes = ['square'];
-                        // Tùy chọn `colors` mặc định sẽ được sử dụng
-                        break;
-                }
-                // Gọi hàm confetti với các tùy chọn đã được cấu hình
-                window.confetti(confettiOptions);
-            };
-
-            const intervalTime = Math.max(25000 / parseInt(densitySlider.value), 200);
-            effectInterval = setInterval(frame, intervalTime);
-        };
-
-        // Gắn sự kiện cho các nút điều khiển
-        toggleButton.addEventListener('click', () => {
-            controlsPanel.classList.toggle('show');
-        });
-
-        [shapeSelect, durationSelect, sizeSlider, densitySlider].forEach(el => {
-            el.addEventListener('change', () => {
-                // Thay vì gọi applyEffect trực tiếp, chúng ta gọi hàm kiểm tra
-                checkForConfettiAndRun();
-            });
-        });
-
-        function checkForConfettiAndRun() {
-            if (typeof window.confetti === 'function') {
-                applyEffect();
-            } else {
-                setTimeout(checkForConfettiAndRun, 100);
-            }
+        // Lên lịch để tự động dừng (nếu cần)
+        if (duration > 0) {
+            durationTimeout = setTimeout(() => {
+                if (effectInterval) clearInterval(effectInterval);
+            }, duration * 1000);
         }
 
-        checkForConfettiAndRun();
-
+        // Tạo một vòng lặp MỚI với các cài đặt hiện tại
+        const density = parseInt(densitySlider.value);
+        const intervalTime = Math.max(25000 / density, 200);
+        effectInterval = setInterval(fireConfetti, intervalTime);
     };
-    // --- KẾT THÚC CODE ĐIỀU KHIỂN HIỆU ỨNG RƠI ---
+
+    // === Phần 5: Gắn các sự kiện ===
+    toggleButton.addEventListener('click', () => {
+        controlsPanel.classList.toggle('show');
+    });
+
+    // Tất cả các thay đổi trong bảng điều khiển đều sẽ gọi cùng một hàm
+    [shapeSelect, durationSelect, sizeSlider, densitySlider].forEach(el => {
+        el.addEventListener('change', startOrUpdateEffect);
+    });
+
+    // === Phần 6: Khởi chạy lần đầu ===
+    // Chờ cho thư viện sẵn sàng rồi mới bắt đầu
+    function initialLaunch() {
+        if (typeof window.confetti === 'function') {
+            startOrUpdateEffect();
+        } else {
+            setTimeout(initialLaunch, 100);
+        }
+    }
+    initialLaunch();
+};
+// --- KẾT THÚC CODE ĐIỀU KHIỂN HIỆU ỨNG RƠI ---
 
     /**
      * @returns {object}

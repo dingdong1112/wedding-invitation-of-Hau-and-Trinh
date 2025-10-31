@@ -1,7 +1,7 @@
 import { dto } from '../../connection/dto.js';
 import { storage } from '../../common/storage.js';
 import { session } from '../../common/session.js';
-import { tapTapAnimation } from '../../libs/confetti.js';
+//import { tapTapAnimation } from '../../libs/confetti.js';
 import { request, HTTP_PATCH, HTTP_POST, HTTP_STATUS_CREATED } from '../../connection/request.js';
 
 export const like = (() => {
@@ -98,7 +98,22 @@ export const like = (() => {
         const notLiked = !likes.has(uuid) && div.getAttribute('data-liked') !== 'true';
 
         if (isTapTap && notLiked) {
-            tapTapAnimation(div);
+            // TÁI TẠO HIỆU ỨNG TAPTAPANIMATION BẰNG CONFETTI GỐC
+            if (typeof window.confetti === 'function') {
+                const rect = div.getBoundingClientRect();
+                const x = (rect.left + rect.right) / 2 / window.innerWidth;
+                const y = (rect.top + rect.bottom) / 2 / window.innerHeight;
+
+                window.confetti({
+                    particleCount: 50,
+                    spread: 70,
+                    origin: { x, y },
+                    scalar: 1,
+                    ticks: 200,
+                    gravity: 1,
+                    disableForReducedMotion: true,
+                });
+            }
 
             div.setAttribute('data-liked', 'true');
             await love(getButtonLike(uuid));
