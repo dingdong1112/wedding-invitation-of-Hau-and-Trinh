@@ -62,8 +62,8 @@ import { guest } from './app/guest/guest.js';
         // ===================================================================
         const eventTitle = "Lễ Cưới Duy Hậu & Diễm Trinh";
         const eventDescription = "Trân trọng kính mời bạn đến tham dự lễ thành hôn của chúng tôi. Sự hiện diện của bạn là niềm vinh hạnh cho gia đình chúng tôi.";
-        const eventLocation = "Địa chỉ tổ chức sự kiện, ABC, XYZ";
-        const eventDurationHours = 4;
+        const eventLocation = "Địa chỉ tổ chức sự kiện, ABC, XYZ"; // Thay bằng địa chỉ của bạn
+        const eventDurationHours = 4; // Sự kiện kéo dài trong bao nhiêu giờ
         // ===================================================================
 
         const startTimeString = document.body.getAttribute('data-time');
@@ -72,7 +72,7 @@ import { guest } from './app/guest/guest.js';
         const startTime = new Date(startTimeString.replace(/-/g, '/'));
         const endTime = new Date(startTime.getTime() + eventDurationHours * 60 * 60 * 1000);
 
-        // --- Tạo link cho Google Calendar (giữ nguyên) ---
+        // --- Tạo link cho Google Calendar (không thay đổi) ---
         function formatGoogleDate(date) {
             return date.toISOString().replace(/-|:|\.\d+/g, '');
         }
@@ -82,42 +82,25 @@ import { guest } from './app/guest/guest.js';
             googleCalendarElement.href = googleLink;
         }
 
-        // --- PHẦN SỬA LỖI CHO CÁC LỊCH CÒN LẠI ---
-
-        // 1. Tạo sẵn nội dung file .ics một lần duy nhất để tối ưu
+        // --- GIẢI PHÁP DỨT ĐIỂM CHO APPLE, OUTLOOK, YAHOO BẰNG DATA URI ---
+        
+        // 1. Tạo nội dung file .ics
         const cal = ics();
         cal.addEvent(eventTitle, eventDescription, eventLocation, startTime, endTime);
         const icsFileContent = cal.build();
-        const blob = new Blob([icsFileContent], { type: 'text/calendar;charset=utf-8' });
+
+        // 2. Tạo Data URI: mã hóa nội dung file vào chính đường link
+        // encodeURIComponent là bắt buộc để xử lý các ký tự đặc biệt và xuống dòng
+        const dataUri = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsFileContent);
+
+        // 3. Gán link Data URI này cho các thẻ <a>
+        const icsLinkElements = document.querySelectorAll('#ics-calendar-link, #outlook-calendar-link, #yahoo-calendar-link');
         const fileName = "dam-cuoi.ics";
 
-        // 2. Hàm để kích hoạt việc tải file
-        function handleIcsDownload(event) {
-            // Ngăn link tự động nhảy trang
-            event.preventDefault(); 
-            
-            // Sử dụng FileSaver.js hoặc cách thủ công để tương thích rộng rãi
-            // Cách thủ công: tạo 1 thẻ <a> ẩn, gán link blob, click và xóa đi
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = fileName;
-            
-            // Thêm vào body để có thể click
-            document.body.appendChild(link);
-            link.click();
-            
-            // Dọn dẹp
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(link.href);
-        }
-
-        // 3. Gán sự kiện 'click' cho các link Apple, Outlook, Yahoo
-        const icsLinkElements = document.querySelectorAll('#ics-calendar-link, #outlook-calendar-link, #yahoo-calendar-link');
-        
         icsLinkElements.forEach(element => {
-            // Quan trọng: đặt href="#" để nó vẫn là một link có thể click
-            element.setAttribute('href', '#'); 
-            element.addEventListener('click', handleIcsDownload);
+            element.setAttribute('href', dataUri);
+            // Thêm thuộc tính download là một gợi ý quan trọng cho trình duyệt
+            element.setAttribute('download', fileName); 
         });
     });
 
