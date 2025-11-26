@@ -8,46 +8,93 @@ export const comment = (() => {
      let wishesData = [];
     let currentIndex = 0;
     let isWishesActive = true;
-    let wishTimeout = null;
-    let loopTimeout = null;
+    
+    // Biến lưu bộ đếm giờ
+    let hideTimer = null;
+    let nextTimer = null;
 
     const init = () => {
         setupFormSubmit();
         fetchWishes();
         setupToggleButton();
-        setupTouchEffect(); // Thêm xử lý chạm mobile
+        setupInteraction(); // Cài đặt tương tác Chuột/Cảm ứng
     };
 
-    // --- HÀM XÁO TRỘN MẢNG (FISHER-YATES SHUFFLE) ---
-    // Giúp lời chúc hiển thị ngẫu nhiên, không theo thứ tự
-    const shuffleArray = (array) => {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    };
-    
-    const fetchWishes = async () => {
-        try {
-            const response = await fetch(SCRIPT_URL);
-            const json = await response.json();
-            if (json.result === 'success' && json.data.length > 0) {
-                // Lọc dữ liệu rỗng
-                let rawData = json.data.filter(item => item.message && item.message.trim() !== "");
-                
-                // --- RANDOM HÓA DỮ LIỆU ---
-                wishesData = shuffleArray(rawData);
+    // --- 1. CÀI ĐẶT TƯƠNG TÁC (QUAN TRỌNG NHẤT) ---
+    const setupInteraction = () => {
+        const box = document.getElementById('wish-notification');
+        if (!box) return;
 
-                if (wishesData.length > 0) {
-                    if(isWishesActive) setTimeout(showNextWish, 3000);
-                }
+        // A. DÀNH CHO LAPTOP (Chuột)
+        // Khi chuột vào: Hủy lệnh ẩn -> Giữ nguyên hiển thị
+        box.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimer); 
+            // Đảm bảo trạng thái rõ nét
+            box.classList.add('is-hovered'); 
+        });
+
+        // Khi chuột ra: Đếm ngược 2s rồi ẩn
+        box.addEventListener('mouseleave', () => {
+            box.classList.remove('is-hovered');
+            // Nếu đang hiện thì mới hẹn giờ ẩn
+            if (box.classList.contains('show')) {
+                startHideTimer(2000); // Đọc xong bỏ chuột ra thì 2s sau mới ẩn
             }
-        } catch (error) { console.error(error); }
+        });
+
+        // B. DÀNH CHO ĐIỆN THOẠI (Cảm ứng)
+        // Chạm vào: Hủy ẩn -> Sáng lên
+        box.addEventListener('touchstart', () => {
+            clearTimeout(hideTimer);
+            box.classList.add('is-touched');
+        }, {passive: true});
+
+        // Thả tay ra: Đếm ngược 5s rồi ẩn
+        box.addEventListener('touchend', () => {
+            setTimeout(() => {
+                box.classList.remove('is-touched');
+                if (box.classList.contains('show')) {
+                    startHideTimer(5000); 
+                }
+            }, 200); // Delay nhỏ để mượt UI
+        }, {passive: true});
     };
 
-    // --- HÀM QUAN TRỌNG: HIỆN LỜI CHÚC ---
-   const showNextWish = () => {
+    // --- 2. HÀM BẮT ĐẦU ĐẾM NGƯỢC ĐỂ ẨN ---
+    const startHideTimer = (duration) => {
+        clearTimeout(hideTimer); // Xóa timer cũ nếu có
+        hideTimer = setTimeout(() => {
+            hideAndNext();
+        }, duration);
+    };
+
+    // --- 3. HÀM ẨN VÀ CHUYỂN TIẾP ---
+    const hideAndNext = () => {
+        const box = document.getElementById('wish-notification');
+        if (!box) return;
+
+        // Bắt đầu trượt ra
+        box.classList.remove('show');
+        
+        // Reset các trạng thái sáng (để lần sau hiện lên là mờ)
+        box.classList.remove('is-touched'); 
+        box.classList.remove('is-hovered');
+
+        // Đợi 0.8s cho CSS trượt xong hẳn rồi mới gọi cái mới
+        // (CSS transition đang để 0.6s, ta đợi 0.8s cho an toàn)
+        clearTimeout(nextTimer);
+        nextTimer = setTimeout(() => {
+            currentIndex++;
+            if (currentIndex >= wishesData.length) currentIndex = 0;
+            if (currentIndex === 0) shuffleArray(wishesData); 
+            
+            // Gọi cái tiếp theo
+            showNextWish();
+        }, 3000); // Nghỉ 3s giữa 2 tin
+    };
+
+    // --- 4. HÀM HIỂN THỊ ---
+    const showNextWish = () => {
         if (!isWishesActive) return;
 
         const box = document.getElementById('wish-notification');
@@ -56,95 +103,53 @@ export const comment = (() => {
 
         if (!box || wishesData.length === 0) return;
 
-        // 1. RESET TRẠNG THÁI TRƯỚC KHI HIỆN (Fix lỗi luôn sáng)
-        box.classList.remove('show');      // Đảm bảo đang ẩn
-        box.classList.remove('is-touched');// Xóa trạng thái chạm cũ
-        
-        // Buộc trình duyệt vẽ lại (Repaint) để hiệu ứng reset có tác dụng ngay
-        void box.offsetWidth; 
+        // Reset timer
+        clearTimeout(hideTimer);
+        clearTimeout(nextTimer);
 
-        // 2. CẬP NHẬT DỮ LIỆU MỚI
+        // Cập nhật nội dung
         const item = wishesData[currentIndex];
         nameEl.innerText = item.name;
         msgEl.innerText = item.message;
 
-        // 3. HIỆN LÊN (Trạng thái mờ mặc định của CSS .wish-box.show)
+        // Hiện lên (Trạng thái mờ mặc định)
         box.classList.add('show');
 
-        // 4. TÍNH TOÁN THỜI GIAN
-        let displayTime = 5000;
+        // Tính thời gian hiển thị tự động
+        let displayTime = 3000;
         const length = item.message.length;
-        if (length < 50) displayTime = 5000;
-        else if (length < 150) displayTime = 12000;
-        else displayTime = 20000;
+        if (length < 70) displayTime = 3000;
+        else if (length < 180) displayTime = 6000;
+        else displayTime = 9000;
 
-        // 5. HẸN GIỜ ẨN
-        wishTimeout = setTimeout(() => {
-            // Kiểm tra: Nếu người dùng đang hover chuột hoặc đang chạm tay vào -> ĐỪNG ẨN VỘI
-            if (box.matches(':hover') || box.classList.contains('is-touched')) {
-                
-                // Tạo vòng lặp kiểm tra mỗi 1s
-                // Chỉ khi nào người dùng bỏ tay ra/bỏ chuột ra thì mới ẩn
-                const checkInteract = setInterval(() => {
-                    const stillHover = box.matches(':hover');
-                    const stillTouch = box.classList.contains('is-touched');
-                    
-                    if (!stillHover && !stillTouch) {
-                        clearInterval(checkInteract);
-                        hideAndNext();
-                    }
-                }, 1000);
-                
-            } else {
-                hideAndNext();
-            }
-        }, displayTime);
-        
-        // Hàm phụ: Ẩn và chuyển tiếp
-        const hideAndNext = () => {
-            box.classList.remove('show'); // Trượt ra ngoài
-            
-            // Fix lỗi kẹt: Đợi 600ms (bằng thời gian transition CSS) để nó trượt hết ra ngoài
-            // Rồi mới tính thời gian nghỉ 3s
-            setTimeout(() => {
-                // Reset lại trạng thái một lần nữa cho chắc
-                box.classList.remove('is-touched');
-                
-                loopTimeout = setTimeout(() => {
-                    currentIndex++;
-                    if (currentIndex >= wishesData.length) currentIndex = 0;
-                    if (currentIndex === 0) shuffleArray(wishesData); 
-                    showNextWish();
-                }, 3000); // Nghỉ 3s
-            }, 600); 
-        };
+        // Bắt đầu đếm giờ ẩn (Nếu người dùng không tương tác)
+        startHideTimer(displayTime);
     };
 
-    // --- XỬ LÝ CHẠM TRÊN MOBILE (Sửa lại logic) ---
-    const setupTouchEffect = () => {
-        const box = document.getElementById('wish-notification');
-        if (box) {
-            // Chạm vào -> Sáng lên
-            box.addEventListener('touchstart', () => {
-                box.classList.add('is-touched');
-            }, {passive: true});
-
-            // Thả tay ra -> Vẫn giữ sáng thêm 3s cho đọc -> Rồi tự tắt sáng
-            box.addEventListener('touchend', () => {
-                setTimeout(() => {
-                    box.classList.remove('is-touched'); 
-                    // Sau khi remove class này, hàm checkInteract ở trên sẽ thấy và tự động gọi hideAndNext()
-                }, 3000); 
-            }, {passive: true});
-            
-            // Xử lý thêm click (đề phòng một số máy tính bảng)
-            box.addEventListener('click', () => {
-                 box.classList.toggle('is-touched');
-            });
+    // ... (Các phần fetchWishes, shuffleArray, setupFormSubmit giữ nguyên) ...
+    
+    const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
+        return array;
     };
 
-    // ... (Các phần setupToggleButton, setupFormSubmit giữ nguyên như cũ) ...
+    const fetchWishes = async () => {
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const json = await response.json();
+            if (json.result === 'success' && json.data.length > 0) {
+                let rawData = json.data.filter(item => item.message && item.message.trim() !== "");
+                wishesData = shuffleArray(rawData);
+                if (wishesData.length > 0) {
+                    if(isWishesActive) setTimeout(showNextWish, 4000);
+                }
+            }
+        } catch (error) { console.error(error); }
+    };
+
     const setupToggleButton = () => {
         const btn = document.getElementById('wishes-toggle-button');
         const box = document.getElementById('wish-notification');
@@ -157,8 +162,8 @@ export const comment = (() => {
                 } else {
                     btn.classList.remove('active');
                     if(box) box.classList.remove('show');
-                    clearTimeout(wishTimeout);
-                    clearTimeout(loopTimeout);
+                    clearTimeout(hideTimer);
+                    clearTimeout(nextTimer);
                 }
             });
         }
@@ -183,11 +188,14 @@ export const comment = (() => {
                         const tempWish = { name: data.get('Ten'), message: data.get('LoiChuc') };
                         wishesData.unshift(tempWish);
                         if(isWishesActive) {
-                            currentIndex = 0;
-                            clearTimeout(wishTimeout);
-                            clearTimeout(loopTimeout);
-                            document.getElementById('wish-notification')?.classList.remove('show');
-                            setTimeout(showNextWish, 500);
+                            // Reset quy trình để hiện tin mới ngay
+                            clearTimeout(hideTimer);
+                            clearTimeout(nextTimer);
+                            const box = document.getElementById('wish-notification');
+                            if(box) box.classList.remove('show');
+                            
+                            currentIndex = 0; // Đưa về đầu (tin mới nhất)
+                            setTimeout(showNextWish, 600);
                         }
                     })
                     .catch(error => { util.notify("Lỗi gửi!").error(); })

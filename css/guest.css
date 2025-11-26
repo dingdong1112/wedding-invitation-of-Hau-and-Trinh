@@ -639,152 +639,106 @@ svg {
   z-index: 2;
 }
 
-/* --- CSS POPUP LỜI CHÚC --- */
+/* --- CSS POPUP LỜI CHÚC (BẢN CHUẨN ĐÃ FIX) --- */
+
+/* Áp dụng chung cho CẢ Desktop và Mobile */
 .wish-box {
-  position: fixed;
-  top: 80px;
-  /* Cách đỉnh 80px để tránh đè nút nhạc */
-  right: 20px;
-  width: 320px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-left: 4px solid #ff4081;
-  /* Viền hồng bên trái */
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-  padding: 15px;
-  display: flex;
-  align-items: flex-start;
-  z-index: 9998;
-  /* Thấp hơn nút nhạc 1 xíu */
-
-  /* Hiệu ứng xuất hiện */
-  opacity: 0;
-  transform: translateX(100%);
-  /* Dịch sang phải để ẩn */
-  transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-  pointer-events: none;
-  /* Để không chặn click khi ẩn */
-}
-
-.wish-box.show {
-  opacity: 1;
-  transform: translateX(0);
-  pointer-events: auto;
-}
-
-.wish-avatar {
-  width: 40px;
-  height: 40px;
-  background: #fff0f5;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  margin-right: 12px;
-  flex-shrink: 0;
-}
-
-.wish-content h5 {
-  margin: 0 0 5px 0;
-  font-size: 0.95rem;
-  font-weight: bold;
-  color: #333;
-  font-family: 'Josefin Sans', sans-serif;
-}
-
-.wish-content p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #666;
-  line-height: 1.4;
-  /*display: -webkit-box;
-    /*-webkit-line-clamp: 3; /* Giới hạn 3 dòng 
-    -webkit-box-orient: vertical;
-    overflow: hidden;*/
-}
-
-/* Responsive trên mobile */
-@media screen and (max-width: 576px) {
-  .wish-box {
     position: fixed;
-    top: 80px;
+    top: 80px; /* Cách đỉnh 80px */
     right: 20px;
-    width: 300px;
-
-    /* Trạng thái mặc định: MỜ ẢO */
+    width: 320px;
+    
+    /* TRẠNG THÁI MẶC ĐỊNH: MỜ ẢO (GLASSMORPHISM) */
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
-
+    
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-left: 4px solid #ff4081;
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     color: rgba(0, 0, 0, 0.6);
-
+    
     padding: 12px;
     display: flex;
     align-items: flex-start;
     z-index: 9998;
+    
+    /* --- FIX LỖI KẸT & CHUYỂN ĐỘNG --- */
+    opacity: 0; 
+    transform: translateX(120%); /* Đẩy xa hẳn ra ngoài (120%) */
+    
+    /* Tách riêng transition */
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), 
+                opacity 0.6s ease,                             
+                background 0.3s ease,                          
+                box-shadow 0.3s ease,                          
+                backdrop-filter 0.3s ease,
+                color 0.3s ease;
+                
+    pointer-events: none; 
+    will-change: transform, opacity; 
+}
 
-    /* --- QUAN TRỌNG: FIX LỖI KẸT & CHUYỂN ĐỘNG --- */
-    opacity: 0;
-    transform: translateX(120%);
-    /* Đẩy xa hơn ra ngoài màn hình (120%) để chắc chắn ẩn */
+/* KHI HIỆN RA (VẪN GIỮ TRẠNG THÁI MỜ) */
+.wish-box.show {
+    opacity: 0.7; /* Chỉ hiện mờ 70% */
+    transform: translateX(0); /* Trượt vào */
+    pointer-events: auto; /* Cho phép tương tác */
+}
 
-    /* Tách riêng transition để kiểm soát tốt hơn */
-    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-      /* Chuyển động trượt */
-      opacity 0.6s ease,
-      /* Độ mờ */
-      background 0.3s ease,
-      /* Màu nền (khi hover) */
-      box-shadow 0.3s ease,
-      /* Bóng (khi hover) */
-      backdrop-filter 0.3s ease;
-    /* Độ nhòe (khi hover) */
-
-    pointer-events: none;
-    /* Không chặn click khi ẩn */
-    will-change: transform, opacity;
-    /* Tối ưu hiệu năng cho điện thoại */
-  }
-
-  /* Khi hiện ra (Vẫn giữ trạng thái MỜ) */
-  .wish-box.show {
-    opacity: 0.7;
-    /* Mờ 70% */
-    transform: translateX(0);
-    /* Trượt vào vị trí cũ */
-    pointer-events: auto;
-    /* Cho phép tương tác */
-  }
-
-  /* --- TRẠNG THÁI RÕ NÉT (Chỉ khi có class này hoặc hover) --- */
-  /* Lưu ý: Class .is-hovered sẽ do JS thêm vào khi cần */
-  .wish-box.is-touched,
-  .wish-box:hover {
-    background: rgba(255, 255, 255, 0.95) !important;
-    opacity: 1 !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+/* --- TRẠNG THÁI RÕ NÉT (KHI HOVER HOẶC CHẠM) --- */
+/* .is-hovered dùng cho JS thêm vào khi rê chuột */
+/* .is-touched dùng cho JS thêm vào khi chạm tay */
+.wish-box:hover, 
+.wish-box.is-touched, 
+.wish-box.is-hovered { 
+    background: rgba(255, 255, 255, 0.95) !important; /* Nền trắng đục */
+    opacity: 1 !important; /* Rõ nét 100% */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     backdrop-filter: blur(10px);
-    color: #000 !important;
-  }
+    color: #000 !important; /* Chữ đen rõ */
+    cursor: default;
+}
 
-  /* Mobile fix: Đảm bảo chiều rộng không bị tràn */
-  @media screen and (max-width: 576px) {
+/* Style cho Avatar */
+.wish-avatar {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 240, 245, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+/* Style cho Tên và Nội dung */
+.wish-content h5 {
+    margin: 0 0 5px 0;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: inherit; /* Ăn theo màu cha */
+    font-family: 'Josefin Sans', sans-serif;
+}
+
+.wish-content p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: inherit; /* Ăn theo màu cha */
+    line-height: 1.4;
+}
+
+/* RIÊNG CHO MOBILE: CHỈNH LẠI KÍCH THƯỚC */
+@media screen and (max-width: 576px) {
     .wish-box {
-      width: auto;
-      /* Tự động co giãn */
-      left: 20px;
-      /* Cách lề trái 20px */
-      right: 20px;
-      /* Cách lề phải 20px */
-      top: 70px;
+        width: auto; /* Tự động co giãn */
+        left: 20px;  
+        right: 20px; 
+        top: 70px;
     }
-  }
 }
 
 /* --- CSS NÚT BẬT/TẮT LỜI CHÚC --- */
