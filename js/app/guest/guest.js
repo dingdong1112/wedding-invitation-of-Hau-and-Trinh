@@ -570,6 +570,12 @@ export const guest = (() => {
 
         // === Phần 5: Gắn các sự kiện ===
         toggleButton.addEventListener('click', () => {
+            // ==> THÊM ĐOẠN NÀY: Đóng bảng nhạc nếu đang mở
+            if (window.musicPlayer && typeof window.musicPlayer.closePanel === 'function') {
+                window.musicPlayer.closePanel();
+            }
+
+            // Sau đó mới mở/đóng bảng pháo hoa
             controlsPanel.classList.toggle('show');
         });
 

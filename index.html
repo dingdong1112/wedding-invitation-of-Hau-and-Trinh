@@ -145,14 +145,14 @@
                             <!-- 1. Cây kim (Tonearm) -->
                             <div class="vinyl-needle">
                                 <svg viewBox="0 0 100 100" width="100%" height="100%" style="overflow: visible;">
-                                    <!-- Trục xoay của kim -->
+                                    <!-- Trục xoay -->
                                     <circle cx="90" cy="10" r="10" fill="#333" stroke="#555" stroke-width="2" />
-                                    <!-- Cần kim -->
-                                    <path d="M90 10 Q 85 40 50 80" stroke="#C0C0C0" stroke-width="6" fill="none"
+                                    <!-- Cần kim (Đã vẽ dài hơn và cong hơn) -->
+                                    <path d="M90 10 Q 80 40 40 105" stroke="#C0C0C0" stroke-width="5" fill="none"
                                         stroke-linecap="round" />
-                                    <!-- Đầu kim -->
-                                    <rect x="40" y="75" width="15" height="20" fill="#222"
-                                        transform="rotate(30 47.5 85)" />
+                                    <!-- Đầu kim (Chỉnh lại vị trí khớp với cần) -->
+                                    <rect x="56.5" y="96" width="10" height="14" fill="#222"
+                                        transform="rotate(35 38 67)" />
                                 </svg>
                             </div>
 
@@ -1314,66 +1314,115 @@
     <!-- Button Group -->
     <!-- CODE MỚI ĐỂ THAY THẾ -->
 
-    <!-- Nút Nhạc Cố Định Ở Đầu Trang -->
-    <div id="floating-music-button-wrapper">
-        <button type="button" id="button-music"
-            class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm" aria-label="Bật/Tắt nhạc"
-            data-offline-disabled="false">
-            <i class="fa-solid fa-circle-pause spin-button"></i>
-        </button>
-    </div>
-
-    <!-- Nút Đổi Giao Diện (giữ lại ở vị trí cũ và ẩn đi) -->
-    <div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
-        <button type="button" id="button-theme"
-            class="btn bg-light-dark border btn-sm rounded-circle d-none btn-transparent shadow-sm mt-3"
-            aria-label="Đổi giao diện" onclick="undangan.theme.change()">
-            <i class="fa-solid fa-circle-half-stroke"></i>
-        </button>
-    </div>
-
-    <!-- BẮT ĐẦU BẢNG ĐIỀU KHIỂN HIỆU ỨNG RƠI -->
-    <div id="particle-controller">
-        <!-- Nút để mở/đóng bảng điều khiển -->
-        <button type="button" id="particle-toggle-button"
-            class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
+    <!-- TRÌNH PHÁT NHẠC CHUYÊN NGHIỆP -->
+    <div id="music-player-container" class="music-widget shadow-lg">
+        <!-- Nút bật mở trình phát (Lúc thu gọn) -->
+        <button id="music-toggle-btn" class="btn-main-control spin-slow">
+            <i class="fa-solid fa-compact-disc"></i>
         </button>
 
-        <!-- Bảng điều khiển (bị ẩn mặc định) -->
-        <div id="particle-controls" class="shadow-lg rounded-5 border">
-            <div class="control-group">
-                <label for="particle-shape">Biểu tượng: </label>
-                <select id="particle-shape" class="form-select form-select-sm">
-                    <option value="confetti">Kim tuyến</option>
-                    <option value="svg-heart" selected>Trái tim ❤️</option>
-                    <option value="snow">Tuyết ❄️</option>
-                    <option value="stars">Ngôi sao ✨</option>
-                </select>
+        <!-- Bảng điều khiển (Lúc mở ra) -->
+        <div id="music-panel" class="music-panel d-none">
+            <!-- Tên bài hát -->
+            <div class="music-info mb-2">
+                <div class="scrolling-text">
+                    <span id="current-song-title">Đang tải bài hát...</span>
+                </div>
             </div>
-            <div class="control-group">
-                <label for="particle-duration">Thời gian rơi:</label>
-                <select id="particle-duration" class="form-select form-select-sm">
-                    <option value="0">Dừng lại</option>
-                    <option value="60">1 phút</option>
-                    <option value="300">5 phút</option>
-                    <option value="600">10 phút</option>
-                    <option value="-1" selected>Rơi mãi</option>
-                </select>
+
+            <!-- Điều khiển chính: Prev - Play - Next -->
+            <div class="music-controls d-flex justify-content-center align-items-center mb-2">
+                <button onclick="window.musicPlayer.prev()" class="btn-control small"><i
+                        class="fa-solid fa-backward-step"></i></button>
+                <button onclick="window.musicPlayer.toggle()" id="btn-play-pause" class="btn-control main mx-2"><i
+                        class="fa-solid fa-play"></i></button>
+                <button onclick="window.musicPlayer.next()" class="btn-control small"><i
+                        class="fa-solid fa-forward-step"></i></button>
             </div>
-            <div class="control-group">
-                <label for="particle-size">Kích thước:</label>
-                <input type="range" id="particle-size" class="form-range" min="0.5" max="2.5" step="0.1" value="1">
+
+            <!-- --- MỚI: Hàng nút chế độ (Shuffle & Loop) --- -->
+            <div class="music-modes d-flex justify-content-around align-items-center mb-2 px-4">
+                <!-- Nút Xáo bài -->
+                <button onclick="window.musicPlayer.toggleShuffle()" id="btn-shuffle" class="btn-control small"
+                    title="Xáo trộn">
+                    <i class="fa-solid fa-shuffle"></i>
+                </button>
+                <!-- Nút Lặp bài -->
+                <button onclick="window.musicPlayer.toggleLoop()" id="btn-loop" class="btn-control small"
+                    title="Chế độ lặp">
+                    <i class="fa-solid fa-repeat"></i>
+                </button>
             </div>
-            <div class="control-group">
-                <label for="particle-density">Mật độ rơi:</label>
-                <input type="range" id="particle-density" class="form-range" min="10" max="200" step="10" value="50">
+
+            <!-- Thanh âm lượng & Nút Playlist -->
+            <div class="music-extra d-flex justify-content-between align-items-center">
+                <div class="volume-wrapper d-flex align-items-center">
+                    <i class="fa-solid fa-volume-low me-1" style="font-size: 0.8rem;"></i>
+                    <input type="range" class="form-range volume-slider" min="0" max="1" step="0.1" value="0.8"
+                        oninput="window.musicPlayer.setVolume(this.value)">
+                </div>
+                <button onclick="window.musicPlayer.togglePlaylist()" class="btn-control small ms-2"><i
+                        class="fa-solid fa-list-ul"></i></button>
+            </div>
+
+            <!-- Danh sách bài hát -->
+            <div id="playlist-container" class="playlist-box d-none mt-2">
+                <ul id="playlist-ul" class="list-group list-group-flush small"></ul>
             </div>
         </div>
-    </div>
-    <!-- KẾT THÚC BẢNG ĐIỀU KHIỂN -->
 
-    <!--
+        <!-- Nút Đổi Giao Diện (giữ lại ở vị trí cũ và ẩn đi) -->
+        <div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
+            <button type="button" id="button-theme"
+                class="btn bg-light-dark border btn-sm rounded-circle d-none btn-transparent shadow-sm mt-3"
+                aria-label="Đổi giao diện" onclick="undangan.theme.change()">
+                <i class="fa-solid fa-circle-half-stroke"></i>
+            </button>
+        </div>
+
+        <!-- BẮT ĐẦU BẢNG ĐIỀU KHIỂN HIỆU ỨNG RƠI -->
+        <div id="particle-controller">
+            <!-- Nút để mở/đóng bảng điều khiển -->
+            <button type="button" id="particle-toggle-button"
+                class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </button>
+
+            <!-- Bảng điều khiển (bị ẩn mặc định) -->
+            <div id="particle-controls" class="shadow-lg rounded-5 border">
+                <div class="control-group">
+                    <label for="particle-shape">Biểu tượng: </label>
+                    <select id="particle-shape" class="form-select form-select-sm">
+                        <option value="confetti">Kim tuyến</option>
+                        <option value="svg-heart" selected>Trái tim ❤️</option>
+                        <option value="snow">Tuyết ❄️</option>
+                        <option value="stars">Ngôi sao ✨</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="particle-duration">Thời gian rơi:</label>
+                    <select id="particle-duration" class="form-select form-select-sm">
+                        <option value="0">Dừng lại</option>
+                        <option value="60">1 phút</option>
+                        <option value="300">5 phút</option>
+                        <option value="600">10 phút</option>
+                        <option value="-1" selected>Rơi mãi</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="particle-size">Kích thước:</label>
+                    <input type="range" id="particle-size" class="form-range" min="0.5" max="2.5" step="0.1" value="1">
+                </div>
+                <div class="control-group">
+                    <label for="particle-density">Mật độ rơi:</label>
+                    <input type="range" id="particle-density" class="form-range" min="10" max="200" step="10"
+                        value="50">
+                </div>
+            </div>
+        </div>
+        <!-- KẾT THÚC BẢNG ĐIỀU KHIỂN -->
+
+        <!--
 <div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
     --Theme Button
     <button type="button" id="button-theme"
@@ -1390,60 +1439,60 @@
     </button>
 </div>
 -->
-    <!-- Loading Page -->
-    <div class="loading-page bg-white-black" id="loading" style="opacity: 1;">
-        <div class="d-flex justify-content-center align-items-center vh-100 overflow-y-auto">
-            <div class="d-flex flex-column width-loading text-center">
-                <img src="./assets/images/placeholder.webp" data-src="./assets/images/icon-95x95.png"
-                    fetchpriority="high" class="img-fluid mb-3 mx-auto object-fit-cover opacity-0" alt="icon"
-                    style="width: 3.5rem; height: 3.5rem;">
-                <div class="progress" role="progressbar" style="height: 0.5rem;" aria-label="progress bar">
-                    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
-                </div>
-                <small class="d-none mt-1 text-theme-auto" id="progress-info" style="font-size: 0.8rem;">Booting
-                    application...</small>
-                <noscript>
-                    <small class="mt-1 text-danger">Sorry, this invitation requires javascript to work</small>
-                </noscript>
-            </div>
-        </div>
-        <div class="text-center position-fixed w-100" style="bottom: 8%; left: 0;">
-            <div class="d-flex flex-column">
-                <small class="text-secondary">from</small>
-                <small class="text-theme-auto"><i class="fa-brands fa-github me-1"></i>duyhau1998</small>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Image -->
-    <div class="modal fade" id="modal-image" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border border-0">
-                <div class="modal-body p-0">
-                    <div class="d-flex position-absolute top-0 end-0">
-                        <a class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
-                            role="button" target="_blank" href="./assets/images/placeholder.webp"
-                            id="button-modal-click">
-                            <i class="fa-solid fa-arrow-up-right-from-square" style="width: 1em !important;"></i>
-                        </a>
-                        <button
-                            class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
-                            id="button-modal-download">
-                            <i class="fa-solid fa-download" style="width: 1em !important;"></i>
-                        </button>
-                        <button
-                            class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
-                            data-bs-dismiss="modal">
-                            <i class="fa-solid fa-circle-xmark" style="width: 1em !important;"></i>
-                        </button>
+        <!-- Loading Page -->
+        <div class="loading-page bg-white-black" id="loading" style="opacity: 1;">
+            <div class="d-flex justify-content-center align-items-center vh-100 overflow-y-auto">
+                <div class="d-flex flex-column width-loading text-center">
+                    <img src="./assets/images/placeholder.webp" data-src="./assets/images/icon-95x95.png"
+                        fetchpriority="high" class="img-fluid mb-3 mx-auto object-fit-cover opacity-0" alt="icon"
+                        style="width: 3.5rem; height: 3.5rem;">
+                    <div class="progress" role="progressbar" style="height: 0.5rem;" aria-label="progress bar">
+                        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
                     </div>
-
-                    <img src="./assets/images/placeholder.webp" class="img-fluid w-100 rounded-4 cursor-pointer"
-                        alt="image" id="show-modal-image">
+                    <small class="d-none mt-1 text-theme-auto" id="progress-info" style="font-size: 0.8rem;">Booting
+                        application...</small>
+                    <noscript>
+                        <small class="mt-1 text-danger">Sorry, this invitation requires javascript to work</small>
+                    </noscript>
+                </div>
+            </div>
+            <div class="text-center position-fixed w-100" style="bottom: 8%; left: 0;">
+                <div class="d-flex flex-column">
+                    <small class="text-secondary">from</small>
+                    <small class="text-theme-auto"><i class="fa-brands fa-github me-1"></i>duyhau1998</small>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Modal Image -->
+        <div class="modal fade" id="modal-image" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 border border-0">
+                    <div class="modal-body p-0">
+                        <div class="d-flex position-absolute top-0 end-0">
+                            <a class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
+                                role="button" target="_blank" href="./assets/images/placeholder.webp"
+                                id="button-modal-click">
+                                <i class="fa-solid fa-arrow-up-right-from-square" style="width: 1em !important;"></i>
+                            </a>
+                            <button
+                                class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
+                                id="button-modal-download">
+                                <i class="fa-solid fa-download" style="width: 1em !important;"></i>
+                            </button>
+                            <button
+                                class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
+                                data-bs-dismiss="modal">
+                                <i class="fa-solid fa-circle-xmark" style="width: 1em !important;"></i>
+                            </button>
+                        </div>
+
+                        <img src="./assets/images/placeholder.webp" class="img-fluid w-100 rounded-4 cursor-pointer"
+                            alt="image" id="show-modal-image">
+                    </div>
+                </div>
+            </div>
+        </div>
 </body>
 
 </html>

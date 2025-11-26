@@ -344,11 +344,179 @@ svg {
 }
 
 .vinyl-wrapper.is-playing .vinyl-needle {
-    transform: rotate(0deg); /* Kim đưa vào đĩa */
+    transform: rotate(15deg); /* Tăng góc quay để kim vào sâu hơn */
 }
 
 /* Animation xoay tròn */
 @keyframes spinVinyl {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
+}
+
+/* --- MUSIC PLAYER STYLES --- */
+.music-widget {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* Nút tròn xoay lúc thu gọn */
+.btn-main-control {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(33, 37, 41, 0.9); /* Màu đen mờ */
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+}
+
+.btn-main-control:hover {
+    transform: scale(1.1);
+    background: black;
+}
+
+.spin-slow {
+    animation: spinVinyl 4s linear infinite;
+}
+
+/* Bảng điều khiển chính */
+.music-panel {
+    background: rgba(33, 37, 41, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    border-radius: 20px; /* Bo góc siêu mịn */
+    width: 220px;
+    margin-top: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    transform-origin: top right;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.8) translateY(-10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Chữ chạy */
+.music-info {
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 0.85rem;
+    text-align: center;
+    color: #ddd;
+}
+
+/* Nút bấm điều khiển */
+.btn-control {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-control.main {
+    width: 40px;
+    height: 40px;
+    background: white;
+    color: black;
+    border-radius: 50%;
+    font-size: 1rem;
+}
+
+.btn-control.small {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    font-size: 0.8rem;
+}
+
+.btn-control:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+/* Thanh volume */
+.volume-slider {
+    width: 80px;
+    height: 4px;
+    border-radius: 5px;
+    accent-color: white; /* Màu thanh kéo */
+}
+
+/* Danh sách phát */
+.playlist-box {
+    max-height: 150px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+.playlist-item {
+    background: transparent !important;
+    color: #ccc !important;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.playlist-item:hover, .playlist-item.active {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+/* Ẩn scrollbar */
+.playlist-box::-webkit-scrollbar { width: 4px; }
+.playlist-box::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
+
+/* --- CSS NÂNG CAO CHO PLAYER --- */
+
+/* Trạng thái nút đang BẬT (Active) */
+.btn-control.active {
+    color: #ff4081 !important; /* Màu hồng/đỏ nổi bật */
+    background: rgba(255, 255, 255, 0.2);
+    font-weight: bold;
+}
+
+/* Xử lý nút Loop khi ở chế độ "Lặp 1 bài" */
+.btn-control.loop-one {
+    color: #ff4081 !important;
+    position: relative;
+}
+
+/* Tạo số 1 nhỏ xíu nằm trên nút Loop */
+.btn-control.loop-one::after {
+    content: '1';
+    position: absolute;
+    font-size: 0.6rem;
+    font-weight: 900;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ff4081;
+    color: white;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
 }
