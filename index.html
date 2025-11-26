@@ -140,9 +140,38 @@
                         <h1 class="font-esthetic pt-5 pb-4 fw-medium" style="font-size: 2.25rem;">We are getting
                             married!</h1>
 
-                        <img src="./assets/images/placeholder.webp" data-src="./assets/images/_HIP0017.webp" alt="bg"
-                            onclick="undangan.guest.modal(this)"
-                            class="img-center-crop rounded-circle border border-3 border-light shadow my-4 mx-auto cursor-pointer">
+                        <!-- BẮT ĐẦU CẤU TRÚC ĐĨA THAN -->
+                        <div id="vinyl-container" class="vinyl-wrapper mx-auto my-4">
+                            <!-- 1. Cây kim (Tonearm) -->
+                            <div class="vinyl-needle">
+                                <svg viewBox="0 0 100 100" width="100%" height="100%" style="overflow: visible;">
+                                    <!-- Trục xoay của kim -->
+                                    <circle cx="90" cy="10" r="10" fill="#333" stroke="#555" stroke-width="2" />
+                                    <!-- Cần kim -->
+                                    <path d="M90 10 Q 85 40 50 80" stroke="#C0C0C0" stroke-width="6" fill="none"
+                                        stroke-linecap="round" />
+                                    <!-- Đầu kim -->
+                                    <rect x="40" y="75" width="15" height="20" fill="#222"
+                                        transform="rotate(30 47.5 85)" />
+                                </svg>
+                            </div>
+
+                            <!-- 2. Đĩa nhạc (Phần sẽ xoay) -->
+                            <div class="vinyl-disk">
+                                <!-- Ảnh gốc của bạn (Đã điều chỉnh class để vừa khít khung đĩa) -->
+                                <img src="./assets/images/placeholder.webp" data-src="./assets/images/_HIP0017.webp"
+                                    alt="bg" onclick="undangan.guest.modal(this)"
+                                    class="img-center-crop rounded-circle shadow cursor-pointer w-100 h-100"
+                                    style="object-fit: cover;">
+
+                                <!-- Lỗ tròn ở giữa -->
+                                <div class="vinyl-hole"></div>
+
+                                <!-- Hiệu ứng vân đĩa than -->
+                                <div class="vinyl-grooves"></div>
+                            </div>
+                        </div>
+                        <!-- KẾT THÚC CẤU TRÚC ĐĨA THAN -->
 
                         <div class="wavy-text">
                             <span>D</span><span>u</span><span>y</span><span>&nbsp;</span><span>H</span><span>ậ</span><span>u</span><span>&nbsp;</span><span>&</span><span>&nbsp;</span><span>D</span><span>i</span><span>ễ</span><span>m</span><span>&nbsp;</span><span>T</span><span>r</span><span>i</span><span>n</span><span>h</span>

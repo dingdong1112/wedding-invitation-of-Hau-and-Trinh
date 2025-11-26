@@ -269,3 +269,86 @@ svg {
   font-size: 0.8rem;
   margin-bottom: 5px;
 }
+
+/* --- CSS CHO ĐĨA THAN --- */
+
+/* 1. Khung bao ngoài */
+.vinyl-wrapper {
+    position: relative;
+    width: 14rem; /* Kích thước đĩa */
+    height: 14rem;
+    z-index: 10;
+}
+
+/* 2. Đĩa nhạc (Phần sẽ xoay) */
+.vinyl-disk {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 4px solid #1a1a1a; /* Viền đen giống đĩa than */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    overflow: hidden;
+    /* Mặc định là dừng */
+    animation: spinVinyl 8s linear infinite;
+    animation-play-state: paused; 
+    transition: transform 0.5s ease;
+}
+
+/* 3. Lỗ tròn ở giữa */
+.vinyl-hole {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background-color: #1a1a1a; /* Màu lỗ đen */
+    border: 2px solid #fff; /* Viền trắng nhỏ */
+    border-radius: 50%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* 4. Vân đĩa than (Tạo cảm giác nhựa bóng) */
+.vinyl-grooves {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 50%;
+    background: repeating-radial-gradient(
+      #0000 0 4px, 
+      #00000010 5px 6px
+    );
+    pointer-events: none;
+    z-index: 4;
+}
+
+/* 5. Cây kim (Tonearm) */
+.vinyl-needle {
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 100px;
+    height: 100px;
+    z-index: 20;
+    transform-origin: 90px 10px; /* Xoay quanh trục góc trên phải */
+    transform: rotate(-45deg); /* Trạng thái nghỉ (gác kim ra ngoài) */
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none; /* Để không che nút bấm vào ảnh */
+    filter: drop-shadow(2px 5px 2px rgba(0,0,0,0.3));
+}
+
+/* --- TRẠNG THÁI KHI NHẠC CHẠY --- */
+.vinyl-wrapper.is-playing .vinyl-disk {
+    animation-play-state: running; /* Đĩa quay */
+}
+
+.vinyl-wrapper.is-playing .vinyl-needle {
+    transform: rotate(0deg); /* Kim đưa vào đĩa */
+}
+
+/* Animation xoay tròn */
+@keyframes spinVinyl {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

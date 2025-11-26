@@ -6,6 +6,7 @@ export const audio = (() => {
 
     const statePlay = '<i class="fa-solid fa-circle-pause spin-button"></i>';
     const statePause = '<i class="fa-solid fa-circle-play"></i>';
+    const vinylContainer = document.getElementById('vinyl-container'); // Lấy element đĩa than
 
     /**
      * @param {boolean} [playOnOpen=true]
@@ -54,6 +55,7 @@ export const audio = (() => {
                 isPlay = true;
                 music.disabled = false;
                 music.innerHTML = statePlay;
+        if(vinylContainer) vinylContainer.classList.add('is-playing');
             } catch (err) {
                 isPlay = false;
                 util.notify(err).error();
@@ -67,6 +69,7 @@ export const audio = (() => {
             isPlay = false;
             audioEl.pause();
             music.innerHTML = statePause;
+            if(vinylContainer) vinylContainer.classList.remove('is-playing');
         };
 
         document.addEventListener('undangan.open', () => {
