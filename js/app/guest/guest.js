@@ -459,62 +459,87 @@ export const guest = (() => {
             const shape = shapeSelect.value;
             const size = parseFloat(sizeSlider.value);
             const density = parseInt(densitySlider.value);
-            // --- KHO MÃ SVG (Dữ liệu hình dáng) ---
+            // --- KHO MÃ SVG (DATA SHAPES) ---
 
-            // 1. Trái tim đặc (Solid Heart)
-            const pathHeart = "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z";
+            // 1. BỘ SƯU TẬP BÔNG TUYẾT (SNOWFLAKES)
+            const snowPaths = [
+                // Mẫu 1: Tuyết tinh thể cổ điển (giống hình số 2)
+                "M22 11h-4.17l2.08-2.08c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0L14.91 11H9.09l-3.59-3.59c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L6.17 11H2c-.55 0-1 .45-1 1s.45 1 1 1h4.17l-2.08 2.08c-.39.39-.39 1.02 0 1.41.2.2.45.29.71.29s.51-.1.71-.29l3.59-3.59h5.82l3.59 3.59c.2.2.45.29.71.29s.51-.1.71-.29c.39-.39.39-1.02 0-1.41L17.83 13H22c.55 0 1-.45 1-1s-.45-1-1-1z",
+                // Mẫu 2: Tuyết lục giác đặc (giống hình số 5/10)
+                "M11.99 2L2 7.77v11.54L11.99 25.08l9.99-5.77V7.77L11.99 2zM12 22.4l-8-4.62v-9.24l8-4.62l8 4.62v9.24l-8 4.62z",
+                // Mẫu 3: Tuyết hoa văn (giống hình số 6)
+                "M21 11h-.77c.69-1.36 1.45-2.29 1.48-2.32a.992.992 0 0 0-.28-1.39c-.47-.27-1.08-.11-1.36.36-.03.05-.83 1.27-1.63 2.88L15.76 5.9c1.61-.8 2.83-1.6 2.88-1.63.47-.28.63-.89.36-1.36a1.003 1.003 0 0 0-1.39-.28c-.03.03-.96.79-2.32 1.48V3c0-.55-.45-1-1-1s-1 .45-1 1v1.11c-1.36-.69-2.29-1.45-2.32-1.48a.992.992 0 0 0-1.39.28c-.27.47-.11 1.08.36 1.36.05.03 1.27.83 2.88 1.63L8.24 10.53c-1.61-.8-2.83-1.6-2.88-1.63-.47-.27-1.08-.11-1.36.36-.28.47-.11 1.09.36 1.36.03.03.79.96 1.48 2.32H5c-.55 0-1 .45-1 1s.45 1 1 1h.83c-.69 1.36-1.45 2.29-1.48 2.32-.27.47-.11 1.08.36 1.36.19.11.39.17.6.17.31 0 .62-.12.8-.39.05-.03 1.27-.83 2.88-1.63l2.68 4.64c-1.61.8-2.83 1.6-2.88 1.63-.47.28-.63.89-.36 1.36.17.29.49.47.82.47.18 0 .36-.06.53-.16.03-.03.96-.79 2.32-1.48V23c0 .55.45 1 1 1s1-.45 1-1v-1.11c1.36.69 2.29 1.45 2.32 1.48.17.1.35.16.53.16.34 0 .65-.17.82-.47.27-.47.11-1.08-.36-1.36-.05-.03-1.27-.83-2.88-1.63l2.68-4.64c1.61.8 2.83 1.6 2.88 1.63.18.11.38.16.57.16.32 0 .63-.13.82-.4.27-.47.11-1.08-.36-1.36-.03-.03-.79-.96-1.48-2.32H21c.55 0 1-.45 1-1s-.45-1-1-1zm-9 1.83l-2.2-3.81 3.81 2.2-1.61.93v1.61zm-1.61-5.66l2.2 3.81-3.81-2.2 1.61-.93V7.17zM9.17 13l3.81 2.2-2.2-3.81-.93 1.61H8.24zm5.66 1.61l-2.2-3.81 3.81 2.2-1.61.93h-1.68z"
+            ];
 
-            // 2. Ngôi sao 5 cánh (Star)
-            const pathStar = "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z";
+            // 2. BỘ SƯU TẬP NGÔI SAO (STARS)
+            const starPaths = [
+                // Sao 5 cánh chuẩn
+                "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z",
+                // Sao 4 cánh (Lấp lánh)
+                "M12,2L14.5,9.5L22,12L14.5,14.5L12,22L9.5,14.5L2,12L9.5,9.5L12,2Z",
+                // Sao 8 cánh (Burst)
+                "M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"
+            ];
 
-            // 3. Bông tuyết (Snowflake)
-            const pathSnow = "M22 11h-4.17l2.08-2.08c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0L14.91 11H9.09l-3.59-3.59c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L6.17 11H2c-.55 0-1 .45-1 1s.45 1 1 1h4.17l-2.08 2.08c-.39.39-.39 1.02 0 1.41.2.2.45.29.71.29s.51-.1.71-.29l3.59-3.59h5.82l3.59 3.59c.2.2.45.29.71.29s.51-.1.71-.29c.39-.39.39-1.02 0-1.41L17.83 13H22c.55 0 1-.45 1-1s-.45-1-1-1z";
+            // 3. BỘ SƯU TẬP TRÁI TIM (HEARTS)
+            const heartPaths = [
+                // Tim đặc chuẩn (Material)
+                "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z",
+                // Tim bầu bĩnh (Cute)
+                "M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402m5.726-20.583c-2.203 0-4.446 1.042-5.726 3.238-1.285-2.206-3.522-3.248-5.719-3.248-3.183 0-6.281 2.187-6.281 6.191 0 4.661 5.571 9.429 12 15.809 6.43-6.38 12-11.148 12-15.809 0-4.011-3.095-6.181-6.274-6.181"
+            ];
 
-            // 4. Kim tuyến chữ nhật (Rectangle Confetti) - Vẽ hình chữ nhật dài
-            const pathRect = "M0 0h24v10H0z";
+            // 4. BỘ SƯU TẬP KIM TUYẾN (CONFETTI SHAPES)
+            const confettiPaths = [
+                "M0 0h24v10H0z", // Chữ nhật dài
+                "M0 0h12v12H0z", // Vuông
+                "M12 2L2 22h20L12 2z" // Tam giác
+            ];
+
+            const createShapes = (paths) => {
+                return paths.map(path => window.confetti.shapeFromPath({ path: path }));
+            };
 
             let confettiOptions = {
-                particleCount: density / 5, // Bắn một lượng nhỏ mỗi lần
+                particleCount: density / 5,
                 angle: 90,
                 spread: 180,
                 origin: { x: Math.random(), y: Math.random() - 0.2 },
-                scalar: size,
                 flat: true,
                 gravity: 0.5,
                 drift: Math.random() * 0.5 - 0.25,
                 disableForReducedMotion: true,
-
                 zIndex: 2000
             };
 
             // --- XỬ LÝ TỪNG LOẠI ---
             switch (shape) {
                 case 'svg-heart':
-                    confettiOptions.shapes = [window.confetti.shapeFromPath({ path: pathHeart })];
-                    confettiOptions.colors = ['#FFC0CB', '#FF69B4', '#FF1493', '#C71585', '#DC143C']; // Tone Hồng/Đỏ
+                    confettiOptions.shapes = createShapes(heartPaths);
+                    // Thêm màu trắng/hồng nhạt vào bộ màu đỏ để tạo chiều sâu
+                    confettiOptions.colors = ['#FFC0CB', '#FF69B4', '#FF1493', '#C71585', '#DC143C', '#FFFFFF'];
                     confettiOptions.scalar = size * 2;
                     break;
 
                 case 'stars':
-                    confettiOptions.shapes = [window.confetti.shapeFromPath({ path: pathStar })];
-                    confettiOptions.colors = ['#FFD700', '#FDB813', '#FFFACD', '#E5C100']; // Tone Vàng/Kim loại
-                    confettiOptions.scalar = size * 1.8;
+                    confettiOptions.shapes = createShapes(starPaths);
+                    confettiOptions.colors = ['#FFD700', '#FDB813', '#FFFACD', '#E5C100', '#FFFFFF'];
+                    confettiOptions.scalar = size * 1.5;
                     break;
 
                 case 'snow':
-                    confettiOptions.shapes = [window.confetti.shapeFromPath({ path: pathSnow })];
-                    confettiOptions.colors = ['#FFFFFF', '#E0FFFF', '#CAE9F5', '#F0F8FF']; // Tone Trắng/Xanh nhạt
+                    confettiOptions.shapes = createShapes(snowPaths);
+                    confettiOptions.colors = ['#FFFFFF', '#E0FFFF', '#CAE9F5', '#F0F8FF'];
                     confettiOptions.scalar = size * 1.5;
-                    confettiOptions.drift = Math.random() * 1 - 0.5; // Tuyết bay lượn nhiều hơn
-                    confettiOptions.gravity = 0.3; // Tuyết rơi chậm hơn
+                    confettiOptions.drift = Math.random() * 1 - 0.5;
+                    confettiOptions.gravity = 0.35; // Tuyết rơi chậm hơn
                     break;
 
                 case 'confetti':
                 default:
-                    // Kim tuyến dùng hình chữ nhật tự vẽ
-                    confettiOptions.shapes = [window.confetti.shapeFromPath({ path: pathRect })];
+                    confettiOptions.shapes = createShapes(confettiPaths);
                     confettiOptions.scalar = size * 1.2;
-                    // Kim tuyến dùng màu ngẫu nhiên mặc định (không set colors)
+                    // Để màu mặc định (random) cho kim tuyến
                     break;
             }
 
