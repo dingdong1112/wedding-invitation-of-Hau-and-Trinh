@@ -2,175 +2,250 @@
 @import url("animation.css");
 
 html {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
 .with-scrollbar {
-    scrollbar-width: auto !important;
-    -ms-overflow-style: auto !important;
+  scrollbar-width: auto !important;
+  -ms-overflow-style: auto !important;
 }
 
 .font-esthetic {
-    font-family: 'Dancing Script', cursive !important;
+  font-family: 'Dancing Script', cursive !important;
 }
 
 .font-esthetic2 {
-    font-family: 'Sacramento', cursive !important;
+  font-family: 'Sacramento', cursive !important;
 }
 
 .font-arabic {
-    font-family: 'Noto Naskh Arabic', serif !important;
+  font-family: 'Noto Naskh Arabic', serif !important;
 }
 
 .img-center-crop {
-    width: 13rem;
-    height: 13rem;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
+  width: 13rem;
+  height: 13rem;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
 }
 
 html[data-bs-theme="dark"] .btn-transparent {
-    background-color: rgba(var(--bs-dark-rgb), 0.5) !important;
-    backdrop-filter: blur(0.5rem);
+  background-color: rgba(var(--bs-dark-rgb), 0.5) !important;
+  backdrop-filter: blur(0.5rem);
 }
 
 html[data-bs-theme="light"] .btn-transparent {
-    background-color: rgba(var(--bs-light-rgb), 0.5) !important;
-    backdrop-filter: blur(0.5rem);
+  background-color: rgba(var(--bs-light-rgb), 0.5) !important;
+  backdrop-filter: blur(0.5rem);
 }
 
 .loading-page {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1056;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1056;
 }
 
 html[data-bs-theme="light"] .color-theme-svg {
-    color: rgb(255, 255, 255);
-    background-color: var(--bs-light);
+  color: rgb(255, 255, 255);
+  background-color: var(--bs-light);
 }
 
 html[data-bs-theme="dark"] .color-theme-svg {
-    color: rgb(0, 0, 0);
-    background-color: var(--bs-dark);
+  color: rgb(0, 0, 0);
+  background-color: var(--bs-dark);
 }
 
 html[data-bs-theme="light"] .bg-light-dark {
-    background-color: rgb(var(--bs-light-rgb));
+  background-color: rgb(var(--bs-light-rgb));
 }
 
 html[data-bs-theme="dark"] .bg-light-dark {
-    background-color: rgb(var(--bs-dark-rgb));
+  background-color: rgb(var(--bs-dark-rgb));
 }
 
 html[data-bs-theme="light"] .bg-white-black {
-    background-color: rgb(var(--bs-white-rgb));
+  background-color: rgb(var(--bs-white-rgb));
 }
 
 html[data-bs-theme="dark"] .bg-white-black {
-    background-color: rgb(var(--bs-black-rgb));
+  background-color: rgb(var(--bs-black-rgb));
 }
 
 .bg-cover-home {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    mask-image: linear-gradient(0.5turn, transparent, black 40%, black 60%, transparent);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mask-image: linear-gradient(0.5turn, transparent, black 40%, black 60%, transparent);
 }
 
 .width-loading {
-    width: 25%;
+  width: 25%;
 }
 
 .cursor-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 992px) {
-    .width-loading {
-        width: 50%;
-    }
+  .width-loading {
+    width: 50%;
+  }
 }
 
 @media screen and (max-width: 576px) {
-    .width-loading {
-        width: 75%;
-    }
+  .width-loading {
+    width: 75%;
+  }
 }
 
 svg {
-    display: block;
-    line-height: 0;
-    shape-rendering: geometricPrecision;
-    backface-visibility: hidden;
+  display: block;
+  line-height: 0;
+  shape-rendering: geometricPrecision;
+  backface-visibility: hidden;
 }
 
 .svg-wrapper {
-    overflow: hidden !important;
-    transform: translateZ(0) !important;
+  overflow: hidden !important;
+  transform: translateZ(0) !important;
 }
 
 .no-gap-bottom {
-    margin-bottom: -0.75rem !important;
+  margin-bottom: -0.75rem !important;
 }
 
 /* --- BẮT ĐẦU CODE HIỆU ỨNG GỢN SÓNG --- */
 
 /* 1. Định nghĩa chuyển động lên-xuống */
 @keyframes wavy {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
-    transform: translateY(-8px); /* Chữ sẽ nhô cao lên 8px */
+    transform: translateY(-8px);
+    /* Chữ sẽ nhô cao lên 8px */
   }
 }
 
 /* 2. Style cho cả cụm từ */
 .wavy-text {
-  display: flex; /* Dùng flexbox để các ký tự xếp hàng ngang */
+  display: flex;
+  /* Dùng flexbox để các ký tự xếp hàng ngang */
   justify-content: center;
-  font-family: 'Dancing Script', 'Esthetic', sans-serif; /* Giữ lại font chữ đẹp */
+  font-family: 'Dancing Script', 'Esthetic', sans-serif;
+  /* Giữ lại font chữ đẹp */
   font-size: 2.5rem;
-  margin: 1.5rem 0; /* Tương đương my-4 của Bootstrap */
-  -webkit-box-reflect: below -15px linear-gradient(transparent, rgba(0,0,0,0.2)); /* Hiệu ứng phản chiếu mờ ảo (tùy chọn) */
+  margin: 1.5rem 0;
+  /* Tương đương my-4 của Bootstrap */
+  -webkit-box-reflect: below -15px linear-gradient(transparent, rgba(0, 0, 0, 0.2));
+  /* Hiệu ứng phản chiếu mờ ảo (tùy chọn) */
 }
 
 /* 3. Style và áp dụng animation cho từng ký tự */
 .wavy-text span {
   position: relative;
   display: inline-block;
-  color: #ffffff; /* Đảm bảo chữ màu trắng */
+  color: #ffffff;
+  /* Đảm bảo chữ màu trắng */
   /*text-transform: uppercase; /* Chuyển thành chữ hoa nếu muốn */
-  animation: wavy 2.5s ease-in-out infinite; /* Áp dụng animation */
-  animation-delay: calc(0.1s * var(--i)); /* Đây là phép màu tạo độ trễ */
+  animation: wavy 2.5s ease-in-out infinite;
+  /* Áp dụng animation */
+  animation-delay: calc(0.1s * var(--i));
+  /* Đây là phép màu tạo độ trễ */
 }
 
 /* 4. Gán độ trễ lần lượt cho từng ký tự */
-.wavy-text span:nth-child(1) { --i: 1; }
-.wavy-text span:nth-child(2) { --i: 2; }
-.wavy-text span:nth-child(3) { --i: 3; }
-.wavy-text span:nth-child(4) { --i: 4; } /* Dấu cách */
-.wavy-text span:nth-child(5) { --i: 5; }
-.wavy-text span:nth-child(6) { --i: 6; }
-.wavy-text span:nth-child(7) { --i: 7; }
-.wavy-text span:nth-child(8) { --i: 8; } /* Dấu cách */
-.wavy-text span:nth-child(9) { --i: 9; } /* & */
-.wavy-text span:nth-child(10) { --i: 10; } /* Dấu cách */
-.wavy-text span:nth-child(11) { --i: 11; }
-.wavy-text span:nth-child(12) { --i: 12; }
-.wavy-text span:nth-child(13) { --i: 13; }
-.wavy-text span:nth-child(14) { --i: 14; }
-.wavy-text span:nth-child(15) { --i: 15; } /* Dấu cách */
-.wavy-text span:nth-child(16) { --i: 16; }
-.wavy-text span:nth-child(17) { --i: 17; }
-.wavy-text span:nth-child(18) { --i: 18; }
-.wavy-text span:nth-child(19) { --i: 19; }
-.wavy-text span:nth-child(20) { --i: 20; }
+.wavy-text span:nth-child(1) {
+  --i: 1;
+}
+
+.wavy-text span:nth-child(2) {
+  --i: 2;
+}
+
+.wavy-text span:nth-child(3) {
+  --i: 3;
+}
+
+.wavy-text span:nth-child(4) {
+  --i: 4;
+}
+
+/* Dấu cách */
+.wavy-text span:nth-child(5) {
+  --i: 5;
+}
+
+.wavy-text span:nth-child(6) {
+  --i: 6;
+}
+
+.wavy-text span:nth-child(7) {
+  --i: 7;
+}
+
+.wavy-text span:nth-child(8) {
+  --i: 8;
+}
+
+/* Dấu cách */
+.wavy-text span:nth-child(9) {
+  --i: 9;
+}
+
+/* & */
+.wavy-text span:nth-child(10) {
+  --i: 10;
+}
+
+/* Dấu cách */
+.wavy-text span:nth-child(11) {
+  --i: 11;
+}
+
+.wavy-text span:nth-child(12) {
+  --i: 12;
+}
+
+.wavy-text span:nth-child(13) {
+  --i: 13;
+}
+
+.wavy-text span:nth-child(14) {
+  --i: 14;
+}
+
+.wavy-text span:nth-child(15) {
+  --i: 15;
+}
+
+/* Dấu cách */
+.wavy-text span:nth-child(16) {
+  --i: 16;
+}
+
+.wavy-text span:nth-child(17) {
+  --i: 17;
+}
+
+.wavy-text span:nth-child(18) {
+  --i: 18;
+}
+
+.wavy-text span:nth-child(19) {
+  --i: 19;
+}
+
+.wavy-text span:nth-child(20) {
+  --i: 20;
+}
 
 /* --- KẾT THÚC CODE HIỆU ỨNG GỢN SÓNG --- */
 
@@ -179,7 +254,8 @@ svg {
   position: relative;
   overflow: hidden;
   width: 100%;
-  padding-top: 56.25%; /* Tỷ lệ 16:9 (chiều cao / chiều rộng) */
+  padding-top: 56.25%;
+  /* Tỷ lệ 16:9 (chiều cao / chiều rộng) */
 }
 
 .video-container iframe {
@@ -195,29 +271,35 @@ svg {
 
 /* --- CSS CHO NÚT ÂM THANH VIDEO --- */
 .video-wrapper #volume-toggle {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    z-index: 10;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 10;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* --- CSS CHO NÚT NHẠC CỐ ĐỊNH --- */
 #floating-music-button-wrapper {
-  position: fixed; /* Giữ nút cố định trên màn hình */
-  top: 20px;       /* Cách lề trên 20px */
-  right: 20px;      /* Cách lề phải 20px */
-  z-index: 1031;   /* Đảm bảo nó nổi lên trên các thành phần khác */
+  position: fixed;
+  /* Giữ nút cố định trên màn hình */
+  top: 20px;
+  /* Cách lề trên 20px */
+  right: 20px;
+  /* Cách lề phải 20px */
+  z-index: 1031;
+  /* Đảm bảo nó nổi lên trên các thành phần khác */
 }
 
 #floating-music-button-wrapper #button-music {
-  width: 40px;     /* Tăng kích thước nút cho dễ bấm */
+  width: 40px;
+  /* Tăng kích thước nút cho dễ bấm */
   height: 40px;
-  font-size: 1.1rem; /* Tăng kích thước icon bên trong */
+  font-size: 1.1rem;
+  /* Tăng kích thước icon bên trong */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -226,7 +308,8 @@ svg {
 /* --- CSS CHO BẢNG ĐIỀU KHIỂN HIỆU ỨNG RƠI --- */
 #particle-controller {
   position: fixed;
-  top: 70px; /* Nằm ngay dưới nút nhạc */
+  top: 70px;
+  /* Nằm ngay dưới nút nhạc */
   right: 20px;
   z-index: 1030;
 }
@@ -241,13 +324,15 @@ svg {
 }
 
 #particle-controls {
-  display: none; /* Ẩn bảng điều khiển mặc định */
+  display: none;
+  /* Ẩn bảng điều khiển mặc định */
   position: absolute;
   top: 50px;
   right: 0;
   width: 220px;
   padding: 15px;
-  background-color: var(--bs-body-bg); /* Tự động đổi màu theo theme */
+  background-color: var(--bs-body-bg);
+  /* Tự động đổi màu theo theme */
   opacity: 0;
   transform: translateY(-10px) scale(0.95);
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -274,249 +359,494 @@ svg {
 
 /* 1. Khung bao ngoài */
 .vinyl-wrapper {
-    position: relative;
-    width: 14rem; /* Kích thước đĩa */
-    height: 14rem;
-    z-index: 10;
+  position: relative;
+  width: 14rem;
+  /* Kích thước đĩa */
+  height: 14rem;
+  z-index: 10;
 }
 
 /* 2. Đĩa nhạc (Phần sẽ xoay) */
 .vinyl-disk {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 4px solid #1a1a1a; /* Viền đen giống đĩa than */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    overflow: hidden;
-    /* Mặc định là dừng */
-    animation: spinVinyl 8s linear infinite;
-    animation-play-state: paused; 
-    transition: transform 0.5s ease;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid #1a1a1a;
+  /* Viền đen giống đĩa than */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  /* Mặc định là dừng */
+  animation: spinVinyl 8s linear infinite;
+  animation-play-state: paused;
+  transition: transform 0.5s ease;
 }
 
 /* 3. Lỗ tròn ở giữa */
 .vinyl-hole {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
-    background-color: #1a1a1a; /* Màu lỗ đen */
-    border: 2px solid #fff; /* Viền trắng nhỏ */
-    border-radius: 50%;
-    z-index: 5;
-    pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background-color: #1a1a1a;
+  /* Màu lỗ đen */
+  border: 2px solid #fff;
+  /* Viền trắng nhỏ */
+  border-radius: 50%;
+  z-index: 5;
+  pointer-events: none;
 }
 
 /* 4. Vân đĩa than (Tạo cảm giác nhựa bóng) */
 .vinyl-grooves {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    border-radius: 50%;
-    background: repeating-radial-gradient(
-      #0000 0 4px, 
-      #00000010 5px 6px
-    );
-    pointer-events: none;
-    z-index: 4;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  background: repeating-radial-gradient(#0000 0 4px,
+      #00000010 5px 6px);
+  pointer-events: none;
+  z-index: 4;
 }
 
 /* 5. Cây kim (Tonearm) */
 .vinyl-needle {
-    position: absolute;
-    top: -30px;
-    right: -30px;
-    width: 100px;
-    height: 100px;
-    z-index: 20;
-    transform-origin: 90px 10px; /* Xoay quanh trục góc trên phải */
-    transform: rotate(-45deg); /* Trạng thái nghỉ (gác kim ra ngoài) */
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none; /* Để không che nút bấm vào ảnh */
-    filter: drop-shadow(2px 5px 2px rgba(0,0,0,0.3));
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  z-index: 20;
+  transform-origin: 90px 10px;
+  /* Xoay quanh trục góc trên phải */
+  transform: rotate(-45deg);
+  /* Trạng thái nghỉ (gác kim ra ngoài) */
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  /* Để không che nút bấm vào ảnh */
+  filter: drop-shadow(2px 5px 2px rgba(0, 0, 0, 0.3));
 }
 
 /* --- TRẠNG THÁI KHI NHẠC CHẠY --- */
 .vinyl-wrapper.is-playing .vinyl-disk {
-    animation-play-state: running; /* Đĩa quay */
+  animation-play-state: running;
+  /* Đĩa quay */
 }
 
 .vinyl-wrapper.is-playing .vinyl-needle {
-    transform: rotate(15deg); /* Tăng góc quay để kim vào sâu hơn */
+  transform: rotate(15deg);
+  /* Tăng góc quay để kim vào sâu hơn */
 }
 
 /* Animation xoay tròn */
 @keyframes spinVinyl {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* --- MUSIC PLAYER STYLES --- */
 .music-widget {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 /* Nút tròn xoay lúc thu gọn */
 .btn-main-control {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background: rgba(33, 37, 41, 0.9); /* Màu đen mờ */
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    backdrop-filter: blur(5px);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(33, 37, 41, 0.9);
+  /* Màu đen mờ */
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  backdrop-filter: blur(5px);
 }
 
 .btn-main-control:hover {
-    transform: scale(1.1);
-    background: black;
+  transform: scale(1.1);
+  background: black;
 }
 
 .spin-slow {
-    animation: spinVinyl 4s linear infinite;
+  animation: spinVinyl 4s linear infinite;
 }
 
 /* Bảng điều khiển chính */
 .music-panel {
-    background: rgba(33, 37, 41, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 15px;
-    border-radius: 20px; /* Bo góc siêu mịn */
-    width: 220px;
-    margin-top: 10px;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: white;
-    transform-origin: top right;
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: rgba(33, 37, 41, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  border-radius: 20px;
+  /* Bo góc siêu mịn */
+  width: 220px;
+  margin-top: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  transform-origin: top right;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes popIn {
-    from { opacity: 0; transform: scale(0.8) translateY(-10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 /* Chữ chạy */
 .music-info {
-    white-space: nowrap;
-    overflow: hidden;
-    font-size: 0.85rem;
-    text-align: center;
-    color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 0.85rem;
+  text-align: center;
+  color: #ddd;
 }
 
 /* Nút bấm điều khiển */
 .btn-control {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    transition: 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-control.main {
-    width: 40px;
-    height: 40px;
-    background: white;
-    color: black;
-    border-radius: 50%;
-    font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  background: white;
+  color: black;
+  border-radius: 50%;
+  font-size: 1rem;
 }
 
 .btn-control.small {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    font-size: 0.8rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.8rem;
 }
 
 .btn-control:hover {
-    opacity: 0.8;
-    transform: scale(1.05);
+  opacity: 0.8;
+  transform: scale(1.05);
 }
 
 /* Thanh volume */
 .volume-slider {
-    width: 80px;
-    height: 4px;
-    border-radius: 5px;
-    accent-color: white; /* Màu thanh kéo */
+  width: 80px;
+  height: 4px;
+  border-radius: 5px;
+  accent-color: white;
+  /* Màu thanh kéo */
 }
 
 /* Danh sách phát */
 .playlist-box {
-    max-height: 150px;
-    overflow-y: auto;
-    background: rgba(0,0,0,0.3);
-    border-radius: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
 }
 
 .playlist-item {
-    background: transparent !important;
-    color: #ccc !important;
-    font-size: 0.8rem;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+  background: transparent !important;
+  color: #ccc !important;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
-.playlist-item:hover, .playlist-item.active {
-    background: rgba(255,255,255,0.1) !important;
-    color: white !important;
-    font-weight: bold;
+.playlist-item:hover,
+.playlist-item.active {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  font-weight: bold;
 }
 
 /* Ẩn scrollbar */
-.playlist-box::-webkit-scrollbar { width: 4px; }
-.playlist-box::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
+.playlist-box::-webkit-scrollbar {
+  width: 4px;
+}
+
+.playlist-box::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 4px;
+}
 
 /* --- CSS NÂNG CAO CHO PLAYER --- */
 
 /* Trạng thái nút đang BẬT (Active) */
 .btn-control.active {
-    color: #ff4081 !important; /* Màu hồng/đỏ nổi bật */
-    background: rgba(255, 255, 255, 0.2);
-    font-weight: bold;
+  color: #ff4081 !important;
+  /* Màu hồng/đỏ nổi bật */
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: bold;
 }
 
 /* Xử lý nút Loop khi ở chế độ "Lặp 1 bài" */
 .btn-control.loop-one {
-    color: #ff4081 !important;
-    position: relative;
+  color: #ff4081 !important;
+  position: relative;
 }
 
 /* Tạo số 1 nhỏ xíu nằm trên nút Loop */
 .btn-control.loop-one::after {
-    content: '1';
-    position: absolute;
-    font-size: 0.6rem;
-    font-weight: 900;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #ff4081;
-    color: white;
-    width: 12px;
-    height: 12px;
+  content: '1';
+  position: absolute;
+  font-size: 0.6rem;
+  font-weight: 900;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ff4081;
+  color: white;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* --- CSS POPUP LỜI CHÚC --- */
+.wish-box {
+  position: fixed;
+  top: 80px;
+  /* Cách đỉnh 80px để tránh đè nút nhạc */
+  right: 20px;
+  width: 320px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-left: 4px solid #ff4081;
+  /* Viền hồng bên trái */
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  padding: 15px;
+  display: flex;
+  align-items: flex-start;
+  z-index: 9998;
+  /* Thấp hơn nút nhạc 1 xíu */
+
+  /* Hiệu ứng xuất hiện */
+  opacity: 0;
+  transform: translateX(100%);
+  /* Dịch sang phải để ẩn */
+  transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  pointer-events: none;
+  /* Để không chặn click khi ẩn */
+}
+
+.wish-box.show {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.wish-avatar {
+  width: 40px;
+  height: 40px;
+  background: #fff0f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.wish-content h5 {
+  margin: 0 0 5px 0;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #333;
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+.wish-content p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.4;
+  /*display: -webkit-box;
+    /*-webkit-line-clamp: 3; /* Giới hạn 3 dòng 
+    -webkit-box-orient: vertical;
+    overflow: hidden;*/
+}
+
+/* Responsive trên mobile */
+@media screen and (max-width: 576px) {
+  .wish-box {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 300px;
+
+    /* Hiệu ứng kính mờ (Glassmorphism) - Nhìn xuyên thấu */
+    background: rgba(255, 255, 255, 0.4);
+    /* Nền trắng rất mờ */
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    /* Cho Safari */
+
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-left: 4px solid #ff4081;
+    /* Giữ viền màu hồng để nhận biết */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    display: flex;
+    align-items: flex-start;
+    z-index: 9998;
+    color: rgba(0, 0, 0, 0.6);
+    /* Mặc định hơi mờ để không che nội dung */
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55),
+      background 0.3s ease,
+      opacity 0.3s ease;
+    /* Thêm transition cho hover */
+    pointer-events: none;
+  }
+
+  /* Khi hiện ra (Vẫn giữ độ trong suốt) */
+  .wish-box.show {
+    opacity: 0.7;
+    /* Hơi mờ */
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  /* Khi rê chuột vào hoặc chạm vào (Hiển thị rõ) */
+  .wish-box:hover,
+  .wish-box.is-touched {
+     background: rgba(255, 255, 255, 0.95) !important;
+    /* Nền trắng rõ */
+   /* Full Opacity */
+    opacity: 1 !important;
+    
+    /* Bóng đổ đậm lên */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    
+    /* Làm nhòe nền sau mạnh hơn để chữ nổi bật */
+    backdrop-filter: blur(10px);
+    
+    /* Chữ chuyển về màu đen rõ nét */
+    color: #000 !important;
+    cursor: default;
+  }
+
+  .wish-avatar {
+    width: 35px;
+    height: 35px;
+    background: rgba(255, 240, 245, 0.8);
+    /* Nền avatar cũng hơi trong */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2;
+    font-size: 1rem;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+
+  .wish-content h5 {
+    margin: 0 0 3px 0;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: inherit; /* Ăn theo màu của cha (.wish-box) */
+    opacity: 0.9;
+    /* Màu chữ đậm hơn để dễ đọc trên nền kính */
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+    /* Viền sáng quanh chữ */
+  }
+
+  .wish-content p {
+    margin: 0;
+    font-size: 0.8rem;
+     color: inherit; /* Ăn theo màu của cha */
+    opacity: 0.8;
+    line-height: 1.3;
+    font-weight: 500;
+    /* Chữ đậm hơn chút */
+  }
+
+  /* Mobile */
+  @media screen and (max-width: 576px) {
+    .wish-box {
+      width: 85%;
+      right: 5%;
+      top: 70px;
+      background: rgba(255, 255, 255, 0.5);
+      /* Mobile cho rõ hơn xíu */
+    }
+  }
+}
+
+/* --- CSS NÚT BẬT/TẮT LỜI CHÚC --- */
+#wishes-toggle-button {
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  color: #666;
+  /* Màu mặc định khi tắt */
+}
+
+#wishes-toggle-button.active {
+  background-color: #ff4081 !important;
+  /* Nền hồng khi bật */
+  color: white !important;
+  /* Chữ trắng khi bật */
+  border-color: #ff4081 !important;
+  box-shadow: 0 0 10px rgba(255, 64, 129, 0.5) !important;
+}
+
+/* Điều chỉnh vị trí cho cả cụm nút bên phải */
+#particle-controller {
+  position: fixed;
+  top: 70px;
+  /* Vị trí so với đỉnh */
+  right: 20px;
+  z-index: 1030;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  /* THÊM DÒNG NÀY ĐỂ TẠO KHOẢNG CÁCH ĐỀU */
+  gap: 15px;
 }

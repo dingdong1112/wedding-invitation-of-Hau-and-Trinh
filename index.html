@@ -1146,71 +1146,58 @@
                 <!-- Comment -->
                 <section class="bg-light-dark my-0 pb-0 pt-3" id="comment">
                     <div class="container">
-                        <div class="border rounded-5 shadow p-3 mb-2">
-                            <h2 class="font-esthetic text-center mt-2 mb-4" style="font-size: 2.25rem;">Ucapan &amp; Doa
+                        <!-- Form Gửi Lời Chúc -->
+                        <div class="border rounded-5 shadow p-3 mb-2 bg-theme-auto">
+                            <h2 class="font-esthetic text-center mt-2 mb-4" style="font-size: 2.25rem;">Gửi Lời Chúc
                             </h2>
 
-                            <div class="mb-3">
-                                <label for="form-name" class="form-label my-1"><i
-                                        class="fa-solid fa-person me-2"></i>Nama</label>
-                                <input dir="auto" type="text" class="form-control shadow-sm rounded-4" id="form-name"
-                                    minlength="2" maxlength="50" placeholder="Isikan Nama Anda" autocomplete="name"
-                                    data-offline-disabled="false">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="form-presence" class="form-label my-1"><i
-                                        class="fa-solid fa-person-circle-question me-2"></i>Presensi</label>
-                                <select class="form-select shadow-sm rounded-4" id="form-presence" autocomplete="off"
-                                    data-offline-disabled="false">
-                                    <option value="0" selected>Konfirmasi Presensi</option>
-                                    <option value="1">&#9989; Datang</option>
-                                    <option value="2">&#10060; Berhalangan</option>
-                                </select>
-                            </div>
-
-                            <div class="d-block mb-3" id="comment-form-default">
-                                <div id="information" class="alert alert-info alert-dismissible fade show rounded-4"
-                                    role="alert">
-                                    <button type="button" class="btn-close rounded-4 p-3" data-bs-dismiss="alert"
-                                        aria-label="Close" onclick="undangan.guest.closeInformation()"></button>
-
-                                    <p style="font-size: 1.5rem;">Bestieee!!!</p>
-                                    <p class="m-0">Cobain like seperti Instagram, dengan tap tap bagian komentarnya</p>
-                                    <hr class="my-2">
-                                    <p class="m-0">Sama bisa format text seperti Whatsapp lohh... cobainn jugaaa,
-                                        makaciwww bestieee</p>
+                            <form id="wishes-form">
+                                <!-- Nhập Tên -->
+                                <div class="mb-3">
+                                    <label class="form-label my-1"><i class="fa-solid fa-person me-2"></i>Tên của
+                                        bạn</label>
+                                    <input type="text" class="form-control shadow-sm rounded-4" name="Ten" required
+                                        placeholder="Nhập tên của bạn...">
                                 </div>
 
-                                <label for="form-comment" class="form-label my-1"><i
-                                        class="fa-solid fa-comment me-2"></i>Ucapan &amp; Doa</label>
-                                <div class="position-relative">
-                                    <button
-                                        class="btn btn-secondary btn-sm rounded-4 shadow-sm me-1 my-1 position-absolute bottom-0 end-0"
-                                        onclick="undangan.comment.gif.open(undangan.comment.gif.default)"
-                                        aria-label="button gif" data-offline-disabled="false"><i
-                                            class="fa-solid fa-photo-film"></i></button>
-                                    <textarea dir="auto" class="form-control shadow-sm rounded-4" id="form-comment"
-                                        rows="4" minlength="1" maxlength="1000" placeholder="Tulis Ucapan dan Doa"
-                                        autocomplete="off" data-offline-disabled="false"></textarea>
+                                <!-- Chọn tham dự -->
+                                <div class="mb-3">
+                                    <label class="form-label my-1"><i
+                                            class="fa-solid fa-person-circle-question me-2"></i>Xác nhận tham dự</label>
+                                    <select class="form-select shadow-sm rounded-4" name="ThamDu">
+                                        <option value="Có">🙋🏻‍♂️ Chắc chắn sẽ đến</option>
+                                        <option value="Không">🙅🏻‍♂️ Rất tiếc không thể tham dự</option>
+                                        <option value="Chưa biết">🤔 Sẽ báo lại sau</option>
+                                    </select>
                                 </div>
-                            </div>
 
-                            <div class="d-none mb-3" id="gif-form-default"></div>
+                                <!-- Nhập lời chúc -->
+                                <div class="mb-3">
+                                    <label class="form-label my-1"><i class="fa-solid fa-comment me-2"></i>Lời
+                                        chúc</label>
+                                    <textarea class="form-control shadow-sm rounded-4" name="LoiChuc" rows="4" required
+                                        placeholder="Gửi những lời chúc tốt đẹp nhất..."></textarea>
+                                </div>
 
-                            <div class="d-grid">
-                                <button class="btn btn-primary btn-sm rounded-4 shadow m-1"
-                                    onclick="undangan.comment.send(this)" data-offline-disabled="false">
-                                    <i class="fa-solid fa-paper-plane me-2"></i>Send
-                                </button>
-                            </div>
+                                <!-- Nút Gửi -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-4 shadow m-1"
+                                        id="btn-send-wish">
+                                        <i class="fa-solid fa-paper-plane me-2"></i>Gửi Lời Chúc
+                                    </button>
+                                </div>
+                            </form>
                         </div>
 
-                        <!-- Comments -->
+                        <!-- Khu vực hiển thị thông báo thành công (Ẩn mặc định) -->
+                        <div id="success-msg" class="alert alert-success rounded-4 d-none mt-3 text-center">
+                            <i class="fa-solid fa-check-circle me-2"></i>Đã gửi lời chúc thành công! Cảm ơn bạn.
+                        </div>
+
+                        <!-- Comments 
                         <div class="py-3" id="comments" data-loading="false"></div>
 
-                        <!-- Pagination -->
-                        <nav class="d-flex d-none justify-content-center mt-1 mb-0" id="pagination"></nav>
+                        <nav class="d-flex d-none justify-content-center mt-1 mb-0" id="pagination"></nav> -->
                     </div>
                 </section>
 
@@ -1388,6 +1375,13 @@
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
             </button>
 
+            <!-- THÊM NÚT MỚI: Nút Bật/Tắt Lời Chúc -->
+            <button type="button" id="wishes-toggle-button"
+                class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm active"
+                title="Bật/Tắt lời chúc">
+                <i class="fa-solid fa-comment-dots"></i>
+            </button>
+
             <!-- Bảng điều khiển (bị ẩn mặc định) -->
             <div id="particle-controls" class="shadow-lg rounded-5 border">
                 <div class="control-group">
@@ -1491,6 +1485,16 @@
                             alt="image" id="show-modal-image">
                     </div>
                 </div>
+            </div>
+        </div>
+        <!-- Popup Lời Chúc Góc Phải -->
+        <div id="wish-notification" class="wish-box">
+            <div class="wish-avatar">
+                <i class="fa-solid fa-heart text-danger"></i>
+            </div>
+            <div class="wish-content">
+                <h5 id="wish-name">Tên Khách</h5>
+                <p id="wish-message">Nội dung lời chúc sẽ hiện ở đây...</p>
             </div>
         </div>
 </body>

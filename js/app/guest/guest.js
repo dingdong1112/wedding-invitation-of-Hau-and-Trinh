@@ -351,8 +351,9 @@ export const guest = (() => {
         });
 
         if (!token || token.length <= 0) {
-            document.getElementById('comment')?.remove();
-            document.querySelector('a.nav-link[href="#comment"]')?.closest('li.nav-item')?.remove();
+            // Comment 2 dòng này lại để nó không xóa form của mình ---
+            // document.getElementById('comment')?.remove();
+            // document.querySelector('a.nav-link[href="#comment"]')?.closest('li.nav-item')?.remove();
 
             vid.load();
             img.load();
