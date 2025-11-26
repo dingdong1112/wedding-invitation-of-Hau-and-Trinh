@@ -23,11 +23,17 @@ export const audio = (() => {
     ];
 
     let audioEl = new Audio();
+    // Cấu hình CORS để Web Audio API hoạt động không bị lỗi bảo mật
+    audioEl.crossOrigin = "anonymous"; 
+
+    let audioCtx = null;
+    let gainNode = null;
+    let source = null;
+
     let currentIndex = 0;
     let isPlaying = false;
     let isPanelOpen = false;
     
-    // --- BIẾN TRẠNG THÁI MỚI ---
     let isShuffle = false; 
     let loopMode = 1; 
 
@@ -39,7 +45,7 @@ export const audio = (() => {
         shuffleBtn: null, loopBtn: null
     };
 
-    // --- HÀM ĐÓNG BẢNG NHẠC (Khai báo ở đây để dùng chung) ---
+    // --- HÀM ĐÓNG BẢNG NHẠC ---
     const closePanel = () => {
         if (isPanelOpen && els.panel && els.toggleBtn) {
             isPanelOpen = false;
@@ -49,10 +55,33 @@ export const audio = (() => {
         }
     };
 
+    // --- KHỞI TẠO WEB AUDIO API (QUAN TRỌNG) ---
+    // Phải gọi hàm này sau khi người dùng tương tác (click) thì trình duyệt mới cho phép
+    const initAudioContext = () => {
+        if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            // Tạo bộ khuếch đại (GainNode)
+            gainNode = audioCtx.createGain();
+            // Kết nối: Audio Element -> Khuếch đại -> Loa
+            source = audioCtx.createMediaElementSource(audioEl);
+            source.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            // Set âm lượng mặc định (0.8)
+            gainNode.gain.value = 0.8;
+        }
+        
+        // Resume nếu bị trình duyệt treo
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    };
+
     const init = () => {
         progress.add();
         
-        // Map elements
+        // Map elements (Giữ nguyên như cũ)
         els.widget = document.getElementById('music-player-container');
         els.toggleBtn = document.getElementById('music-toggle-btn');
         els.panel = document.getElementById('music-panel');
@@ -67,30 +96,23 @@ export const audio = (() => {
         if (els.toggleBtn) {
             els.toggleBtn.addEventListener('click', () => {
                 if (!isPanelOpen) {
-                    // --- LOGIC MỞ BẢNG NHẠC ---
                     isPanelOpen = true;
                     els.panel.classList.remove('d-none');
                     els.toggleBtn.classList.remove('spin-slow'); 
                     els.toggleBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-                    
-                    // Đóng bảng pháo hoa nếu đang mở
                     const particlePanel = document.getElementById('particle-controls');
                     if (particlePanel) particlePanel.classList.remove('show');
-
                 } else {
-                    // --- LOGIC ĐÓNG BẢNG NHẠC ---
-                    closePanel(); // Gọi hàm đã khai báo bên ngoài
+                    closePanel();
                 }
             });
         }
 
-        // Lấy nhạc từ HTML nếu có
         const defaultUrl = document.body.getAttribute('data-audio');
         if(defaultUrl && playlist.length === 0) {
             playlist.push({ title: "Nhạc nền", src: defaultUrl });
         }
 
-        // Sự kiện khi hết bài
         audioEl.addEventListener('ended', () => {
             if (loopMode === 2) {
                 audioEl.currentTime = 0;
@@ -108,7 +130,11 @@ export const audio = (() => {
 
         document.addEventListener('undangan.open', () => {
             els.widget?.classList.remove('d-none');
-            play();
+            // Khởi tạo Audio Context ngay khi mở thiệp
+            try {
+                initAudioContext();
+                play();
+            } catch(e) { console.log("Audio Context init failed on auto-play", e); }
         });
 
         return { load: () => {} };
@@ -123,11 +149,14 @@ export const audio = (() => {
     };
 
     const play = () => {
+        // Đảm bảo AudioContext đã chạy trước khi Play
+        initAudioContext();
+
         audioEl.play().then(() => {
             isPlaying = true;
             updatePlayButton();
             updateVinylState();
-        }).catch(e => console.log("Autoplay blocked"));
+        }).catch(e => console.log("Autoplay blocked or CORS issue"));
     };
 
     const pause = () => {
@@ -144,7 +173,6 @@ export const audio = (() => {
             pause();
             return;
         }
-
         if (isShuffle) {
             let randomIndex = currentIndex;
             if (playlist.length > 1) {
@@ -168,7 +196,22 @@ export const audio = (() => {
         play();
     };
 
-    // --- XỬ LÝ NÚT CHỨC NĂNG MỚI ---
+    // --- HÀM SET VOLUME MỚI (DÙNG GAIN NODE) ---
+    const setVolume = (val) => {
+        const volume = parseFloat(val);
+        // Nếu đã có AudioContext (Web Audio API)
+        if (gainNode) {
+            // GainNode cho phép giá trị > 1 (Khuếch đại)
+            // Ví dụ: 1.2 là 120%
+            gainNode.gain.value = volume;
+        } else {
+            // Fallback cho trường hợp chưa init (hiếm gặp)
+            // Audio Tag thường chỉ max là 1
+            audioEl.volume = Math.min(volume, 1); 
+        }
+    };
+
+    // (Các hàm toggleShuffle, toggleLoop, updateModeButtons... Giữ nguyên như cũ)
     const toggleShuffle = () => {
         isShuffle = !isShuffle;
         updateModeButtons();
@@ -182,21 +225,13 @@ export const audio = (() => {
 
     const updateModeButtons = () => {
         if(!els.shuffleBtn || !els.loopBtn) return;
-
-        // Nút Shuffle
         if (isShuffle) els.shuffleBtn.classList.add('active');
         else els.shuffleBtn.classList.remove('active');
-
-        // Nút Loop
         els.loopBtn.className = 'btn-control small'; 
-        if (loopMode === 1) {
-            els.loopBtn.classList.add('active'); 
-        } else if (loopMode === 2) {
-            els.loopBtn.classList.add('active', 'loop-one'); 
-        }
+        if (loopMode === 1) els.loopBtn.classList.add('active'); 
+        else if (loopMode === 2) els.loopBtn.classList.add('active', 'loop-one'); 
     };
 
-    const setVolume = (val) => audioEl.volume = val;
     const togglePlaylist = () => els.playlistContainer.classList.toggle('d-none');
 
     const updatePlayButton = () => {
@@ -235,12 +270,11 @@ export const audio = (() => {
         });
     };
 
-    // --- GÁN VÀO WINDOW ---
     window.musicPlayer = {
         play, pause, toggle, next, prev,
         setVolume, togglePlaylist,
         toggleShuffle, toggleLoop,
-        closePanel // Export hàm này ra
+        closePanel
     };
 
     return { init, load: () => {} };
