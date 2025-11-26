@@ -470,7 +470,9 @@ export const guest = (() => {
                 flat: true,
                 gravity: 0.5,
                 drift: Math.random() * 0.5 - 0.25,
-                disableForReducedMotion: true
+                disableForReducedMotion: true,
+
+                zIndex: 2000 
             };
 
             const emojiVariation = '\uFE0F';
