@@ -27,38 +27,7 @@ export const comment = (() => {
         }
         return array;
     };
-
-    // --- XỬ LÝ HIỆU ỨNG CHẠM TRÊN MOBILE ---
-    const setupTouchEffect = () => {
-        const box = document.getElementById('wish-notification');
-        if (box) {
-            // Khi chạm vào: Thêm class 'is-touched' để làm rõ
-            box.addEventListener('touchstart', () => {
-                box.classList.add('is-touched');
-                // Tạm dừng ẩn khi đang đọc
-                clearTimeout(wishTimeout);
-            }, {passive: true});
-
-            // Khi thả tay ra (hoặc chạm chỗ khác): Chờ 3s rồi tiếp tục quy trình
-            // Lưu ý: Logic này khá phức tạp trên web, để đơn giản:
-            // Chạm vào -> Rõ -> Giữ nguyên trạng thái rõ 5s -> Tự mờ lại và chạy tiếp
-            box.addEventListener('touchend', () => {
-                setTimeout(() => {
-                    box.classList.remove('is-touched');
-                    // Gọi lại quy trình ẩn để tiếp tục vòng lặp
-                    wishTimeout = setTimeout(() => {
-                        box.classList.remove('show');
-                        loopTimeout = setTimeout(() => {
-                            currentIndex++;
-                            if (currentIndex >= wishesData.length) currentIndex = 0;
-                            showNextWish();
-                        }, 3000);
-                    }, 2000); // Cho đọc thêm 2s nữa
-                }, 5000); // Giữ rõ 5s sau khi chạm
-            });
-        }
-    };
-
+    
     const fetchWishes = async () => {
         try {
             const response = await fetch(SCRIPT_URL);
@@ -77,7 +46,8 @@ export const comment = (() => {
         } catch (error) { console.error(error); }
     };
 
-    const showNextWish = () => {
+    // --- HÀM QUAN TRỌNG: HIỆN LỜI CHÚC ---
+   const showNextWish = () => {
         if (!isWishesActive) return;
 
         const box = document.getElementById('wish-notification');
@@ -86,50 +56,92 @@ export const comment = (() => {
 
         if (!box || wishesData.length === 0) return;
 
-        // Reset trạng thái chạm
-        box.classList.remove('is-touched');
+        // 1. RESET TRẠNG THÁI TRƯỚC KHI HIỆN (Fix lỗi luôn sáng)
+        box.classList.remove('show');      // Đảm bảo đang ẩn
+        box.classList.remove('is-touched');// Xóa trạng thái chạm cũ
+        
+        // Buộc trình duyệt vẽ lại (Repaint) để hiệu ứng reset có tác dụng ngay
+        void box.offsetWidth; 
 
+        // 2. CẬP NHẬT DỮ LIỆU MỚI
         const item = wishesData[currentIndex];
         nameEl.innerText = item.name;
         msgEl.innerText = item.message;
 
+        // 3. HIỆN LÊN (Trạng thái mờ mặc định của CSS .wish-box.show)
         box.classList.add('show');
 
+        // 4. TÍNH TOÁN THỜI GIAN
         let displayTime = 5000;
         const length = item.message.length;
         if (length < 50) displayTime = 5000;
         else if (length < 150) displayTime = 12000;
         else displayTime = 20000;
 
-        // Nếu là hover chuột (Desktop), CSS sẽ tự xử lý việc giữ hiển thị
-        // JS chỉ lo việc đếm giờ ẩn đi thôi
-        
+        // 5. HẸN GIỜ ẨN
         wishTimeout = setTimeout(() => {
-            // Kiểm tra nếu đang hover thì ĐỪNG ẩn vội (cho người ta đọc)
-            if (box.matches(':hover')) {
-                // Đợi chuột rời đi rồi mới ẩn (Check mỗi 1s)
-                const checkHover = setInterval(() => {
-                    if (!box.matches(':hover')) {
-                        clearInterval(checkHover);
+            // Kiểm tra: Nếu người dùng đang hover chuột hoặc đang chạm tay vào -> ĐỪNG ẨN VỘI
+            if (box.matches(':hover') || box.classList.contains('is-touched')) {
+                
+                // Tạo vòng lặp kiểm tra mỗi 1s
+                // Chỉ khi nào người dùng bỏ tay ra/bỏ chuột ra thì mới ẩn
+                const checkInteract = setInterval(() => {
+                    const stillHover = box.matches(':hover');
+                    const stillTouch = box.classList.contains('is-touched');
+                    
+                    if (!stillHover && !stillTouch) {
+                        clearInterval(checkInteract);
                         hideAndNext();
                     }
                 }, 1000);
+                
             } else {
                 hideAndNext();
             }
         }, displayTime);
         
-        // Hàm phụ để ẩn và chuyển bài
+        // Hàm phụ: Ẩn và chuyển tiếp
         const hideAndNext = () => {
-            box.classList.remove('show');
-            loopTimeout = setTimeout(() => {
-                currentIndex++;
-                if (currentIndex >= wishesData.length) currentIndex = 0;
-                // Nếu hết vòng thì lại Random lại danh sách cho đỡ chán
-                if (currentIndex === 0) shuffleArray(wishesData); 
-                showNextWish();
-            }, 3000);
+            box.classList.remove('show'); // Trượt ra ngoài
+            
+            // Fix lỗi kẹt: Đợi 600ms (bằng thời gian transition CSS) để nó trượt hết ra ngoài
+            // Rồi mới tính thời gian nghỉ 3s
+            setTimeout(() => {
+                // Reset lại trạng thái một lần nữa cho chắc
+                box.classList.remove('is-touched');
+                
+                loopTimeout = setTimeout(() => {
+                    currentIndex++;
+                    if (currentIndex >= wishesData.length) currentIndex = 0;
+                    if (currentIndex === 0) shuffleArray(wishesData); 
+                    showNextWish();
+                }, 3000); // Nghỉ 3s
+            }, 600); 
         };
+    };
+
+    // --- XỬ LÝ CHẠM TRÊN MOBILE (Sửa lại logic) ---
+    const setupTouchEffect = () => {
+        const box = document.getElementById('wish-notification');
+        if (box) {
+            // Chạm vào -> Sáng lên
+            box.addEventListener('touchstart', () => {
+                box.classList.add('is-touched');
+            }, {passive: true});
+
+            // Thả tay ra -> Vẫn giữ sáng thêm 3s cho đọc -> Rồi tự tắt sáng
+            box.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    box.classList.remove('is-touched'); 
+                    // Sau khi remove class này, hàm checkInteract ở trên sẽ thấy và tự động gọi hideAndNext()
+                }, 3000); 
+            }, {passive: true});
+            
+            // Xử lý thêm click (đề phòng một số máy tính bảng)
+            box.addEventListener('click', () => {
+                 box.classList.toggle('is-touched');
+            });
+        }
     };
 
     // ... (Các phần setupToggleButton, setupFormSubmit giữ nguyên như cũ) ...
