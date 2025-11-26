@@ -459,7 +459,19 @@ export const guest = (() => {
             const shape = shapeSelect.value;
             const size = parseFloat(sizeSlider.value);
             const density = parseInt(densitySlider.value);
-            const heartPathString = "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z";
+            // --- KHO MÃ SVG (Dữ liệu hình dáng) ---
+
+            // 1. Trái tim đặc (Solid Heart)
+            const pathHeart = "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z";
+
+            // 2. Ngôi sao 5 cánh (Star)
+            const pathStar = "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z";
+
+            // 3. Bông tuyết (Snowflake)
+            const pathSnow = "M22 11h-4.17l2.08-2.08c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0L14.91 11H9.09l-3.59-3.59c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L6.17 11H2c-.55 0-1 .45-1 1s.45 1 1 1h4.17l-2.08 2.08c-.39.39-.39 1.02 0 1.41.2.2.45.29.71.29s.51-.1.71-.29l3.59-3.59h5.82l3.59 3.59c.2.2.45.29.71.29s.51-.1.71-.29c.39-.39.39-1.02 0-1.41L17.83 13H22c.55 0 1-.45 1-1s-.45-1-1-1z";
+
+            // 4. Kim tuyến chữ nhật (Rectangle Confetti) - Vẽ hình chữ nhật dài
+            const pathRect = "M0 0h24v10H0z";
 
             let confettiOptions = {
                 particleCount: density / 5, // Bắn một lượng nhỏ mỗi lần
@@ -472,43 +484,37 @@ export const guest = (() => {
                 drift: Math.random() * 0.5 - 0.25,
                 disableForReducedMotion: true,
 
-                zIndex: 2000 
+                zIndex: 2000
             };
 
-            const emojiVariation = '\uFE0F';
-
+            // --- XỬ LÝ TỪNG LOẠI ---
             switch (shape) {
-                case 'hearts':
-                    confettiOptions.symbols = ['❤️' + emojiVariation];
-                    confettiOptions.colors = undefined;
-                    confettiOptions.scalar = size * 1.5;
-                    confettiOptions.gravity = 0.3;
+                case 'svg-heart':
+                    confettiOptions.shapes = [window.confetti.shapeFromPath({ path: pathHeart })];
+                    confettiOptions.colors = ['#FFC0CB', '#FF69B4', '#FF1493', '#C71585', '#DC143C']; // Tone Hồng/Đỏ
+                    confettiOptions.scalar = size * 2;
                     break;
-                case 'snow':
-                    confettiOptions.symbols = ['❄️' + emojiVariation];
-                    confettiOptions.colors = undefined;
-                    confettiOptions.scalar = size * 1.2;
-                    confettiOptions.drift = Math.random() * 0.7 - 0.35;
-                    break;
+
                 case 'stars':
-                    confettiOptions.symbols = ['✨' + emojiVariation];
-                    confettiOptions.colors = undefined;
-                    confettiOptions.scalar = size * 1.3;
+                    confettiOptions.shapes = [window.confetti.shapeFromPath({ path: pathStar })];
+                    confettiOptions.colors = ['#FFD700', '#FDB813', '#FFFACD', '#E5C100']; // Tone Vàng/Kim loại
+                    confettiOptions.scalar = size * 1.8;
                     break;
 
-                case 'svg-heart': // --- CODE MỚI CHO TRÁI TIM VẼ ---
-                    const customHeart = window.confetti.shapeFromPath({
-                        path: heartPathString
-                    });
-                    confettiOptions.shapes = [customHeart];
-                    // Chọn bộ màu hồng/đỏ cho trái tim
-                    confettiOptions.colors = ['#FFC0CB', '#FF69B4', '#FF1493', '#C71585', '#DC143C'];
-                    confettiOptions.scalar = size * 2; // SVG thường bé nên cần nhân to lên
+                case 'snow':
+                    confettiOptions.shapes = [window.confetti.shapeFromPath({ path: pathSnow })];
+                    confettiOptions.colors = ['#FFFFFF', '#E0FFFF', '#CAE9F5', '#F0F8FF']; // Tone Trắng/Xanh nhạt
+                    confettiOptions.scalar = size * 1.5;
+                    confettiOptions.drift = Math.random() * 1 - 0.5; // Tuyết bay lượn nhiều hơn
+                    confettiOptions.gravity = 0.3; // Tuyết rơi chậm hơn
                     break;
 
-                default: // confetti (hình vuông)
-                    confettiOptions.shapes = ['square'];
-                    confettiOptions.colors = undefined;
+                case 'confetti':
+                default:
+                    // Kim tuyến dùng hình chữ nhật tự vẽ
+                    confettiOptions.shapes = [window.confetti.shapeFromPath({ path: pathRect })];
+                    confettiOptions.scalar = size * 1.2;
+                    // Kim tuyến dùng màu ngẫu nhiên mặc định (không set colors)
                     break;
             }
 
@@ -533,7 +539,7 @@ export const guest = (() => {
 
             // Tạo một vòng lặp MỚI với các cài đặt hiện tại
             const density = parseInt(densitySlider.value);
-             const intervalTime = Math.max(50000 / density, 500);
+            const intervalTime = Math.max(50000 / density, 500);
             effectInterval = setInterval(fireConfetti, intervalTime);
         };
 
