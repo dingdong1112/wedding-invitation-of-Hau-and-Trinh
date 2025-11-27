@@ -2,7 +2,7 @@
 const { MongoClient } = require('mongodb');
 
 // --- THAY CHUỖI KẾT NỐI CỦA BẠN VÀO DÒNG DƯỚI ĐÂY ---
-const uri = "mongodb+srv://admin:hhh111!!!@weddingdb.p6k1yfo.mongodb.net/?appName=WeddingDB"; 
+const uri = "mongodb+srv://admin:admin0123@weddingdb.p6k1yfo.mongodb.net/?appName=WeddingDB"; 
 
 const client = new MongoClient(uri);
 
