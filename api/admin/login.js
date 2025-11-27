@@ -1,7 +1,7 @@
 // api/admin/login.js
 const { MongoClient } = require('mongodb');
 
-const uri = process.env.MONGO_URI || "mongodb+srv://admin:admin0123@weddingdb.p6k1yfo.mongodb.net/?appName=WeddingDB"; 
+const uri = "mongodb+srv://admin:admin0123@weddingdb.p6k1yfo.mongodb.net/?appName=WeddingDB"; 
 const client = new MongoClient(uri);
 
 export default async function handler(req, res) {
