@@ -27,20 +27,26 @@
 
     <!-- Preload Resources -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap" as="style">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=" crossorigin="anonymous" as="style">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css" integrity="sha256-4rTIfo5GQTi/7UJqoyUJQKzxW8VN/YBH31+Cy+vTZj4=" crossorigin="anonymous" as="style">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=" crossorigin="anonymous" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"
+        integrity="sha256-4rTIfo5GQTi/7UJqoyUJQKzxW8VN/YBH31+Cy+vTZj4=" crossorigin="anonymous" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous" as="script">
 
     <!-- Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap">
 
     <!-- Dependencies CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css" integrity="sha256-4rTIfo5GQTi/7UJqoyUJQKzxW8VN/YBH31+Cy+vTZj4=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"
+        integrity="sha256-4rTIfo5GQTi/7UJqoyUJQKzxW8VN/YBH31+Cy+vTZj4=" crossorigin="anonymous">
     <link rel="stylesheet" href="./css/admin.css">
 
     <!-- Dependencies JS -->
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous"></script>
     <script src="./dist/admin.js"></script>
 </head>
 
@@ -86,12 +92,17 @@
             <div class="col-md-3 d-none d-md-block m-0 p-0">
                 <ul class="nav flex-column w-100 nav-pills pe-4" role="tablist">
                     <li class="nav-item pe-2" role="presentation">
-                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active" data-bs-toggle="pill" data-bs-target="#pills-home" id="button-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">
+                        <button
+                            class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
+                            data-bs-toggle="pill" data-bs-target="#pills-home" id="button-home" type="button" role="tab"
+                            aria-controls="pills-home" aria-selected="true">
                             <i class="fa-solid fa-house ms-3 me-2"></i>Home
                         </button>
                     </li>
                     <li class="nav-item pe-2" role="presentation">
-                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm" data-bs-toggle="pill" data-bs-target="#pills-setting" id="button-setting" type="button" role="tab" aria-controls="pills-setting" aria-selected="false">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-setting" id="button-setting" type="button"
+                            role="tab" aria-controls="pills-setting" aria-selected="false">
                             <i class="fa-solid fa-gear ms-3 me-2"></i>Setting
                         </button>
                     </li>
@@ -99,7 +110,9 @@
                         <hr class="my-2" aria-hidden="true">
                     </li>
                     <li class="nav-item pe-2" role="presentation">
-                        <button class="btn-theme-auto logout nav-link w-100 text-start fw-semibold mt-1 rounded-4 shadow-sm" onclick="undangan.admin.logout()" type="button" role="tab" aria-selected="false">
+                        <button
+                            class="btn-theme-auto logout nav-link w-100 text-start fw-semibold mt-1 rounded-4 shadow-sm"
+                            onclick="undangan.admin.logout()" type="button" role="tab" aria-selected="false">
                             <i class="fa-solid fa-right-from-bracket ms-3 me-2"></i>Logout
                         </button>
                     </li>
@@ -116,13 +129,19 @@
                         <!-- Sub Header -->
                         <div class="rounded-4 p-2 mb-4 shadow" style="background-color: var(--bs-gray-200)">
                             <div class="d-flex justify-content-between">
-                                <h5 class="fw-bold my-1 ms-0 p-0" style="color: var(--bs-gray-900); font-size: 1rem;"><i class="fa-solid fa-home mx-2"></i>Home</h5>
+                                <h5 class="fw-bold my-1 ms-0 p-0" style="color: var(--bs-gray-900); font-size: 1rem;"><i
+                                        class="fa-solid fa-home mx-2"></i>Home</h5>
                                 <div class="d-flex">
-                                    <button class="btn btn-success rounded-3 btn-sm shadow-sm my-0 ms-0 me-2 pb-0" onclick="undangan.admin.download(this)" data-offline-disabled="false" aria-label="Download comment">
-                                        <i class="fa-solid fa-download"></i><span class="d-none d-sm-inline ms-2">Download</span>
+                                    <button class="btn btn-success rounded-3 btn-sm shadow-sm my-0 ms-0 me-2 pb-0"
+                                        onclick="undangan.admin.download(this)" data-offline-disabled="false"
+                                        aria-label="Download comment">
+                                        <i class="fa-solid fa-download"></i><span
+                                            class="d-none d-sm-inline ms-2">Download</span>
                                     </button>
-                                    <button class="btn btn-secondary rounded-3 btn-sm shadow-sm m-0 pb-0" onclick="undangan.theme.change()" aria-label="Change theme">
-                                        <i class="fa-solid fa-circle-half-stroke"></i><span class="d-none d-sm-inline ms-2">Theme</span>
+                                    <button class="btn btn-secondary rounded-3 btn-sm shadow-sm m-0 pb-0"
+                                        onclick="undangan.theme.change()" aria-label="Change theme">
+                                        <i class="fa-solid fa-circle-half-stroke"></i><span
+                                            class="d-none d-sm-inline ms-2">Theme</span>
                                     </button>
                                 </div>
                             </div>
@@ -225,18 +244,29 @@
                                 <!-- Form -->
                                 <div class="bg-theme-auto p-3 mb-3 rounded-4 shadow">
                                     <div class="d-block" id="comment-form-default">
-                                        <label for="form-comment" class="form-label fw-bold my-1"><i class="fa-solid fa-comment me-2"></i>Comment</label>
+                                        <label for="form-comment" class="form-label fw-bold my-1"><i
+                                                class="fa-solid fa-comment me-2"></i>Comment</label>
 
                                         <div class="position-relative">
-                                            <button class="btn btn-secondary btn-sm rounded-4 shadow-sm me-1 my-1 position-absolute bottom-0 end-0" onclick="undangan.comment.gif.open(undangan.comment.gif.default)" aria-label="button gif" data-offline-disabled="false"><i class="fa-solid fa-photo-film"></i></button>
-                                            <textarea dir="auto" class="form-control shadow-sm mb-3 rounded-4" id="form-comment" name="form-comment" rows="3" minlength="1" maxlength="1000" placeholder="Type to comment" data-offline-disabled="false"></textarea>
+                                            <button
+                                                class="btn btn-secondary btn-sm rounded-4 shadow-sm me-1 my-1 position-absolute bottom-0 end-0"
+                                                onclick="undangan.comment.gif.open(undangan.comment.gif.default)"
+                                                aria-label="button gif" data-offline-disabled="false"><i
+                                                    class="fa-solid fa-photo-film"></i></button>
+                                            <textarea dir="auto" class="form-control shadow-sm mb-3 rounded-4"
+                                                id="form-comment" name="form-comment" rows="3" minlength="1"
+                                                maxlength="1000" placeholder="Type to comment"
+                                                data-offline-disabled="false"></textarea>
                                         </div>
                                     </div>
 
                                     <div class="d-none mb-3" id="gif-form-default"></div>
 
                                     <div class="d-flex justify-content-end mb-0">
-                                        <button onclick="undangan.comment.send(this)" class="btn btn-primary btn-sm rounded-4 shadow-sm" data-offline-disabled="false"><i class="fa-solid fa-paper-plane me-2"></i>Send</button>
+                                        <button onclick="undangan.comment.send(this)"
+                                            class="btn btn-primary btn-sm rounded-4 shadow-sm"
+                                            data-offline-disabled="false"><i
+                                                class="fa-solid fa-paper-plane me-2"></i>Send</button>
                                     </div>
                                 </div>
                             </div>
@@ -256,7 +286,8 @@
 
                         <!-- Sub Header -->
                         <div class="rounded-4 p-2 mb-4 shadow" style="background-color: var(--bs-gray-200)">
-                            <h5 class="fw-bold my-1 ms-0 p-0" style="color: var(--bs-gray-900); font-size: 1rem;"><i class="fa-solid fa-gear mx-2"></i>Setting</h5>
+                            <h5 class="fw-bold my-1 ms-0 p-0" style="color: var(--bs-gray-900); font-size: 1rem;"><i
+                                    class="fa-solid fa-gear mx-2"></i>Setting</h5>
                         </div>
 
                         <!-- Email -->
@@ -270,12 +301,18 @@
                             <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-person me-2"></i>Name</p>
                             <form>
                                 <div class="mb-3">
-                                    <input dir="auto" type="text" class="form-control form-control-sm rounded-4 shadow-sm" id="form-name" minlength="2" maxlength="50" name="form-name" oninput="undangan.admin.enableButtonName()" autocomplete="name" data-offline-disabled="false">
+                                    <input dir="auto" type="text"
+                                        class="form-control form-control-sm rounded-4 shadow-sm" id="form-name"
+                                        minlength="2" maxlength="50" name="form-name"
+                                        oninput="undangan.admin.enableButtonName()" autocomplete="name"
+                                        data-offline-disabled="false">
                                 </div>
                             </form>
 
                             <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm" id="button-change-name" onclick="undangan.admin.changeName(this)" disabled data-offline-disabled="false">Change</button>
+                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
+                                    id="button-change-name" onclick="undangan.admin.changeName(this)" disabled
+                                    data-offline-disabled="false">Change</button>
                             </div>
                         </div>
 
@@ -284,41 +321,59 @@
                             <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-key me-2"></i>Access Key</p>
 
                             <div class="input-group input-group-sm mb-3">
-                                <input type="text" class="form-control form-control-sm rounded-start-4 shadow-sm" id="dashboard-accesskey" placeholder="Regenerate key" readonly>
-                                <button class="btn btn-sm btn-outline-secondary rounded-end-4 shadow-sm" type="button" data-copy="" onclick="undangan.util.copy(this)" id="button-copy-accesskey"><i class="fa-solid fa-copy"></i></button>
+                                <input type="text" class="form-control form-control-sm rounded-start-4 shadow-sm"
+                                    id="dashboard-accesskey" placeholder="Regenerate key" readonly>
+                                <button class="btn btn-sm btn-outline-secondary rounded-end-4 shadow-sm" type="button"
+                                    data-copy="" onclick="undangan.util.copy(this)" id="button-copy-accesskey"><i
+                                        class="fa-solid fa-copy"></i></button>
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm" onclick="undangan.admin.regenerate(this)" data-offline-disabled="false">Regenerate</button>
+                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
+                                    onclick="undangan.admin.regenerate(this)"
+                                    data-offline-disabled="false">Regenerate</button>
                             </div>
                         </div>
 
                         <!-- Time Zone -->
                         <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-location-dot me-2"></i>Time Zone</p>
+                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-location-dot me-2"></i>Time Zone
+                            </p>
                             <form>
                                 <div class="position-relative mb-3">
-                                    <input type="text" class="form-control form-control-sm rounded-4 shadow-sm" id="form-timezone" oninput="undangan.admin.openLists(this, this.value)" onclick="undangan.admin.openLists(this)" autocomplete="off" data-offline-disabled="false">
-                                    <div id="dropdown-tz-list" class="d-none list-group position-absolute w-100 shadow-sm rounded-4 overflow-y-scroll z-3" style="max-height: 15rem;"></div>
+                                    <input type="text" class="form-control form-control-sm rounded-4 shadow-sm"
+                                        id="form-timezone" oninput="undangan.admin.openLists(this, this.value)"
+                                        onclick="undangan.admin.openLists(this)" autocomplete="off"
+                                        data-offline-disabled="false">
+                                    <div id="dropdown-tz-list"
+                                        class="d-none list-group position-absolute w-100 shadow-sm rounded-4 overflow-y-scroll z-3"
+                                        style="max-height: 15rem;"></div>
                                 </div>
                             </form>
 
                             <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm" id="button-timezone" onclick="undangan.admin.changeTz(this)" disabled data-offline-disabled="false">Change</button>
+                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
+                                    id="button-timezone" onclick="undangan.admin.changeTz(this)" disabled
+                                    data-offline-disabled="false">Change</button>
                             </div>
                         </div>
 
                         <!-- Tenor Key -->
                         <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-photo-film me-2"></i>Tenor Key</p>
+                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-photo-film me-2"></i>Tenor Key
+                            </p>
 
                             <div class="input-group input-group-sm mb-3">
-                                <input type="text" class="form-control form-control-sm rounded-start-4 shadow-sm" id="dashboard-tenorkey" placeholder="Api key tenor" autocomplete="off">
-                                <button class="btn btn-sm btn-outline-secondary rounded-end-4 shadow-sm" type="button" onclick="document.getElementById('dashboard-tenorkey').value = null"><i class="fa-solid fa-trash-can"></i></button>
+                                <input type="text" class="form-control form-control-sm rounded-start-4 shadow-sm"
+                                    id="dashboard-tenorkey" placeholder="Api key tenor" autocomplete="off">
+                                <button class="btn btn-sm btn-outline-secondary rounded-end-4 shadow-sm" type="button"
+                                    onclick="document.getElementById('dashboard-tenorkey').value = null"><i
+                                        class="fa-solid fa-trash-can"></i></button>
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm" onclick="undangan.admin.tenor(this)" data-offline-disabled="false">Save</button>
+                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
+                                    onclick="undangan.admin.tenor(this)" data-offline-disabled="false">Save</button>
                             </div>
                         </div>
 
@@ -327,49 +382,80 @@
                             <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-sliders me-2"></i>Control</p>
 
                             <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch" id="filterBadWord" onchange="undangan.admin.changeCheckboxValue(this, 'filter')" data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="filterBadWord">Filter bad word</label>
+                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
+                                    role="switch" id="filterBadWord"
+                                    onchange="undangan.admin.changeCheckboxValue(this, 'filter')"
+                                    data-offline-disabled="false">
+                                <label class="form-check-label" style="cursor:pointer;" for="filterBadWord">Filter bad
+                                    word</label>
                             </div>
                             <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch" id="confettiAnimation" onchange="undangan.admin.changeCheckboxValue(this, 'confetti_animation')" data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="confettiAnimation">Confetti animation</label>
+                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
+                                    role="switch" id="confettiAnimation"
+                                    onchange="undangan.admin.changeCheckboxValue(this, 'confetti_animation')"
+                                    data-offline-disabled="false">
+                                <label class="form-check-label" style="cursor:pointer;" for="confettiAnimation">Confetti
+                                    animation</label>
                             </div>
                             <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch" id="replyComment" onchange="undangan.admin.changeCheckboxValue(this, 'can_reply')" data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="replyComment">Can reply</label>
+                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
+                                    role="switch" id="replyComment"
+                                    onchange="undangan.admin.changeCheckboxValue(this, 'can_reply')"
+                                    data-offline-disabled="false">
+                                <label class="form-check-label" style="cursor:pointer;" for="replyComment">Can
+                                    reply</label>
                             </div>
                             <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch" id="editComment" onchange="undangan.admin.changeCheckboxValue(this, 'can_edit')" data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="editComment">Can edit</label>
+                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
+                                    role="switch" id="editComment"
+                                    onchange="undangan.admin.changeCheckboxValue(this, 'can_edit')"
+                                    data-offline-disabled="false">
+                                <label class="form-check-label" style="cursor:pointer;" for="editComment">Can
+                                    edit</label>
                             </div>
                             <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch" id="deleteComment" onchange="undangan.admin.changeCheckboxValue(this, 'can_delete')" data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="deleteComment">Can delete</label>
+                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
+                                    role="switch" id="deleteComment"
+                                    onchange="undangan.admin.changeCheckboxValue(this, 'can_delete')"
+                                    data-offline-disabled="false">
+                                <label class="form-check-label" style="cursor:pointer;" for="deleteComment">Can
+                                    delete</label>
                             </div>
                         </div>
 
                         <!-- Change Password -->
                         <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-lock me-2"></i>Change Password</p>
+                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-lock me-2"></i>Change Password
+                            </p>
                             <form>
                                 <input hidden type="text" name="username" autocomplete="username" value="...">
                                 <div class="my-2">
-                                    <input type="password" class="form-control form-control-sm rounded-4 shadow-sm" id="old_password" minlength="8" maxlength="20" name="old_password" placeholder="Old Password" autocomplete="current-password" data-offline-disabled="false">
+                                    <input type="password" class="form-control form-control-sm rounded-4 shadow-sm"
+                                        id="old_password" minlength="8" maxlength="20" name="old_password"
+                                        placeholder="Old Password" autocomplete="current-password"
+                                        data-offline-disabled="false">
                                 </div>
                                 <div class="mb-3">
-                                    <input type="password" class="form-control form-control-sm rounded-4 shadow-sm" id="new_password" minlength="8" maxlength="20" name="new_password" oninput="undangan.admin.enableButtonPassword()" placeholder="New Password" autocomplete="new-password" data-offline-disabled="false">
+                                    <input type="password" class="form-control form-control-sm rounded-4 shadow-sm"
+                                        id="new_password" minlength="8" maxlength="20" name="new_password"
+                                        oninput="undangan.admin.enableButtonPassword()" placeholder="New Password"
+                                        autocomplete="new-password" data-offline-disabled="false">
                                 </div>
                             </form>
 
                             <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm" id="button-change-password" onclick="undangan.admin.changePassword(this)" disabled data-offline-disabled="false">Change</button>
+                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
+                                    id="button-change-password" onclick="undangan.admin.changePassword(this)" disabled
+                                    data-offline-disabled="false">Change</button>
                             </div>
                         </div>
 
                         <!-- Logout -->
                         <div class="d-block d-md-none d-lg-none d-xl-none">
                             <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                                <button type="button" class="btn btn-danger btn-sm w-100 text-center fw-semibold rounded-4 shadow-sm" onclick="undangan.admin.logout()">
+                                <button type="button"
+                                    class="btn btn-danger btn-sm w-100 text-center fw-semibold rounded-4 shadow-sm"
+                                    onclick="undangan.admin.logout()">
                                     <i class="fa-solid fa-right-from-bracket me-2"></i>Logout
                                 </button>
                             </div>
@@ -377,7 +463,9 @@
 
                         <div class="p-3 bg-theme-auto mb-4 rounded-4 shadow">
                             <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-heart me-2"></i>Love Project</p>
-                            <p class="m-0 p-0">Discover and support this project on <i class="fa-brands fa-github me-1"></i><a target="_blank" href="https://github.com/dewanakl/undangan">GitHub</a></p>
+                            <p class="m-0 p-0">Discover and support this project on <i
+                                    class="fa-brands fa-github me-1"></i><a target="_blank"
+                                    href="https://github.com/dewanakl/undangan">GitHub</a></p>
                         </div>
                     </section>
                 </div>
@@ -385,29 +473,36 @@
         </div>
     </main>
 
-   <!-- Modal login -->
-<div class="modal fade" id="mainModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-label="modal login" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4">
-            <div class="modal-body">
-                <form id="admin-login-form" onsubmit="event.preventDefault(); undangan.admin.auth.login(this.querySelector('button[type=submit]'))">
-                    <!-- Bỏ trường EMAIL cũ -->
-                    
-                    <div class="mb-3">
-                        <label for="admin-pass" class="form-label my-1"><i class="fa-solid fa-lock me-2"></i>Mật khẩu Admin</label>
-                        <!-- ĐỔI ID VÀ NAME THÀNH 'admin-pass' -->
-                        <input type="password" class="form-control shadow-sm rounded-4" id="admin-pass" name="admin-pass" minlength="8" maxlength="20" placeholder="Enter your password" required autocomplete="current-password" data-offline-disabled="false">
-                    </div>
-                    
-                    <div class="d-grid">
-                        <!-- THAY HÀM GỌI LẠI ĐỂ DÙNG HÀM MỚI -->
-                        <button type="submit" class="btn btn-primary shadow-sm rounded-4" onclick="undangan.admin.auth.login(this)" data-offline-disabled="false"><i class="fa-solid fa-right-to-bracket me-2"></i>Login</button>
-                    </div>
-                </form>
+    <!-- Modal login -->
+    <div class="modal fade" id="mainModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-label="modal login"
+        tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-body">
+                    <form id="admin-login-form" 
+                        onsubmit="event.preventDefault();
+                        undangan.admin.auth.login(this.querySelector('button[type=submit]'))">
+
+                        <div class="mb-3">
+                            <label for="admin-pass" class="form-label my-1"><i class="fa-solid fa-lock me-2"></i>Mật
+                                khẩu Admin</label>
+                            <input type="password" class="form-control shadow-sm rounded-4" id="admin-pass"
+                                name="admin-pass" minlength="8" maxlength="20" placeholder="Enter your password"
+                                required autocomplete="current-password" data-offline-disabled="false">
+                        </div>
+
+                        <div class="d-grid">
+                            <!-- NÚT CHỈ CẦN TYPE SUBMIT, KHÔNG CẦN ONCLICK -->
+                            <button type="submit" class="btn btn-primary shadow-sm rounded-4"
+                                data-offline-disabled="false">
+                                <i class="fa-solid fa-right-to-bracket me-2"></i>Login
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 
 </html>
