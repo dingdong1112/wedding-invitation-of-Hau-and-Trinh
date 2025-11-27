@@ -22,21 +22,23 @@ export const session = (() => {
     const setToken = (token) => ses.set('token', token);
 
     /**
-     * @param {object} body
-     * @returns {Promise<boolean>}
-     */
-    const login = (body, serverUrl) => {
-        request(HTTP_POST, serverUrl) // Gửi URL đầy đủ
-            .body(body)
-            .send(dto.tokenResponse)
-            .then((res) => {
-                if (res.code === HTTP_STATUS_OK) {
-                    // TOKEN MỚI: Chỉ cần lưu VERCEL_ADMIN_TOKEN thay vì token JWT cũ
-                    setToken("VERCEL_ADMIN_TOKEN"); // Token cứng để xác thực Admin
-                }
-                return res.code === HTTP_STATUS_OK;
-            });
-    };
+ * @param {object} body
+ * @returns {Promise<boolean>}
+ */
+const login = (body, serverUrl) => {
+    return request(HTTP_POST, serverUrl)
+        .body(body)
+        .send(tokenResponse) // Dùng tokenResponse đã sửa
+        .then((res) => {
+            // res.data giờ là {token: "VERCEL_ADMIN_TOKEN"} hoặc {token: null}
+            if (res.code === HTTP_STATUS_OK && res.data.token) {
+                // Chỉ set token nếu nó tồn tại
+                setToken(res.data.token); 
+                return true;
+            }
+            return false;
+        });
+};
 
     /**
      * @returns {void}

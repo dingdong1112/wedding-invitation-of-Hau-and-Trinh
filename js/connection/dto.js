@@ -53,10 +53,18 @@ export const dto = (() => {
      * @param {{token: string}} token
      * @returns {{token: string}}
      */
-    const tokenResponse = ({ token }) => {
-        return {
-            token,
-        };
+    const tokenResponse = (data) => {
+        // API mới trả về data: {result: 'success', token: 'VERCEL_ADMIN_TOKEN'}
+        // Nếu API thành công, ta trả về token
+        if (data.result === 'success') {
+            // Trả về token cho hàm login
+            return { token: data.token };
+        }
+        // Nếu API lỗi, hàm send sẽ tự throw error
+
+        // Phải trả về một cấu trúc an toàn để tránh lỗi destructuring
+        // Nếu data không có token, thì trả về một object rỗng
+        return { token: null };
     };
 
     /**
