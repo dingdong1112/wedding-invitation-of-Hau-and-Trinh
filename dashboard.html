@@ -46,7 +46,7 @@
 
 <!-- <html lang="en" data-bs-theme="auto"> ['auto', 'dark', 'light'] -->
 
-<body data-url="https://api.ulems.my.id/">
+<body data-url="https://wedding-invitation-of-hau-and-chin.vercel.app/">
 
     <!-- Nav bottom -->
     <nav class="navbar navbar-expand fixed-bottom rounded-top-4 border-top d-md-none d-lg-none d-xl-none p-0">
@@ -390,7 +390,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4">
             <div class="modal-body">
-                <form id="admin-login-form">
+                <form id="admin-login-form" onsubmit="event.preventDefault(); undangan.admin.auth.login(this.querySelector('button[type=submit]'))">
                     <!-- Bỏ trường EMAIL cũ -->
                     
                     <div class="mb-3">
@@ -401,7 +401,7 @@
                     
                     <div class="d-grid">
                         <!-- THAY HÀM GỌI LẠI ĐỂ DÙNG HÀM MỚI -->
-                        <button type="submit" class="btn btn-primary shadow-sm rounded-4" onclick="adminLoginHandler(this)" data-offline-disabled="false"><i class="fa-solid fa-right-to-bracket me-2"></i>Login</button>
+                        <button type="submit" class="btn btn-primary shadow-sm rounded-4" onclick="undangan.admin.auth.login(this)" data-offline-disabled="false"><i class="fa-solid fa-right-to-bracket me-2"></i>Login</button>
                     </div>
                 </form>
             </div>
