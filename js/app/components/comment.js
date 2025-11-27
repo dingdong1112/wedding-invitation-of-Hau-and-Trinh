@@ -3,7 +3,7 @@ import { util } from '../../common/util.js';
 export const comment = (() => {
 
     // --- DÁN URL MỚI VÀO ĐÂY (URL BẠN VỪA DEPLOY NEW VERSION) ---
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHxK_zKto0k8zjq-nCc8aK13f03_yy9NJO4nihSV8JVYGY2AMiHkjGYVXK787tQiWb/exec';
+    const SCRIPT_URL = '/api/wishes';
 
      let wishesData = [];
     let currentIndex = 0;
