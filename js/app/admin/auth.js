@@ -65,7 +65,7 @@ export const auth = (() => {
     /** @returns {Promise<object>} */
     const getDetailUser = () => {
         // API này sẽ gọi API lấy Config của bạn (vì API /api/user cũ đã chết)
-        return request(HTTP_GET, '/api/config').token(session.getToken()).send().then((res) => {
+        return request(HTTP_GET, '/api/config').token(session.getToken()).send().then((res) => { 
             if (res.code !== HTTP_STATUS_OK) {
                 throw new Error('failed to get config.');
             }

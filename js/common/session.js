@@ -1,6 +1,5 @@
 import { util } from './util.js';
 import { storage } from './storage.js';
-import { dto } from '../connection/dto.js';
 import { request, HTTP_POST, HTTP_GET, HTTP_STATUS_OK } from '../connection/request.js';
 
 export const session = (() => {
@@ -25,20 +24,26 @@ export const session = (() => {
  * @param {object} body
  * @returns {Promise<boolean>}
  */
-const login = (body, serverUrl) => {
-    return request(HTTP_POST, serverUrl)
-        .body(body)
-        .send(tokenResponse) // Dùng tokenResponse đã sửa
-        .then((res) => {
-            // res.data giờ là {token: "VERCEL_ADMIN_TOKEN"} hoặc {token: null}
-            if (res.code === HTTP_STATUS_OK && res.data.token) {
-                // Chỉ set token nếu nó tồn tại
-                setToken(res.data.token); 
-                return true;
-            }
-            return false;
-        });
-};
+    const tokenResponse = (data) => {
+        if (data && data.result === 'success' && data.token) {
+            return { token: data.token };
+        }
+        return { token: null };
+    };
+
+    const login = (body, serverUrl) => {
+        return request(HTTP_POST, serverUrl)
+            .body(body)
+            // Dùng tokenResponse vừa định nghĩa lại
+            .send(tokenResponse)
+            .then((res) => {
+                if (res.code === HTTP_STATUS_OK && res.data.token) {
+                    setToken(res.data.token);
+                    return true;
+                }
+                return false;
+            });
+    };
 
     /**
      * @returns {void}
