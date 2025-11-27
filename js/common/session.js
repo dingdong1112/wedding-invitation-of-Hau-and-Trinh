@@ -1,7 +1,6 @@
 import { util } from './util.js';
 import { storage } from './storage.js';
 import { dto } from '../connection/dto.js';
-import { request, HTTP_POST, HTTP_GET, HTTP_STATUS_OK } from '../connection/request.js';
 
 export const session = (() => {
 
