@@ -4,71 +4,129 @@ const { MongoClient } = require('mongodb');
 // --- THAY CHUỖI KẾT NỐI CỦA BẠN VÀO DÒNG DƯỚI ĐÂY ---
 const uri = "mongodb+srv://admin:admin0123@weddingdb.p6k1yfo.mongodb.net/?appName=WeddingDB"; 
 
+if (!uri) {
+    throw new Error('MONGO_URI is not defined.');
+}
+
 const client = new MongoClient(uri);
 
+export const config = {
+    api: {
+        bodyParser: true, // Giữ nguyên để Vercel tự parse JSON/Form URL Encoded
+    },
+};
+
 export default async function handler(req, res) {
-    // Cấu hình CORS để web không bị chặn
+    // Cấu hình CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-    );
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,DELETE,POST,PUT,PATCH');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-    // Xử lý request OPTIONS (preflight)
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+        return res.status(200).end();
     }
 
     try {
-        // Kết nối DB (Vercel sẽ cache kết nối này để chạy nhanh hơn ở lần sau)
         await client.connect();
-        const database = client.db('WeddingDB'); // Tên Database tự đặt
-        const collection = database.collection('wishes'); // Tên bảng lưu lời chúc
+        const database = client.db('WeddingDB');
+        const wishesCollection = database.collection('wishes');
+        const settingsCollection = database.collection('settings');
+        
+        // --- CHỨC NĂNG CHUNG (Lấy Config) ---
+        const mainConfig = await settingsCollection.findOne({ key: "main_config" });
+        const adminPass = mainConfig ? mainConfig.admin_password : null;
 
-        // 1. LẤY DANH SÁCH LỜI CHÚC (GET)
-        if (req.method === 'GET') {
-            const wishes = await collection.find({}).sort({ _id: -1 }).toArray();
+        // --- 1. LẤY DANH SÁCH LỜI CHÚC (GET) ---
+        if (req.method === 'GET' && req.url === '/api/wishes') {
+            const wishes = await wishesCollection.find({}).sort({ _id: -1 }).toArray();
             
-            // Trả về đúng định dạng mà file comment.js cần
+            // Trả về dữ liệu lời chúc
             return res.status(200).json({
                 result: 'success',
-                data: wishes.map(w => ({ name: w.name, message: w.message }))
+                data: wishes.map(w => ({ id: w._id, name: w.name, message: w.message, created_at: w.createdAt, presence: w.presence }))
             });
         } 
         
-        // 2. GỬI LỜI CHÚC MỚI (POST)
-        else if (req.method === 'POST') {
-            // Xử lý dữ liệu gửi lên (có thể là JSON hoặc FormData)
-            let body = req.body;
-            
-            // Nếu gửi dạng FormData, Vercel đôi khi nhận là string, cần parse
-            if (typeof body === 'string') {
-                try { body = JSON.parse(body); } catch (e) {}
-            }
+        // --- 2. LẤY CẤU HÌNH TRANG ADMIN/KHÁCH (GET /api/config) ---
+        else if (req.method === 'GET' && req.url === '/api/config') {
+             if (!mainConfig) return res.status(404).json({ error: 'Config not found' });
+             // Chỉ trả về các trường cần thiết cho Frontend
+             return res.status(200).json({
+                 result: 'success',
+                 data: {
+                     can_delete: mainConfig.can_delete,
+                     can_edit: mainConfig.can_edit,
+                     can_reply: mainConfig.can_reply,
+                     confetti_enabled: mainConfig.confetti_enabled,
+                     per_page: mainConfig.per_page,
+                 }
+             });
+        }
 
-            // Lấy thông tin (Ưu tiên các tên trường thường dùng)
-            const name = body.Ten || body.name;
-            const message = body.LoiChuc || body.message;
+        // --- 3. GỬI LỜI CHÚC MỚI (POST) ---
+        else if (req.method === 'POST') {
+            const data = req.body; 
+            const name = data.Ten; 
+            const message = data.LoiChuc;
+            const presence = data.ThamDu;
 
             if (!name || !message) {
-                return res.status(400).json({ error: 'Thiếu tên hoặc lời chúc' });
+                return res.status(400).json({ error: "Thiếu thông tin" });
             }
-
-            await collection.insertOne({
+            
+            await wishesCollection.insertOne({
                 name: name,
                 message: message,
-                createdAt: new Date()
+                presence: presence,
+                createdAt: new Date(),
+                is_admin: false // Mặc định là khách thường
             });
 
             return res.status(200).json({ result: 'success' });
         }
         
-        // Phương thức không hỗ trợ
+        // --- 4. ĐĂNG NHẬP ADMIN (POST /api/admin/login) ---
+        else if (req.method === 'POST' && req.url === '/api/admin/login') {
+            const { password } = req.body;
+
+            if (password === adminPass) {
+                // Tạo một token đơn giản (có thể thay bằng JWT nếu cần bảo mật cao hơn)
+                return res.status(200).json({ result: 'success', token: "VERCEL_ADMIN_TOKEN" });
+            } else {
+                return res.status(401).json({ result: 'error', message: 'Mật khẩu không đúng' });
+            }
+        }
+        
+        // --- 5. LƯU CẤU HÌNH ADMIN (PATCH /api/admin/settings) ---
+        else if (req.method === 'PATCH' && req.url === '/api/admin/settings') {
+            const token = req.headers['authorization'];
+            if (token !== "VERCEL_ADMIN_TOKEN") return res.status(401).json({ error: "Unauthorized" });
+
+            const { admin_password, ...settings } = req.body;
+            
+            // Xóa password cũ nếu admin muốn đổi
+            const updateDoc = { $set: settings };
+            if (admin_password) updateDoc.$set.admin_password = admin_password;
+
+            await settingsCollection.updateOne({ key: "main_config" }, updateDoc);
+            return res.status(200).json({ result: 'success' });
+        }
+
+        // --- 6. XÓA LỜI CHÚC (DELETE /api/wishes/:id) ---
+        else if (req.method === 'DELETE' && req.url.startsWith('/api/wishes/')) {
+            const token = req.headers['authorization'];
+            if (token !== "VERCEL_ADMIN_TOKEN") return res.status(401).json({ error: "Unauthorized" });
+
+            const id = req.url.split('/').pop();
+            if (!id) return res.status(400).json({ error: 'Missing ID' });
+
+            await wishesCollection.deleteOne({ _id: new ObjectId(id) });
+            return res.status(200).json({ result: 'success' });
+        }
+        
         else {
-            return res.status(405).json({ error: 'Method not allowed' });
+            return res.status(404).json({ error: 'Not Found' });
         }
 
     } catch (error) {

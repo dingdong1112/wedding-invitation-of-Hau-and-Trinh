@@ -385,28 +385,29 @@
         </div>
     </main>
 
-    <!-- Modal login -->
-    <div class="modal fade" id="mainModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-label="modal login" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4">
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="loginEmail" class="form-label my-1"><i class="fa-solid fa-envelope me-2"></i>Email</label>
-                            <input type="email" class="form-control shadow-sm rounded-4" id="loginEmail" minlength="5" maxlength="254" placeholder="Enter your email" required autocomplete="email" data-offline-disabled="false">
-                        </div>
-                        <div class="mb-3">
-                            <label for="loginPassword" class="form-label my-1"><i class="fa-solid fa-lock me-2"></i>Password</label>
-                            <input type="password" class="form-control shadow-sm rounded-4" id="loginPassword" minlength="8" maxlength="20" placeholder="Enter your password" required autocomplete="current-password" data-offline-disabled="false">
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary shadow-sm rounded-4" onclick="undangan.admin.auth.login(this)" data-offline-disabled="false"><i class="fa-solid fa-right-to-bracket me-2"></i>Login</button>
-                        </div>
-                    </form>
-                </div>
+   <!-- Modal login -->
+<div class="modal fade" id="mainModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-label="modal login" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-body">
+                <form id="admin-login-form">
+                    <!-- Bỏ trường EMAIL cũ -->
+                    
+                    <div class="mb-3">
+                        <label for="admin-pass" class="form-label my-1"><i class="fa-solid fa-lock me-2"></i>Mật khẩu Admin</label>
+                        <!-- ĐỔI ID VÀ NAME THÀNH 'admin-pass' -->
+                        <input type="password" class="form-control shadow-sm rounded-4" id="admin-pass" name="admin-pass" minlength="8" maxlength="20" placeholder="Enter your password" required autocomplete="current-password" data-offline-disabled="false">
+                    </div>
+                    
+                    <div class="d-grid">
+                        <!-- THAY HÀM GỌI LẠI ĐỂ DÙNG HÀM MỚI -->
+                        <button type="submit" class="btn btn-primary shadow-sm rounded-4" onclick="adminLoginHandler(this)" data-offline-disabled="false"><i class="fa-solid fa-right-to-bracket me-2"></i>Login</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 </body>
 
 </html>

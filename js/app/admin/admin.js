@@ -10,36 +10,45 @@ import { offline } from '../../common/offline.js';
 import { comment } from '../components/comment.js';
 import { pool, request, HTTP_GET, HTTP_PATCH, HTTP_PUT } from '../../connection/request.js';
 
+const SERVER_URL = "https://wedding-invitation-of-hau-and-chin.vercel.app"; // Thay link của bạn
+
 export const admin = (() => {
 
     /**
      * @returns {Promise<void>}
      */
     const getUserStats = () => auth.getDetailUser().then((res) => {
+        // Bỏ qua hiển thị Dashboard-Name/Email/AccessKey vì API mới không trả về
 
-        util.safeInnerHTML(document.getElementById('dashboard-name'), `${util.escapeHtml(res.data.name)}<i class="fa-solid fa-hands text-warning ms-2"></i>`);
-        document.getElementById('dashboard-email').textContent = res.data.email;
-        document.getElementById('dashboard-accesskey').value = res.data.access_key;
-        document.getElementById('button-copy-accesskey').setAttribute('data-copy', res.data.access_key);
+        // Tải cấu hình từ MongoDB
+        const configStorage = storage('config');
 
-        document.getElementById('form-name').value = util.escapeHtml(res.data.name);
-        document.getElementById('form-timezone').value = res.data.tz;
-        document.getElementById('filterBadWord').checked = Boolean(res.data.is_filter);
-        document.getElementById('confettiAnimation').checked = Boolean(res.data.is_confetti_animation);
-        document.getElementById('replyComment').checked = Boolean(res.data.can_reply);
-        document.getElementById('editComment').checked = Boolean(res.data.can_edit);
-        document.getElementById('deleteComment').checked = Boolean(res.data.can_delete);
-        document.getElementById('dashboard-tenorkey').value = res.data.tenor_key;
+        // Load các giá trị checkbox từ storage
+        document.getElementById('filterBadWord').checked = configStorage.get('is_filter') || false;
+        document.getElementById('confettiAnimation').checked = configStorage.get('confetti_enabled') || false;
+        document.getElementById('replyComment').checked = configStorage.get('can_reply') || false;
+        document.getElementById('editComment').checked = configStorage.get('can_edit') || false;
+        document.getElementById('deleteComment').checked = configStorage.get('can_delete') || false;
 
-        storage('config').set('tenor_key', res.data.tenor_key);
+        // Bỏ qua TenorKey và Timezone vì không dùng
+
         document.dispatchEvent(new Event('undangan.session'));
 
-        request(HTTP_GET, '/api/stats').token(session.getToken()).withCache(1000 * 30).withForceCache().send().then((resp) => {
-            document.getElementById('count-comment').textContent = String(resp.data.comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            document.getElementById('count-like').textContent = String(resp.data.likes).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            document.getElementById('count-present').textContent = String(resp.data.present).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            document.getElementById('count-absent').textContent = String(resp.data.absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        });
+        // TẢI THỐNG KÊ (GIẢ LẬP)
+        request(HTTP_GET, '/api/wishes') // Gọi API lấy tất cả lời chúc
+            .token(session.getToken())
+            .send()
+            .then((resp) => {
+                const comments = resp.data.length;
+                // GIẢ ĐỊNH LOGIC TÍNH TOÁN (Vì API cũ đã chết)
+                let present = resp.data.filter(i => i.presence === 'Có' || i.presence === '1').length;
+                let absent = resp.data.filter(i => i.presence === 'Không' || i.presence === '2').length;
+
+                document.getElementById('count-comment').textContent = String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                document.getElementById('count-present').textContent = String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                document.getElementById('count-absent').textContent = String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                // Bỏ qua count-like vì không có API Like
+            });
 
         comment.show();
     });
@@ -52,10 +61,28 @@ export const admin = (() => {
     const changeCheckboxValue = (checkbox, type) => {
         const label = util.disableCheckbox(checkbox);
 
-        request(HTTP_PATCH, '/api/user')
+        // Chuẩn bị body
+        const body = {};
+        // Đảm bảo tên trường khớp với MongoDB (ví dụ: confetti_animation -> confetti_enabled)
+        const fieldMap = {
+            'filterBadWord': 'is_filter',
+            'confettiAnimation': 'confetti_enabled', // Cần khớp với key MongoDB settings
+            'replyComment': 'can_reply',
+            'editComment': 'can_edit',
+            'deleteComment': 'can_delete',
+        };
+
+        const mongoField = fieldMap[checkbox.id] || type;
+        body[mongoField] = checkbox.checked;
+
+        request(HTTP_PATCH, '/api/admin/settings')
             .token(session.getToken())
-            .body({ [type]: checkbox.checked })
+            .body(body)
             .send()
+            .then(() => {
+                // Cập nhật local storage sau khi server thành công
+                storage('config').set(mongoField, checkbox.checked);
+            })
             .finally(() => label.restore());
     };
 

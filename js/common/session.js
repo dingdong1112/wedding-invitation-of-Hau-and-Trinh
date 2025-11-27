@@ -25,15 +25,15 @@ export const session = (() => {
      * @param {object} body
      * @returns {Promise<boolean>}
      */
-    const login = (body) => {
-        return request(HTTP_POST, '/api/session')
+    const login = (body, serverUrl = '/api/session') => {
+        return request(HTTP_POST, serverUrl)
             .body(body)
             .send(dto.tokenResponse)
             .then((res) => {
                 if (res.code === HTTP_STATUS_OK) {
-                    setToken(res.data.token);
+                    // TOKEN MỚI: Chỉ cần lưu VERCEL_ADMIN_TOKEN thay vì token JWT cũ
+                    setToken("VERCEL_ADMIN_TOKEN"); // Token cứng để xác thực Admin
                 }
-
                 return res.code === HTTP_STATUS_OK;
             });
     };
