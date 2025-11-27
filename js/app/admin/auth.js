@@ -31,17 +31,18 @@ export const auth = (() => {
         // API MỚI: /api/admin/login, chỉ gửi password
         try {
             // SỬ DỤNG AWAIT để nhận thẳng kết quả, tránh lỗi 'then'
-            const success = await session.login( 
-            { password: formPassword.value }, 
-            BASE_API_URL + '/api/admin/login' // <-- TRUYỀN URL ĐẦY ĐỦ VÀO
+            const success = await session.login(
+                { password: formPassword.value },
+                BASE_API_URL + '/api/admin/login'
             );
 
             if (success) {
                 formPassword.value = null;
                 bs.modal('mainModal').hide();
-                // admin.js sẽ tự động chạy getUserStats sau khi modal ẩn
-            } else {
-                // Nếu server trả về 401, session.login đã xử lý alert
+
+                // --- THÔNG BÁO THÀNH CÔNG CHO ADMIN.JS ---
+                // Kích hoạt một sự kiện tùy chỉnh (custom event)
+                document.dispatchEvent(new Event('undangan.admin.success'));
             }
         } catch (e) {
             // Xử lý lỗi Network hoặc lỗi khác (lỗi này đã được xử lý trong request.js)
@@ -49,7 +50,7 @@ export const auth = (() => {
             console.error("Login failed:", e);
         } finally {
             btn.restore();
-            formPassword.disabled = false;
+        formPassword.disabled = false;
         }
     };
     // -----------------------------------------------------------------
@@ -65,7 +66,7 @@ export const auth = (() => {
     /** @returns {Promise<object>} */
     const getDetailUser = () => {
         // API này sẽ gọi API lấy Config của bạn (vì API /api/user cũ đã chết)
-        return request(HTTP_GET, '/api/config').token(session.getToken()).send().then((res) => { 
+        return request(HTTP_GET, '/api/config').token(session.getToken()).send().then((res) => {
             if (res.code !== HTTP_STATUS_OK) {
                 throw new Error('failed to get config.');
             }

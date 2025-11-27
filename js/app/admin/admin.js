@@ -11,7 +11,7 @@ import { comment } from '../components/comment.js';
 import { pool, request, HTTP_GET, HTTP_PATCH, HTTP_PUT } from '../../connection/request.js';
 
 export const admin = (() => {
-    
+
     // ĐỊNH NGHĨA SERVER URL 
     const SERVER_URL = "https://wedding-invitation-of-hau-and-chin.vercel.app";
 
@@ -19,7 +19,7 @@ export const admin = (() => {
      * @returns {Promise<void>}
      */
     const getUserStats = () => auth.getDetailUser(SERVER_URL).then((res) => { // Truyền URL vào auth
-        
+
         // --- LOGIC HIỂN THỊ THÔNG TIN ADMIN (GIẢ LẬP) ---
         util.safeInnerHTML(document.getElementById('dashboard-name'), `Admin<i class="fa-solid fa-hands text-warning ms-2"></i>`);
         document.getElementById('dashboard-email').textContent = 'admin@wedding.app';
@@ -32,9 +32,9 @@ export const admin = (() => {
         // Load config
         document.getElementById('confettiAnimation').checked = configStorage.get('confetti_enabled');
         document.getElementById('deleteComment').checked = configStorage.get('can_delete');
-        
+
         // Vô hiệu hóa các trường không dùng đến
-        document.getElementById('filterBadWord')?.closest('.form-check')?.remove(); 
+        document.getElementById('filterBadWord')?.closest('.form-check')?.remove();
         document.getElementById('replyComment')?.closest('.form-check')?.remove();
         document.getElementById('editComment')?.closest('.form-check')?.remove();
         document.getElementById('form-timezone')?.closest('.p-3')?.remove();
@@ -43,7 +43,7 @@ export const admin = (() => {
         document.dispatchEvent(new Event('undangan.session'));
 
         // Tải thống kê (GỌI ĐÚNG API MỚI)
-        request(HTTP_GET, SERVER_URL + '/api/wishes') 
+        request(HTTP_GET, SERVER_URL + '/api/wishes')
             .token(session.getToken())
             .withCache(1000 * 30)
             .send()
@@ -75,9 +75,9 @@ export const admin = (() => {
     const changeCheckboxValue = (checkbox, type) => {
         const label = util.disableCheckbox(checkbox);
         const body = {};
-        
+
         const fieldMap = {
-            'confettiAnimation': 'confetti_enabled', 
+            'confettiAnimation': 'confetti_enabled',
             'deleteComment': 'can_delete',
         };
         const mongoField = fieldMap[checkbox.id] || type;
@@ -93,18 +93,18 @@ export const admin = (() => {
             })
             .finally(() => label.restore());
     };
-    
+
     // Vô hiệu hóa các hàm không dùng đến
     const tenor = () => util.notify("Tính năng không được hỗ trợ.").warning();
     const regenerate = () => util.notify("Tính năng không được hỗ trợ.").warning();
     const changePassword = () => util.notify("Sửa mật khẩu trong Cấu hình Server.").warning();
     const changeName = () => util.notify("Đổi tên trong Cấu hình Server.").warning();
     const download = () => util.notify("Vui lòng tải thủ công từ MongoDB Atlas.").warning();
-    const enableButtonName = () => {};
-    const enableButtonPassword = () => {};
-    const openLists = () => {};
+    const enableButtonName = () => { };
+    const enableButtonPassword = () => { };
+    const openLists = () => { };
     const changeTz = () => util.notify("Tính năng không được hỗ trợ.").warning();
-    
+
     const logout = () => {
         if (!util.ask('Are you sure?')) return;
         auth.clearSession();
@@ -117,7 +117,10 @@ export const admin = (() => {
     const pageLoaded = () => {
         lang.init();
         // Cần thiết lập SERVER_URL để các module khác biết gọi đến đâu
-        document.body.setAttribute('data-url', SERVER_URL); 
+        document.body.setAttribute('data-url', SERVER_URL);
+
+        document.addEventListener('undangan.admin.success', getUserStats);
+        document.addEventListener('hidden.bs.modal', getUserStats);
 
         // ... (các bước init khác giữ nguyên)
 
@@ -130,9 +133,7 @@ export const admin = (() => {
         session.isValid() ? getUserStats() : auth.clearSession();
     };
 
-    /**
-     * @returns {object}
-     */
+    /** @returns {object} */
     const init = () => {
         auth.init();
         theme.init();
