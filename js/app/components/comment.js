@@ -173,36 +173,58 @@ export const comment = (() => {
         const form = document.getElementById('wishes-form');
         const btn = document.getElementById('btn-send-wish');
         const successMsg = document.getElementById('success-msg');
+        
         if (form) {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const originalBtnText = btn.innerHTML;
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang gửi...';
+                
+                // --- 1. ĐỌC FORM DATA VÀ CHUYỂN THÀNH OBJECT JSON ---
                 const data = new FormData(form);
-                fetch(SCRIPT_URL, { method: 'POST', body: data })
-                    .then(response => {
-                        form.reset();
-                        successMsg.classList.remove('d-none');
-                        setTimeout(() => successMsg.classList.add('d-none'), 5000);
-                        const tempWish = { name: data.get('Ten'), message: data.get('LoiChuc') };
-                        wishesData.unshift(tempWish);
-                        if(isWishesActive) {
-                            // Reset quy trình để hiện tin mới ngay
-                            clearTimeout(hideTimer);
-                            clearTimeout(nextTimer);
-                            const box = document.getElementById('wish-notification');
-                            if(box) box.classList.remove('show');
-                            
-                            currentIndex = 0; // Đưa về đầu (tin mới nhất)
-                            setTimeout(showNextWish, 600);
-                        }
-                    })
-                    .catch(error => { util.notify("Lỗi gửi!").error(); })
-                    .finally(() => {
-                        btn.disabled = false;
-                        btn.innerHTML = originalBtnText;
-                    });
+                const formDataObject = {};
+                
+                // Chuyển FormData sang Object JS
+                data.forEach((value, key) => {
+                    // Chúng ta chỉ cần Ten, ThamDu và LoiChuc
+                    formDataObject[key] = value;
+                });
+
+                // --- 2. THỰC HIỆN FETCH GỬI JSON ---
+                fetch(SCRIPT_URL, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Báo cho Server biết đây là JSON
+                    },
+                    body: JSON.stringify(formDataObject) // Gửi dữ liệu JSON
+                })
+                .then(response => response.json()) // Đọc Response dưới dạng JSON
+                .then(json => {
+                    if (json.result !== 'success') {
+                         throw new Error(json.error || "Lỗi gửi không xác định.");
+                    }
+                    
+                    form.reset();
+                    successMsg.classList.remove('d-none');
+                    setTimeout(() => successMsg.classList.add('d-none'), 5000);
+                    
+                    // Logic hiển thị lời chúc mới
+                    const tempWish = { name: formDataObject.Ten, message: formDataObject.LoiChuc };
+                    wishesData.unshift(tempWish);
+                    if(isWishesActive) {
+                        currentIndex = 0;
+                        clearTimeout(hideTimer);
+                        clearTimeout(nextTimer);
+                        document.getElementById('wish-notification')?.classList.remove('show');
+                        setTimeout(showNextWish, 600);
+                    }
+                })
+                .catch(error => { util.notify("Lỗi gửi lời chúc: " + error.message).error(); })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtnText;
+                });
             });
         }
     };
