@@ -25,8 +25,8 @@ export const session = (() => {
      * @param {object} body
      * @returns {Promise<boolean>}
      */
-    const login = (body, serverUrl = '/api/session') => {
-        return request(HTTP_POST, serverUrl)
+    const login = (body, serverUrl) => {
+        request(HTTP_POST, serverUrl) // Gửi URL đầy đủ
             .body(body)
             .send(dto.tokenResponse)
             .then((res) => {

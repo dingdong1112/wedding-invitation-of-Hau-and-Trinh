@@ -5,6 +5,9 @@ import { dto } from '../../connection/dto.js';
 import { storage } from '../../common/storage.js';
 import { session } from '../../common/session.js';
 import { pool, cacheRequest, request, HTTP_POST, HTTP_STATUS_OK } from '../../connection/request.js';
+import { HTTP_POST, HTTP_STATUS_OK } from '../../connection/request.js';
+
+const BASE_API_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app'; 
 
 export const auth = (() => {
 
@@ -24,8 +27,8 @@ export const auth = (() => {
         // API MỚI: /api/admin/login, chỉ gửi password
         session.login(
             { password: formPassword.value }, 
-            '/api/admin/login' // <-- Endpoint mới
-        ).then((res) => {
+        BASE_API_URL + '/api/admin/login' // <-- GỬI URL ĐẦY ĐỦ
+    ).then((res) => {
             if (res) {
                 formPassword.value = null;
                 bs.modal('mainModal').hide();
