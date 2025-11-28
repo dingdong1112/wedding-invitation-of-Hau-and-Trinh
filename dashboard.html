@@ -28,28 +28,15 @@
 <body data-url="https://wedding-invitation-of-hau-and-chin.vercel.app/">
 
     <!-- Mobile Nav -->
-   <nav class="navbar navbar-expand fixed-bottom rounded-top-4 border-top d-md-none d-lg-none d-xl-none p-0">
+    <nav class="navbar navbar-expand fixed-bottom rounded-top-4 border-top d-md-none d-lg-none d-xl-none p-0">
         <ul class="navbar-nav nav-justified w-100 align-items-center">
             <li class="nav-item">
-                <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavHome(this)"
-                    data-bs-toggle="pill" data-bs-target="#pills-home">
-                    <i class="fa-solid fa-chart-pie"></i><span class="d-block small">Thống kê</span>
+                <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavHome(this)">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="d-block" style="font-size: 0.7rem;">Home</span>
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" onclick="undangan.admin.navbar.buttonNavSetting(this)" data-bs-toggle="pill"
-                    data-bs-target="#pills-setting-mobile">
-                    <i class="fa-solid fa-comments"></i><span class="d-block small">Lời chúc</span>
-                </button>
-            </li>
-            <li class="nav-item pe-2" role="presentation">
-                <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                    data-bs-toggle="pill" data-bs-target="#pills-setting-mobile" id="button-setting-mobile"
-                    type="button" role="tab" aria-controls="pills-setting-mobile" aria-selected="false">
-                    <i class="fa-solid fa-gear ms-3 me-2"></i>Setting
-                </button>
-            </li>
-             <li class="nav-item">
                 <button class="nav-link" onclick="undangan.admin.navbar.buttonNavSetting(this)">
                     <i class="fa-solid fa-gear"></i>
                     <span class="d-block" style="font-size: 0.7rem;">Setting</span>
@@ -70,13 +57,21 @@
             <!-- MENU TRÁI (Desktop) -->
             <div class="col-md-3 d-none d-md-block m-0 p-0">
                 <ul class="nav flex-column w-100 nav-pills pe-4" id="admin-tabs" role="tablist">
-                    <li class="nav-item pe-2">
+                    <li class="nav-item pe-2" role="presentation">
+                        <button
+                            class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
+                            data-bs-toggle="pill" data-bs-target="#pills-home" id="button-home" type="button" role="tab"
+                            aria-controls="pills-home" aria-selected="true">
+                            <i class="fa-solid fa-house ms-3 me-2"></i>Home
+                        </button>
+                    </li>
+                    <!--li class="nav-item pe-2">
                         <button
                             class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
                             data-bs-toggle="pill" data-bs-target="#pills-home">
                             <i class="fa-solid fa-chart-pie ms-3 me-2"></i>Thống Kê
                         </button>
-                    </li>
+                    </li-->
                     <li class="nav-item pe-2">
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
                             data-bs-toggle="pill" data-bs-target="#pills-wishes"
@@ -91,7 +86,9 @@
                         </button>
                     </li>
                     <li class="nav-item pe-2" role="presentation">
-                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm" data-bs-toggle="pill" data-bs-target="#pills-setting-mobile" id="button-setting" type="button" role="tab" aria-controls="pills-setting-mobile" aria-selected="false">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-setting-mobile" id="button-setting"
+                            type="button" role="tab" aria-controls="pills-setting" aria-selected="false">
                             <i class="fa-solid fa-gear ms-3 me-2"></i>Setting
                         </button>
                     </li>
