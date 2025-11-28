@@ -780,6 +780,7 @@ export const admin = (() => {
                     applyFilters();
                 }
             } catch (e) {
+                console.log(e);
                 container.innerHTML = '<p class="text-center text-danger">Lỗi tải dữ liệu.</p>';
             }
         };
