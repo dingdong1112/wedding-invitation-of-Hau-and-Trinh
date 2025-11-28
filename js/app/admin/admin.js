@@ -791,6 +791,11 @@ const adminModule = () => {
             }
         };
 
+        // --- BIẾN TOÀN CỤC ĐỂ LƯU DỮ LIỆU ---
+        let cachedWishesData = [];
+        let pieChartInstance = null;
+        let barChartInstance = null;
+
         // Hàm: Tải thống kê (Gọi loadWishesManager bên trong)
         const getUserStats = () => auth.getDetailUser(SERVER_URL).then((res) => {
             util.safeInnerHTML(document.getElementById('dashboard-name'), `Admin<i class="fa-solid fa-hands text-warning ms-2"></i>`);
@@ -818,32 +823,34 @@ const adminModule = () => {
 
             // Load dữ liệu thống kê
             request(HTTP_GET, SERVER_URL + '/api/wishes')
-                .token(session.getToken())
-                .withCache(1000 * 30)
-                .send()
-                .then((resp) => {
-                    const allWishes = resp.data;
-                    // 1. TÍNH TOÁN SỐ LIỆU CƠ BẢN
-                    const comments = allWishes.length;
-                    let present = allWishes.filter(i => i.presence === 'Có' || i.presence === '1' || i.presence === true).length;
-                    let absent = allWishes.filter(i => i.presence === 'Không' || i.presence === '2' || i.presence === false).length;
-                    let unknown = comments - present - absent; // Số người chưa xác định
+            .token(session.getToken())
+            .withCache(1000 * 30)
+            .send()
+            .then((resp) => {
+                const allWishes = resp.data;
+                cachedWishesData = allWishes; // <--- LƯU LẠI DỮ LIỆU ĐỂ LỌC SAU
 
-                    setText('count-comment', String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                    setText('count-present', String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                    setText('count-absent', String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                    setText('count-like', '0');
+                // 1. TÍNH TOÁN SỐ LIỆU CƠ BẢN
+                const comments = allWishes.length;
+                let present = allWishes.filter(i => ['Có', '1', 'true', true, 1].includes(i.presence)).length;
+                let absent = allWishes.filter(i => ['Không', '0', 'false', false, 0].includes(i.presence)).length;
+                let unknown = comments - present - absent;
 
-                    // 2. VẼ BIỂU ĐỒ TRÒN (PIE CHART) - Tỷ lệ tham dự
-                    renderPieChart(present, absent, unknown);
+                // Cập nhật UI số liệu
+                setText('count-comment', String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                setText('count-present', String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                setText('count-absent', String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                setText('count-like', '0');
 
-                    // 3. VẼ BIỂU ĐỒ CỘT (BAR CHART) - Xu hướng theo ngày
-                    renderTrendChart(allWishes);
+                   // 3. VẼ BIỂU ĐỒ
+                renderPieChart(present, absent, unknown);
+                renderTrendChart(allWishes, 'week'); // Mặc định vẽ 7 ngày
 
-                    // 4. HIỂN THỊ BẢNG LỜI CHÚC MỚI NHẤT
-                    renderLatestWishes(allWishes);
-                    // QUAN TRỌNG: Gọi hàm load list sau khi đã có dữ liệu
-                    loadWishesManager();
+                // 4. HIỂN THỊ BẢNG LỜI CHÚC MỚI NHẤT
+                renderLatestWishes(allWishes);
+                
+                // 5. Load danh sách quản lý
+                if(typeof loadWishesManager === 'function') loadWishesManager();
                 });
 
         }).catch(err => {
@@ -851,8 +858,6 @@ const adminModule = () => {
         });
 
         // VẼ BIÊU ĐỒ
-        let pieChartInstance = null;
-        let barChartInstance = null;
 
         // --- CẤU HÌNH MÀU SẮC CHUNG ---
         //Chart.defaults.color = '#e0e0e0'; // Màu chữ sáng

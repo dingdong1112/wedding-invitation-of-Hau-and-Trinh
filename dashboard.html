@@ -181,9 +181,17 @@
                             <div class="col-md-8 mb-4">
                                 <div class="card border-0 shadow-sm h-100 rounded-4">
                                     <div class="card-body">
-                                        <h6 class="card-title fw-bold text-secondary"><i
-                                                class="fa-solid fa-chart-bar me-2"></i>Xu Hướng Lời Chúc (7 ngày qua)
-                                        </h6>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="fw-bold text-secondary mb-0"><i
+                                                    class="fa-solid fa-chart-bar me-2"></i>Xu Hướng</h6>
+                                            <select
+                                                class="form-select form-select-sm w-auto bg-dark text-light border-secondary"
+                                                id="chartFilter" onchange="updateTrendChart(this.value)">
+                                                <option value="week" selected>7 ngày qua</option>
+                                                <option value="month">30 ngày qua</option>
+                                                <option value="year">12 tháng qua</option>
+                                            </select>
+                                        </div>
                                         <div style="height: 250px; width: 100%;">
                                             <canvas id="wishesTrendChart"></canvas>
                                         </div>
