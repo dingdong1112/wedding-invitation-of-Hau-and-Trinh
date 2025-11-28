@@ -350,6 +350,50 @@
                                 <label class="form-check-label text-danger fw-bold" for="toggle-lock">KHÓA chức năng gửi
                                     lời chúc (Maintenance)</label>
                             </div>
+                            <!-- Time Zone -->
+                            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
+                                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-location-dot me-2"></i>Time
+                                    Zone
+                                </p>
+                                <form>
+                                    <div class="position-relative mb-3">
+                                        <input type="text" class="form-control form-control-sm rounded-4 shadow-sm"
+                                            id="form-timezone" oninput="undangan.admin.openLists(this, this.value)"
+                                            onclick="undangan.admin.openLists(this)" autocomplete="off"
+                                            data-offline-disabled="false">
+                                        <div id="dropdown-tz-list"
+                                            class="d-none list-group position-absolute w-100 shadow-sm rounded-4 overflow-y-scroll z-3"
+                                            style="max-height: 15rem;"></div>
+                                    </div>
+                                </form>
+
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
+                                        id="button-timezone" onclick="undangan.admin.changeTz(this)" disabled
+                                        data-offline-disabled="false">Change</button>
+                                </div>
+                            </div>
+
+                            <!-- Tenor Key -->
+                            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
+                                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-photo-film me-2"></i>Tenor
+                                    Key
+                                </p>
+
+                                <div class="input-group input-group-sm mb-3">
+                                    <input type="text" class="form-control form-control-sm rounded-start-4 shadow-sm"
+                                        id="dashboard-tenorkey" placeholder="Api key tenor" autocomplete="off">
+                                    <button class="btn btn-sm btn-outline-secondary rounded-end-4 shadow-sm"
+                                        type="button"
+                                        onclick="document.getElementById('dashboard-tenorkey').value = null"><i
+                                            class="fa-solid fa-trash-can"></i></button>
+                                </div>
+
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
+                                        onclick="undangan.admin.tenor(this)" data-offline-disabled="false">Save</button>
+                                </div>
+                            </div>
                         </div>
                     </section>
                     <section class="tab-pane fade" id="pills-security">
@@ -437,87 +481,6 @@
                                 onclick="undangan.admin.saveWish()">Lưu thay đổi</button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Time Zone -->
-            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-location-dot me-2"></i>Time Zone
-                </p>
-                <form>
-                    <div class="position-relative mb-3">
-                        <input type="text" class="form-control form-control-sm rounded-4 shadow-sm" id="form-timezone"
-                            oninput="undangan.admin.openLists(this, this.value)"
-                            onclick="undangan.admin.openLists(this)" autocomplete="off" data-offline-disabled="false">
-                        <div id="dropdown-tz-list"
-                            class="d-none list-group position-absolute w-100 shadow-sm rounded-4 overflow-y-scroll z-3"
-                            style="max-height: 15rem;"></div>
-                    </div>
-                </form>
-
-                <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm" id="button-timezone"
-                        onclick="undangan.admin.changeTz(this)" disabled data-offline-disabled="false">Change</button>
-                </div>
-            </div>
-
-            <!-- Tenor Key -->
-            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-photo-film me-2"></i>Tenor Key
-                </p>
-
-                <div class="input-group input-group-sm mb-3">
-                    <input type="text" class="form-control form-control-sm rounded-start-4 shadow-sm"
-                        id="dashboard-tenorkey" placeholder="Api key tenor" autocomplete="off">
-                    <button class="btn btn-sm btn-outline-secondary rounded-end-4 shadow-sm" type="button"
-                        onclick="document.getElementById('dashboard-tenorkey').value = null"><i
-                            class="fa-solid fa-trash-can"></i></button>
-                </div>
-
-                <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
-                        onclick="undangan.admin.tenor(this)" data-offline-disabled="false">Save</button>
-                </div>
-            </div>
-
-            <!-- Toggle -->
-            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-sliders me-2"></i>Control</p>
-
-                <div class="form-check form-switch mb-1">
-                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
-                        id="filterBadWord" onchange="undangan.admin.changeCheckboxValue(this, 'filter')"
-                        data-offline-disabled="false">
-                    <label class="form-check-label" style="cursor:pointer;" for="filterBadWord">Filter bad
-                        word</label>
-                </div>
-                <div class="form-check form-switch mb-1">
-                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
-                        id="confettiAnimation" onchange="undangan.admin.changeCheckboxValue(this, 'confetti_animation')"
-                        data-offline-disabled="false">
-                    <label class="form-check-label" style="cursor:pointer;" for="confettiAnimation">Bật
-                        chức năng bắn pháo hoa</label>
-                </div>
-                <div class="form-check form-switch mb-1">
-                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
-                        id="replyComment" onchange="undangan.admin.changeCheckboxValue(this, 'can_reply')"
-                        data-offline-disabled="false">
-                    <label class="form-check-label" style="cursor:pointer;" for="replyComment">Can
-                        reply</label>
-                </div>
-                <div class="form-check form-switch mb-1">
-                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
-                        id="editComment" onchange="undangan.admin.changeCheckboxValue(this, 'can_edit')"
-                        data-offline-disabled="false">
-                    <label class="form-check-label" style="cursor:pointer;" for="editComment">Can
-                        edit</label>
-                </div>
-                <div class="form-check form-switch mb-1">
-                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
-                        id="deleteComment" onchange="undangan.admin.changeCheckboxValue(this, 'can_delete')"
-                        data-offline-disabled="false">
-                    <label class="form-check-label" style="cursor:pointer;" for="deleteComment">Khóa
-                        chức năng gửi lời chúc</label>
                 </div>
             </div>
 
