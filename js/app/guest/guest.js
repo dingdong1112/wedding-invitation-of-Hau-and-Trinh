@@ -171,7 +171,7 @@ export const guest = (() => {
         theme.spyTop();
 
         const config = storage('config');
-        if (typeof window.confetti === 'function' && config.get('particle_control_enabled')) {
+        if (typeof window.confetti === 'function' && config.get('confetti_enabled')) {
             window.confetti();
             util.timeOut(window.confetti, 1500);
 
@@ -425,13 +425,17 @@ export const guest = (() => {
         // 5. Tải thư viện phụ trợ
         lib.load({
             aos: true,
-            confetti: serverConfig.particle_control_enabled
+            confetti: serverConfig.confetti_enabled
         });
 
         // 6. Kích hoạt Popup Lời Chúc và hoàn tất loading
 
-        if (serverConfig.particle_control_enabled) {
+        if (!serverConfig.particle_control_enabled) {
             particleController.style.display = 'remove';
+        }
+        else {
+            particleController.style.display = 'add';
+            setupParticleControls();
         }
 
 
@@ -679,7 +683,7 @@ export const guest = (() => {
             ]);
             // CHẠY HÀM TẠO LỊCH CỦA CHÚNG TA SAU KHI MỌI THỨ ĐÃ TẢI XONG
             initializeCalendarLinks();
-            setupParticleControls();
+            //setupParticleControls();
         });
 
         return {
