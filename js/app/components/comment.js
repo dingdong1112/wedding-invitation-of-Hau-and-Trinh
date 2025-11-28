@@ -13,7 +13,33 @@ export const comment = (() => {
     let hideTimer = null;
     let nextTimer = null;
 
-    const init = () => {
+    const init = async () => {
+        // 1. LẤY CẤU HÌNH
+        let isLocked = false;
+        try {
+            const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
+            const json = await res.json();
+            // Tận dụng trường can_delete làm cờ "Khóa"
+            isLocked = json.data.can_delete;
+        } catch (e) { }
+
+        const form = document.getElementById('wishes-form');
+        const btn = document.getElementById('btn-send-wish');
+
+        // 2. XỬ LÝ KHÓA
+        if (isLocked && form) {
+            // Vô hiệu hóa toàn bộ form
+            const inputs = form.querySelectorAll('input, textarea, select, button');
+            inputs.forEach(i => i.disabled = true);
+
+            // Đổi nút gửi thành thông báo
+            if (btn) {
+                btn.innerHTML = '<i class="fa-solid fa-lock me-2"></i>Đã đóng nhận lời chúc';
+                btn.classList.replace('btn-primary', 'btn-secondary');
+            }
+
+            return; // Dừng lại, không gắn sự kiện submit nữa
+        }
         setupFormSubmit();
         fetchWishes();
         setupToggleButton();

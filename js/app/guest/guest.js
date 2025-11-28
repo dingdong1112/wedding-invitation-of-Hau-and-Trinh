@@ -171,10 +171,10 @@ export const guest = (() => {
 
         //confetti.basicAnimation();
         //util.timeOut(confetti.openAnimation, 1500);
-        if (typeof window.confetti === 'function') {
-            window.confetti();
-            util.timeOut(window.confetti, 1500);
-        }
+        if (isConfettiOn && typeof window.confetti === 'function') {
+                window.confetti();
+                util.timeOut(window.confetti, 1500);
+            }
 
         document.dispatchEvent(new Event('undangan.open'));
         util.changeOpacity(document.getElementById('welcome'), false).then((el) => el.remove());
@@ -327,7 +327,7 @@ export const guest = (() => {
     /**
      * @returns {void}
      */
-    const pageLoaded = () => {
+    const pageLoaded = async () => {
         lang.init();
         offline.init();
         comment.init();
@@ -335,11 +335,31 @@ export const guest = (() => {
 
         config = storage('config');
         information = storage('information');
+        let isConfettiOn = true;
+        // GỌI API LẤY CẤU HÌNH
+        try {
+            const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
+            if (res.ok) {
+                const json = await res.json();
+                // Lấy giá trị từ DB
+                isConfettiOn = json.data.confetti_enabled; 
+            }
+        } catch (e) { console.log("Dùng config mặc định"); }
+
+        // LOAD TÀI NGUYÊN
+        vid.load();
+        img.load();
+        aud.load();
+
+        const lib = loaderLibs();
+        lib.load({ 
+            aos: true,
+            confetti: isConfettiOn // Chỉ load thư viện confetti nếu được bật
+        });
 
         const vid = video.init();
         const img = image.init();
         const aud = audio.init();
-        const lib = loaderLibs();
         const token = document.body.getAttribute('data-key');
         const params = new URLSearchParams(window.location.search);
 

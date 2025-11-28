@@ -394,8 +394,8 @@
                                     role="switch" id="confettiAnimation"
                                     onchange="undangan.admin.changeCheckboxValue(this, 'confetti_animation')"
                                     data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="confettiAnimation">Confetti
-                                    animation</label>
+                                <label class="form-check-label" style="cursor:pointer;" for="confettiAnimation">Bật 
+                                    chức năng bắn pháo hoa</label>
                             </div>
                             <div class="form-check form-switch mb-1">
                                 <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
@@ -418,8 +418,8 @@
                                     role="switch" id="deleteComment"
                                     onchange="undangan.admin.changeCheckboxValue(this, 'can_delete')"
                                     data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="deleteComment">Can
-                                    delete</label>
+                                <label class="form-check-label" style="cursor:pointer;" for="deleteComment">Khóa
+                                    chức năng gửi lời chúc</label>
                             </div>
                         </div>
 
@@ -479,8 +479,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4">
                 <div class="modal-body">
-                    <form id="admin-login-form" 
-                        onsubmit="event.preventDefault();
+                    <form id="admin-login-form" onsubmit="event.preventDefault();
                         undangan.admin.auth.login(this.querySelector('button[type=submit]'))">
 
                         <div class="mb-3">
