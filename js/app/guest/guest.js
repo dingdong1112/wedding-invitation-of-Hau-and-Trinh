@@ -177,7 +177,7 @@ export const guest = (() => {
 
             // Nếu có animation rơi (ve), cũng phải kiểm tra config
             // Ve là animation rơi liên tục.
-            util.timeOut(ve, 1500);
+            //util.timeOut(ve, 1500);
         }
 
         document.dispatchEvent(new Event('undangan.open'));
