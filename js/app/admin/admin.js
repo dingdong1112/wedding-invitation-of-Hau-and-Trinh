@@ -276,23 +276,31 @@ export const admin = (() => {
 
                 console.log("Regenerate Response:", res); // Debug xem nó trả về gì
 
-                 let newToken = res.data ? res.data.token : null;
+                let newToken = res.data ? res.data.token : null;
 
                 // Trường hợp 2: request trả về trực tiếp { token: ... } (hoặc res.token)
                 if (!newToken && res.token) {
                     newToken = res.token;
                 }
-                
+
                 // Trường hợp 3: res.result === 'success'
                 if (newToken) {
                     session.setToken(newToken);
                     document.getElementById('dashboard-accesskey').value = newToken;
-                    util.notify("Token mới đã được tạo!").success();
+                    util.notify("Token mới đã tạo! Đang đăng xuất...").success();
+
+                    // Xóa token cũ ở client
+                    session.logout();
+
+                    // Đợi 1.5s cho người dùng đọc thông báo rồi reload trang
+                    setTimeout(() => {
+                        location.reload(); // Trang sẽ tự động hiện form login vì không còn token
+                    }, 1500);
                 } else {
                     util.notify("Lỗi: Không nhận được token mới.").error();
                     // Chỉ logout nếu mã lỗi là 401
                     if (res.code === 401 || res.status === 401) {
-                         setTimeout(() => auth.clearSession(), 1000);
+                        setTimeout(() => auth.clearSession(), 1000);
                     }
                 }
             } catch (e) {
