@@ -8,7 +8,7 @@ import { storage } from '../../common/storage.js';
 import { session } from '../../common/session.js';
 import { offline } from '../../common/offline.js';
 import { comment } from '../components/comment.js';
-import { pool, request, HTTP_GET, HTTP_PATCH, HTTP_PUT, HTTP_POST , HTTP_DELETE} from '../../connection/request.js';
+import { pool, request, HTTP_GET, HTTP_PATCH, HTTP_PUT, HTTP_POST, HTTP_DELETE } from '../../connection/request.js';
 
 export const admin = (() => {
 
@@ -483,58 +483,169 @@ export const admin = (() => {
 
         // --- 2. ĐỊNH NGHĨA CÁC HÀM LOGIC TRƯỚC (Để tránh lỗi chưa khai báo) ---
 
+        // --- BIẾN TOÀN CỤC CHO PHÂN TRANG ---
+        let allWishesData = []; // Lưu toàn bộ dữ liệu
+        let currentPage = 1;
+        let itemsPerPage = 10;
+
+        // --- HÀM MỚI: RENDER DANH SÁCH THEO TRANG ---
+        const renderWishesPage = () => {
+            const container = document.getElementById('wishes-manager-list');
+            const paginationControls = document.getElementById('pagination-controls');
+
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (allWishesData.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted">Chưa có lời chúc nào.</p>';
+                paginationControls.classList.add('d-none');
+                return;
+            }
+
+            paginationControls.classList.remove('d-none');
+
+            // Tính toán cắt mảng
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = allWishesData.slice(start, end);
+            const totalPages = Math.ceil(allWishesData.length / itemsPerPage);
+
+            // Render Items
+            pageData.forEach(item => {
+                const id = item.id || item._id;
+                const starClass = item.is_highlight ? 'text-warning' : 'text-secondary';
+                const presenceBadge = item.presence ?
+                    '<span class="badge bg-success-subtle text-success rounded-pill me-1"><i class="fa-solid fa-check"></i> Tham dự</span>' :
+                    '<span class="badge bg-danger-subtle text-danger rounded-pill me-1"><i class="fa-solid fa-xmark"></i> Vắng</span>';
+
+                // Encode dữ liệu để truyền vào hàm view
+                const safeName = util.escapeHtml(item.name);
+                const safeMsg = util.escapeHtml(item.message);
+                const safeTime = new Date(item.created_at).toLocaleString();
+
+                const html = `
+                <div class="bg-white p-3 rounded-4 shadow-sm border mb-0 d-flex flex-column flex-sm-row justify-content-between gap-3" id="wish-row-${id}">
+                    <div class="flex-grow-1" style="min-width: 0;"> <!-- min-width: 0 fix lỗi flex tràn text -->
+                        <div class="d-flex align-items-center mb-1 flex-wrap gap-1">
+                            <h6 class="fw-bold mb-0 me-2 text-truncate" style="max-width: 200px;">${safeName}</h6>
+                            ${presenceBadge}
+                            <small class="text-muted ms-auto ms-sm-0" style="font-size: 0.7rem;">${safeTime}</small>
+                        </div>
+                        
+                        <!-- MESSAGE CẮT GỌN -->
+                        <div class="d-flex align-items-center gap-1">
+                            <p class="mb-0 text-secondary wish-message-truncate flex-grow-1" 
+                               onclick="undangan.admin.viewWishDetail('${id}')"
+                               title="Bấm để xem chi tiết">
+                               ${safeMsg}
+                            </p>
+                            <small class="text-primary cursor-pointer fst-italic" 
+                                   style="white-space: nowrap; font-size: 0.75rem;"
+                                   onclick="undangan.admin.viewWishDetail('${id}')">
+                                (Xem thêm)
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0 pt-2 pt-sm-0 border-top border-sm-0 mt-2 mt-sm-0">
+                        <button class="btn btn-light btn-sm rounded-circle ${starClass} shadow-sm" 
+                                onclick="window.toggleHighlight('${id}', ${!item.is_highlight})" title="Ghim">
+                            <i class="fa-solid fa-star"></i>
+                        </button>
+                        <button class="btn btn-light btn-sm rounded-circle text-primary shadow-sm" 
+                                onclick="window.openEditWish('${id}')" title="Sửa">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn btn-light btn-sm rounded-circle text-danger shadow-sm" 
+                                onclick="window.deleteWish('${id}')" title="Xóa">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+
+            // Render Pagination Buttons
+            renderPaginationButtons(totalPages);
+        };
+
+        const renderPaginationButtons = (totalPages) => {
+            const ul = document.getElementById('pagination-ul');
+            if (!ul) return;
+            ul.innerHTML = '';
+
+            // Nút Previous
+            ul.insertAdjacentHTML('beforeend', `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <button class="page-link rounded-start-3" onclick="undangan.admin.changePage(${currentPage - 1})"><i class="fa-solid fa-angle-left"></i></button>
+                </li>
+            `);
+
+            // Các trang (Logic thu gọn nếu nhiều trang: 1, 2, ..., 5, 6, ..., 10)
+            for (let i = 1; i <= totalPages; i++) {
+                // Hiển thị trang đầu, cuối, và xung quanh trang hiện tại
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    ul.insertAdjacentHTML('beforeend', `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <button class="page-link" onclick="undangan.admin.changePage(${i})">${i}</button>
+                        </li>
+                    `);
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    ul.insertAdjacentHTML('beforeend', `<li class="page-item disabled"><span class="page-link">...</span></li>`);
+                }
+            }
+
+            // Nút Next
+            ul.insertAdjacentHTML('beforeend', `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <button class="page-link rounded-end-3" onclick="undangan.admin.changePage(${currentPage + 1})"><i class="fa-solid fa-angle-right"></i></button>
+                </li>
+            `);
+        };
+
+        // --- CÁC HÀM GỌI TỪ HTML ---
+        window.changePage = (page) => {
+            currentPage = page;
+            renderWishesPage();
+        };
+
+        window.changePerPage = (num) => {
+            itemsPerPage = parseInt(num);
+            currentPage = 1; // Reset về trang 1
+            renderWishesPage();
+        };
+
+        window.viewWishDetail = (id) => {
+            const item = allWishesData.find(w => (w.id || w._id) === id);
+            if (!item) return;
+
+            document.getElementById('view-wish-name').textContent = item.name;
+            document.getElementById('view-wish-time').textContent = new Date(item.created_at).toLocaleString();
+            document.getElementById('view-wish-msg').textContent = item.message;
+
+            const badge = document.getElementById('view-wish-presence');
+            if (item.presence) {
+                badge.innerHTML = '<span class="badge bg-success">Tham dự</span>';
+            } else {
+                badge.innerHTML = '<span class="badge bg-danger">Vắng mặt</span>';
+            }
+
+            // @ts-ignore
+            const modal = new bootstrap.Modal(document.getElementById('viewWishModal'));
+            modal.show();
+        };
+
         // Hàm: Load danh sách lời chúc
         const loadWishesManager = async () => {
             const container = document.getElementById('wishes-manager-list');
-            if (!container) return;
-
-            container.innerHTML = '<p class="text-center text-muted py-3"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách...</p>';
+            container.innerHTML = '<p class="text-center text-muted py-3"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải...</p>';
 
             try {
                 const res = await request(HTTP_GET, SERVER_URL + '/api/wishes').token(session.getToken()).send();
-
                 if (res.code === 200) {
-                    container.innerHTML = '';
-                    if (res.data.length === 0) {
-                        container.innerHTML = '<p class="text-center text-muted">Chưa có lời chúc nào.</p>';
-                        return;
-                    }
-
-                    res.data.forEach(item => {
-                        const id = item.id || item._id;
-                        const starClass = item.is_highlight ? 'text-warning' : 'text-secondary';
-                        const presenceBadge = item.presence ?
-                            '<span class="badge bg-success-subtle text-success rounded-pill me-1"><i class="fa-solid fa-check"></i> Tham dự</span>' :
-                            '<span class="badge bg-danger-subtle text-danger rounded-pill me-1"><i class="fa-solid fa-xmark"></i> Vắng</span>';
-
-                        // Lưu ý: Gọi window.toggleHighlight để chắc chắn HTML gọi được
-                        const html = `
-                    <div class="bg-white p-3 rounded-4 shadow-sm border mb-0 d-flex flex-column flex-sm-row justify-content-between gap-3" id="wish-row-${id}">
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center mb-1">
-                                <h6 class="fw-bold mb-0 me-2">${util.escapeHtml(item.name)}</h6>
-                                ${presenceBadge}
-                                <small class="text-muted" style="font-size: 0.75rem;">${new Date(item.created_at).toLocaleString()}</small>
-                            </div>
-                            <p class="mb-0 text-secondary" style="font-size: 0.9rem; white-space: pre-wrap;">${util.escapeHtml(item.message)}</p>
-                        </div>
-                        <div class="d-flex align-items-start gap-2 flex-shrink-0">
-                            <button class="btn btn-light btn-sm rounded-circle ${starClass} shadow-sm" 
-                                    onclick="window.toggleHighlight('${id}', ${!item.is_highlight})" title="Ghim/Bỏ ghim">
-                                <i class="fa-solid fa-star"></i>
-                            </button>
-                            <button class="btn btn-light btn-sm rounded-circle text-primary shadow-sm" 
-                                    onclick="window.openEditWish('${id}')" title="Sửa">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="btn btn-light btn-sm rounded-circle text-danger shadow-sm" 
-                                    onclick="window.deleteWish('${id}')" title="Xóa">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>`;
-                        container.insertAdjacentHTML('beforeend', html);
-                    });
+                    allWishesData = res.data; // Lưu vào biến toàn cục
+                    currentPage = 1; // Reset trang
+                    renderWishesPage(); // Render trang 1
                 }
             } catch (e) {
                 container.innerHTML = '<p class="text-center text-danger">Lỗi tải dữ liệu.</p>';
@@ -806,6 +917,9 @@ export const admin = (() => {
             window.toggleTokenVisibility = toggleTokenVisibility;
             window.copyToken = copyToken;
             window.regenerateToken = regenerateToken;
+            window.changePage = changePage;
+            window.changePerPage = changePerPage;
+            window.viewWishDetail = viewWishDetail;
             // -------------------------------------------------------
 
             document.addEventListener('undangan.admin.success', getUserStats);
@@ -855,6 +969,9 @@ export const admin = (() => {
                 regenerateToken,
                 pageLoaded,
                 updateConfig,
+                changePage,
+                changePerPage,
+                viewWishDetail,
             },
         };
     };

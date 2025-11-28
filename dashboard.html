@@ -37,7 +37,7 @@
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavComments(this)">
+                <button class="nav-link" onclick="undangan.admin.navbar.buttonNavComments(this)">
                     <i class="fa-solid fa-comments"></i>
                     <span class="d-block" style="font-size: 0.4rem;">Quản Lý Lời Chúc</span>
                 </button>
@@ -49,17 +49,17 @@
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavSecurity(this)">
+                <button class="nav-link" onclick="undangan.admin.navbar.buttonNavSecurity(this)">
                     <i class="fa-solid fa-user-shield"></i>
                     <span class="d-block" style="font-size: 0.4rem;">Bảo Mật & Token</span>
                 </button>
             </li>
             <li class="nav-item">
-            <button class="nav-link logout" onclick="undangan.admin.logout()">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span class="d-block" style="font-size: 0.7rem;">Logout</span>
-            </button>
-        </li>
+                <button class="nav-link logout" onclick="undangan.admin.logout()">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="d-block" style="font-size: 0.7rem;">Logout</span>
+                </button>
+            </li>
         </ul>
     </nav>
 
@@ -173,6 +173,25 @@
                             </button>
                         </div>
                         <div id="wishes-manager-list" class="d-flex flex-column gap-3"></div>
+                        <!-- PHÂN TRANG & CÔNG CỤ -->
+                        <div id="pagination-controls" class="pagination-container d-none">
+                            <div class="d-flex align-items-center gap-2">
+                                <small class="text-muted">Hiển thị:</small>
+                                <select class="form-select form-select-sm rounded-3" style="width: 70px;"
+                                    id="per-page-select" onchange="undangan.admin.changePerPage(this.value)">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0" id="pagination-ul">
+                                    <!-- JS sẽ render nút phân trang vào đây -->
+                                </ul>
+                            </nav>
+                        </div>
                     </section>
 
                     <!-- 3. SETTINGS -->
@@ -314,6 +333,38 @@
                     <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Hủy</button>
                     <button type="button" class="btn btn-primary rounded-pill px-4"
                         onclick="undangan.admin.saveWish()">Lưu Lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Xem Chi Tiết Lời Chúc -->
+    <div class="modal fade" id="viewWishModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Chi Tiết Lời Chúc</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fa-solid fa-user fa-xl text-secondary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0" id="view-wish-name">Tên Khách</h5>
+                            <small class="text-muted" id="view-wish-time">Thời gian</small>
+                            <div id="view-wish-presence" class="mt-1"></div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-light rounded-3">
+                        <p class="mb-0" id="view-wish-msg"
+                            style="white-space: pre-wrap; font-size: 1rem; line-height: 1.6;"></p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>

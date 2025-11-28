@@ -46,3 +46,28 @@ html[data-bs-theme="light"] .btn-theme-auto:hover:not(.nav-link.active) {
     color: var(--bs-light) !important;
     background-color: var(--bs-danger) !important;
 }
+
+/* --- STYLE CHO LỜI CHÚC GỌN --- */
+.wish-message-truncate {
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* Số dòng muốn hiện */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer; /* Con trỏ tay để biết bấm được */
+    transition: color 0.2s;
+}
+
+.wish-message-truncate:hover {
+    color: var(--bs-primary) !important; /* Hover đổi màu xanh */
+}
+
+/* --- STYLE PHÂN TRANG --- */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
