@@ -375,6 +375,8 @@ export const guest = (() => {
         } catch (e) {
             console.warn("Lỗi tải config, dùng mặc định.");
         }
+
+        comment.show();
         
         // ----------------------------------------------------
         // 3. ĐỒNG BỘ HÓA GIAO DIỆN (DỰA TRÊN serverConfig)
@@ -411,6 +413,7 @@ export const guest = (() => {
         
         // D. POPUP LỜI CHÚC NGẪU NHIÊN (popup_wishes_enabled)
         // Logic này cần được xử lý trong hàm fetchWishes của comment.js.
+
         
         // 4. Tải tài nguyên (Chạy song song cho nhanh)
         vid.load();

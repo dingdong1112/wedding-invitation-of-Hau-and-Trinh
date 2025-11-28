@@ -1,6 +1,6 @@
 import { util } from '../../common/util.js';
 import { storage } from '../../common/storage.js';
-import { request, HTTP_GET, HTTP_DELETE } from '../../connection/request.js'; 
+import { request, HTTP_GET, HTTP_DELETE } from '../../connection/request.js';
 // Cần thêm import card và session, nhưng vì không có, ta giả lập.
 // Import các module Admin mà bạn có:
 import { card } from './card.js';
@@ -10,6 +10,8 @@ export const comment = (() => {
 
     // --- DÁN URL MỚI VÀO ĐÂY (URL BẠN VỪA DEPLOY NEW VERSION) ---
     const SCRIPT_URL = '/api/wishes';
+    const SERVER_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app';
+    const config = storage('config');
 
     let wishesData = [];
     let currentIndex = 0;
@@ -21,7 +23,7 @@ export const comment = (() => {
 
     const init = async () => {
         // 1. LẤY CẤU HÌNH
-        let isLocked = false;
+        const isLocked = config.get('comment_lock_enabled') || false;
         try {
             const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
             const json = await res.json();
@@ -43,6 +45,7 @@ export const comment = (() => {
                 btn.innerHTML = '<i class="fa-solid fa-lock me-2"></i>Đã đóng nhận lời chúc';
                 btn.classList.replace('btn-primary', 'btn-secondary');
             }
+            form.remove();
 
             return; // Dừng lại, không gắn sự kiện submit nữa
         }
@@ -169,6 +172,10 @@ export const comment = (() => {
     };
 
     const fetchWishes = async () => {
+        if (!storage('config').get('popup_wishes_enabled')) {
+            console.log("Admin đã tắt Popup Lời Chúc.");
+            return;
+        }
         try {
             const response = await fetch(SCRIPT_URL);
             const json = await response.json();
@@ -177,11 +184,12 @@ export const comment = (() => {
                 let rawData = json.data.filter(item => item.message && item.message.trim() !== "");
                 wishesData = shuffleArray(rawData);
                 if (wishesData.length > 0) {
-                    if (isWishesActive) setTimeout(showNextWish, 4000);
+                    if (isWishesActive) setTimeout(showNextWish, 3000);
                 }
             }
         } catch (error) { console.error(error); }
     };
+
 
     const setupToggleButton = () => {
         const btn = document.getElementById('wishes-toggle-button');
