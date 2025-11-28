@@ -123,12 +123,18 @@ const adminModule = () => {
     let barChartInstance = null;
 
     // --- CẤU HÌNH MÀU SẮC CHUNG ---
-    Chart.defaults.color = '#e0e0e0'; // Màu chữ sáng
-    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)'; // Màu đường kẻ mờ
+    //Chart.defaults.color = '#e0e0e0'; // Màu chữ sáng
+    //Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)'; // Màu đường kẻ mờ
 
     const renderPieChart = (present, absent, unknown) => {
+        // 1. KIỂM TRA AN TOÀN: Nếu Chart chưa tải xong, đợi 0.5s rồi thử lại
+        if (typeof Chart === 'undefined') {
+            setTimeout(() => renderPieChart(present, absent, unknown), 500);
+            return;
+        }
+
         const ctx = document.getElementById('attendanceChart');
-        if (!ctx) return; // Kiểm tra xem thẻ canvas có tồn tại không
+        if (!ctx) return;
 
         if (pieChartInstance) pieChartInstance.destroy();
 
@@ -138,30 +144,40 @@ const adminModule = () => {
                 labels: ['Tham gia', 'Vắng mặt', 'Chưa rõ'],
                 datasets: [{
                     data: [present, absent, unknown],
-                    backgroundColor: ['#3b82f6', '#ef4444', '#6b7280'], // Xanh dương, Đỏ, Xám
-                    borderWidth: 0,
+                    backgroundColor: ['#3b82f6', '#ef4444', '#6b7280'],
+                    borderWidth: 0, // Không viền
                     hoverOffset: 10
                 }]
             },
             options: {
+                // --- CẤU HÌNH MÀU SẮC TRỰC TIẾP TẠI ĐÂY ---
+                color: '#e0e0e0', 
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                // -------------------------------------------
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { padding: 20, usePointStyle: true }
+                        labels: { padding: 20, usePointStyle: true, color: '#e0e0e0' } // Màu chữ chú thích
                     }
                 },
-                cutout: '70%' // Làm vòng tròn mảnh hơn cho đẹp
+                cutout: '70%'
             }
         });
     };
 
     const renderTrendChart = (wishes) => {
+        // 1. KIỂM TRA AN TOÀN
+        if (typeof Chart === 'undefined') {
+            setTimeout(() => renderTrendChart(wishes), 500);
+            return;
+        }
+
         const ctx = document.getElementById('wishesTrendChart');
         if (!ctx) return;
 
-        // ... (Phần xử lý dữ liệu giữ nguyên) ...
+        // Xử lý dữ liệu (Giữ nguyên logic cũ)
         const last7Days = {};
         for(let i=6; i>=0; i--) {
             const d = new Date();
@@ -183,25 +199,28 @@ const adminModule = () => {
                 datasets: [{
                     label: 'Số lời chúc',
                     data: Object.values(last7Days),
-                    backgroundColor: '#8b5cf6', // Màu tím sáng
+                    backgroundColor: '#8b5cf6',
                     borderRadius: 4,
                     barThickness: 20
                 }]
             },
             options: {
+                // --- CẤU HÌNH MÀU SẮC TRỰC TIẾP TẠI ĐÂY ---
+                color: '#e0e0e0',
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                // -------------------------------------------
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false } // Ẩn chú thích thừa
-                },
+                plugins: { legend: { display: false } },
                 scales: {
                     y: { 
                         beginAtZero: true, 
-                        ticks: { stepSize: 1 },
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' } // Lưới mờ
+                        ticks: { stepSize: 1, color: '#e0e0e0' }, // Màu số trục Y
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' } 
                     },
                     x: {
-                        grid: { display: false } // Ẩn lưới dọc
+                        ticks: { color: '#e0e0e0' }, // Màu chữ trục X
+                        grid: { display: false } 
                     }
                 }
             }
