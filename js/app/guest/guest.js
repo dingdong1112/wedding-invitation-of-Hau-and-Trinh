@@ -338,12 +338,12 @@ export const guest = (() => {
     /**
      * @returns {void}
      */
-   const pageLoaded = async () => {
+    const pageLoaded = async () => {
         // 1. Khởi tạo các module cơ bản
         lang.init();
         offline.init();
         // Comment.init phải chạy trước khi tải config vì nó cần progress.add
-        comment.init(); 
+        comment.init();
         progress.init();
         const vid = video.init();
         const img = image.init();
@@ -352,20 +352,20 @@ export const guest = (() => {
 
         config = storage('config');
         information = storage('information');
-        
+
         // Cần đảm bảo các element có sẵn để tránh lỗi JS
         const vinylContainer = document.getElementById('vinyl-container');
         const particleController = document.getElementById('particle-controller');
         const wishesToggleButton = document.getElementById('wishes-toggle-button');
 
         // 2. Lấy Cấu Hình từ Server (MongoDB)
-        let serverConfig = { 
-            confetti_enabled: document.body.getAttribute('data-confetti') === 'true' 
+        let serverConfig = {
+            confetti_enabled: document.body.getAttribute('data-confetti') === 'true'
         };
 
         try {
             // Serverless Function sẽ tự thêm hostname
-            const res = await fetch('/api/config'); 
+            const res = await fetch('/api/config');
             if (res.status === 200) {
                 const json = await res.json();
                 serverConfig = json.data;
@@ -376,8 +376,7 @@ export const guest = (() => {
             console.warn("Lỗi tải config, dùng mặc định.");
         }
 
-        comment.show();
-        
+
         // ----------------------------------------------------
         // 3. ĐỒNG BỘ HÓA GIAO DIỆN (DỰA TRÊN serverConfig)
         // ----------------------------------------------------
@@ -388,37 +387,37 @@ export const guest = (() => {
                 vinylContainer.style.display = 'none';
             }
         }
-        
+
         // B. NÚT ĐIỀU KHIỂN PHÁO HOA (particle_control_enabled)
         if (particleController) {
             if (!serverConfig.particle_control_enabled) {
                 particleController.style.display = 'none';
             }
         }
-        
+
         // C. KHÓA FORM GỬI LỜI CHÚC (comment_lock_enabled)
         const sendForm = document.getElementById('wishes-form');
         const sendBtn = document.getElementById('btn-send-wish');
         if (serverConfig.comment_lock_enabled && sendForm) {
             sendForm.remove(); // Xóa form hoàn toàn (hoặc ẩn đi)
             if (sendBtn) sendBtn.disabled = true; // Khóa nút nếu vẫn giữ form
-            
+
             // Thêm thông báo bảo trì nếu cần
             const container = document.getElementById('comment')?.querySelector('.container');
             if (container) {
-                 container.insertAdjacentHTML('afterbegin', 
-                 '<div class="alert alert-danger rounded-4 shadow-sm text-center">Chức năng Gửi Lời Chúc đang bảo trì.</div>');
+                container.insertAdjacentHTML('afterbegin',
+                    '<div class="alert alert-danger rounded-4 shadow-sm text-center">Chức năng Gửi Lời Chúc đang bảo trì.</div>');
             }
         }
-        
+
         // D. POPUP LỜI CHÚC NGẪU NHIÊN (popup_wishes_enabled)
         // Logic này cần được xử lý trong hàm fetchWishes của comment.js.
 
-        
+
         // 4. Tải tài nguyên (Chạy song song cho nhanh)
         vid.load();
         img.load();
-        
+
         // QUAN TRỌNG: Truyền cờ autoplay vào audio.load()
         aud.load(serverConfig.autoplay_enabled);
 
@@ -427,18 +426,15 @@ export const guest = (() => {
             aos: true,
             confetti: serverConfig.confetti_enabled
         });
-        
-        // 6. Kích hoạt Popup Lời Chúc và hoàn tất loading
-        comment.show(); // Hàm này sẽ tự động gọi fetchWishes
 
-        progress.complete('config'); 
-        progress.complete('comment'); 
-        
+        // 6. Kích hoạt Popup Lời Chúc và hoàn tất loading
+
+
         // 7. Xử lý sự kiện giao diện (Giữ nguyên)
         window.addEventListener('resize', util.debounce(slide));
         document.addEventListener('undangan.progress.done', () => booting());
         document.addEventListener('hide.bs.modal', () => document.activeElement?.blur());
-        
+
         const btnDownload = document.getElementById('button-modal-download');
         if (btnDownload) {
             btnDownload.addEventListener('click', (e) => {

@@ -28,6 +28,7 @@ export const comment = (() => {
             const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
             const json = await res.json();
             // Tận dụng trường can_delete làm cờ "Khóa"
+            //isLocked = json.data.can_delete;
         } catch (e) { }
 
         const form = document.getElementById('wishes-form');
@@ -171,7 +172,7 @@ export const comment = (() => {
     };
 
     const fetchWishes = async () => {
-        if (!storage('config').get('popup_wishes_enabled')) {
+        if (!storage('config').get('wishes_popup_enabled')) {
             console.log("Admin đã tắt Popup Lời Chúc.");
             return;
         }
@@ -355,10 +356,7 @@ export const comment = (() => {
                     });
             });
         }
-        return{
-            show,
-        }
     };
 
-    return { init, send: () => { } };
+    return { init, show: () => { }, send: () => { } };
 })();
