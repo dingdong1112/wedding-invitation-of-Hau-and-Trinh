@@ -329,91 +329,66 @@ export const guest = (() => {
      * @returns {void}
      */
     const pageLoaded = async () => {
+        // 1. Khởi tạo các module cơ bản
         lang.init();
         offline.init();
         comment.init();
         progress.init();
-
+        
         const vid = video.init();
         const img = image.init();
         const aud = audio.init();
         const lib = loaderLibs();
-
+        
         config = storage('config');
         information = storage('information');
-        let isConfettiOn = true;
-        // GỌI API LẤY CẤU HÌNH
-       try {
+
+        // 2. Lấy Cấu Hình từ Server (MongoDB)
+        try {
             const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
             if (res.status === 200) {
                 const json = await res.json();
-                isConfettiOn = json.data.confetti_enabled; // Cập nhật giá trị
-                // ...
+                // Cập nhật biến toàn cục để hàm open() dùng
+                isConfettiOn = json.data.confetti_enabled; 
+                
+                // Lưu các cấu hình khác vào storage (ví dụ: can_delete để khóa form)
+                Object.entries(json.data).forEach(([k, v]) => config.set(k, v));
             }
         } catch (e) {
-            console.warn("Dùng config mặc định");
+            console.warn("Lỗi tải config, dùng mặc định.");
         }
 
-        // LOAD TÀI NGUYÊN
+        // 3. Tải tài nguyên (Chạy song song cho nhanh)
         vid.load();
         img.load();
         aud.load();
 
-       lib.load({ 
+        // 4. Tải thư viện phụ trợ
+        // Chỉ tải confetti nếu Admin bật
+        lib.load({ 
             aos: true,
             confetti: isConfettiOn 
         });
 
-        const token = document.body.getAttribute('data-key');
-        const params = new URLSearchParams(window.location.search);
-
+        // 5. Xử lý sự kiện giao diện
         window.addEventListener('resize', util.debounce(slide));
         document.addEventListener('undangan.progress.done', () => booting());
         document.addEventListener('hide.bs.modal', () => document.activeElement?.blur());
-        document.getElementById('button-modal-download').addEventListener('click', (e) => {
-            img.download(e.currentTarget.getAttribute('data-src'));
-        });
-
-        if (!token || token.length <= 0) {
-            // Comment 2 dòng này lại để nó không xóa form của mình ---
-            // document.getElementById('comment')?.remove();
-            // document.querySelector('a.nav-link[href="#comment"]')?.closest('li.nav-item')?.remove();
-
-            vid.load();
-            img.load();
-            aud.load();
-            lib.load({ confetti: document.body.getAttribute('data-confetti') === 'true' });
+        
+        const btnDownload = document.getElementById('button-modal-download');
+        if(btnDownload) {
+            btnDownload.addEventListener('click', (e) => {
+                img.download(e.currentTarget.getAttribute('data-src'));
+            });
         }
 
-        if (token && token.length > 0) {
-            // add 2 progress for config and comment.
-            // before img.load();
-            progress.add();
-            progress.add();
-
-            // if don't have data-src.
-            if (!img.hasDataSrc()) {
-                img.load();
-            }
-
-            session.guest(params.get('k') ?? token).then(({ data }) => {
-                document.dispatchEvent(new Event('undangan.session'));
-                progress.complete('config');
-
-                if (img.hasDataSrc()) {
-                    img.load();
-                }
-
-                vid.load();
-                aud.load();
-                lib.load({ confetti: data.is_confetti_animation });
-
-                comment.show()
-                    .then(() => progress.complete('comment'))
-                    .catch(() => progress.invalid('comment'));
-
-            }).catch(() => progress.invalid('config'));
-        }
+        // 6. Kích hoạt Popup Lời Chúc (Luôn chạy vì là khách vãng lai)
+        comment.show(); 
+        
+        // Vì không còn token, ta coi như đã load xong config & comment
+        // Gọi complete thủ công để thanh loading chạy hết
+        progress.complete('config'); // Giả lập
+        progress.complete('comment'); // Giả lập
     };
 
 

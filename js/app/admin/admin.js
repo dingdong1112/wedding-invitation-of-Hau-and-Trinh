@@ -143,44 +143,52 @@ export const admin = (() => {
     };
 
     const changePassword = (button) => {
+        const oldPass = document.getElementById('old_password').value;
         const newPass = document.getElementById('new_password').value;
-        if (!newPass) return util.notify("Nhập mật khẩu mới").warning();
+
+        if (!oldPass) return util.notify("Vui lòng nhập mật khẩu cũ").warning();
+        if (!newPass) return util.notify("Vui lòng nhập mật khẩu mới").warning();
+
+        if (!util.ask("Bạn có chắc chắn muốn đổi mật khẩu không?")) return; // Hộp thoại xác nhận
 
         const btn = util.disableButton(button);
 
         request(HTTP_PATCH, SERVER_URL + '/api/admin/settings')
             .token(session.getToken())
-            .body({ admin_password: newPass })
+            .body({
+                old_password: oldPass, // Gửi pass cũ
+                admin_password: newPass // Gửi pass mới
+            })
             .send()
             .then((res) => {
-                if (res.code === 200) {
+                if (res.code === 200 && res.data.result === 'success') {
                     util.notify("Đổi mật khẩu thành công. Vui lòng đăng nhập lại.").success();
                     setTimeout(() => auth.clearSession(), 1500);
+                } else {
+                    // Hiển thị lỗi từ server (ví dụ: Mật khẩu cũ sai)
+                    util.notify(res.data.message || "Đổi mật khẩu thất bại").error();
                 }
             })
+            .catch(() => util.notify("Lỗi kết nối").error())
             .finally(() => btn.restore());
     };
-
     /**
      * @returns {void}
      */
     const pageLoaded = () => {
         lang.init();
-        // Cần thiết lập SERVER_URL để các module khác biết gọi đến đâu
-        document.body.setAttribute('data-url', SERVER_URL);
-
-        document.addEventListener('undangan.admin.success', getUserStats);
-        document.addEventListener('hidden.bs.modal', getUserStats);
-
-        // ... (các bước init khác giữ nguyên)
-
-        const raw = window.location.hash.slice(1);
-        if (raw.length > 0) {
-            session.setToken(raw);
-            window.history.replaceState({}, document.title, window.location.pathname);
+        // ...
+        
+        // KIỂM TRA TOKEN
+        const token = session.getToken(); // Lấy từ localStorage
+        
+        if (token === "VERCEL_ADMIN_TOKEN") {
+            // Nếu có token cứng, coi như đã đăng nhập -> Vào thẳng Dashboard
+            getUserStats();
+        } else {
+            // Nếu không -> Hiện form đăng nhập
+            auth.clearSession();
         }
-
-        session.isValid() ? getUserStats() : auth.clearSession();
     };
 
     /** @returns {object} */
