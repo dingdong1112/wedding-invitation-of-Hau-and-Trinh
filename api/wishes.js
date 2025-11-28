@@ -45,62 +45,7 @@ export default async function handler(req, res) {
             return res.status(200).json({ result: 'success' });
         }
         
-        // --- 3. XÓA LỜI CHÚC (DELETE) --- MỚI THÊM VÀO
-        // URL sẽ có dạng: /api/wishes/654abc...
-        else if (req.method === 'DELETE') {
-            
-            // A. Kiểm tra Token Động
-            const clientToken = req.headers['authorization'];
-            if (!clientToken) return res.status(401).json({ error: "Missing Token" });
-
-            const config = await settingsCollection.findOne({ key: "main_config" });
-            if (!config) return res.status(500).json({ error: "Server Config Error" });
-
-            // So sánh token client gửi lên với token trong DB
-            if (clientToken !== config.access_token || Date.now() > config.token_expiry) {
-                return res.status(401).json({ error: "Token Invalid or Expired" });
-            }
-
-            // B. Lấy ID từ URL và Xóa
-            const id = req.url.split('/').pop(); // Lấy phần cuối cùng của URL
-            
-            if (!id || id === 'wishes') { // Kiểm tra nếu không có ID
-                 return res.status(400).json({ error: 'Missing ID' });
-            }
-
-            await wishesCollection.deleteOne({ _id: new ObjectId(id) });
-            return res.status(200).json({ result: 'success' });
-        }
-
-        // --- 4. SỬA / HIGHLIGHT LỜI CHÚC (PUT /api/wishes/:id) ---
-        else if (req.method === 'PUT' && req.url.startsWith('/api/wishes/')) {
-            // Xác thực Token
-            const clientToken = req.headers['authorization'];
-            if (!clientToken) return res.status(401).json({ error: "Missing Token" });
-            const config = await settingsCollection.findOne({ key: "main_config" });
-            if (clientToken !== config.access_token || Date.now() > config.token_expiry) {
-                return res.status(401).json({ error: "Unauthorized" });
-            }
-
-            const id = req.url.split('/').pop();
-            const body = req.body; // { name, message, is_highlight }
-
-            const updateData = {};
-            if (body.name) updateData.name = body.name;
-            if (body.message) updateData.message = body.message;
-            if (typeof body.is_highlight !== 'undefined') updateData.is_highlight = body.is_highlight;
-
-            await wishesCollection.updateOne(
-                { _id: new ObjectId(id) },
-                { $set: updateData }
-            );
-
-            return res.status(200).json({ result: 'success' });
-        }
-        
-        else {
-             return res.status(404).json({ error: 'Not Found' }); 
-        }
+       
 
     } catch (error) {
         return res.status(500).json({ error: error.message });

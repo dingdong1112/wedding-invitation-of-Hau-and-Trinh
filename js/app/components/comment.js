@@ -1,4 +1,10 @@
 import { util } from '../../common/util.js';
+import { storage } from '../../common/storage.js';
+import { request, HTTP_GET, HTTP_DELETE } from '../../connection/request.js'; 
+// Cần thêm import card và session, nhưng vì không có, ta giả lập.
+// Import các module Admin mà bạn có:
+import { card } from './card.js';
+import { session } from '../../common/session.js';
 
 export const comment = (() => {
 
