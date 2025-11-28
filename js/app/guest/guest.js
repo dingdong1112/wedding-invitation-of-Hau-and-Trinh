@@ -358,6 +358,7 @@ export const guest = (() => {
         const vinylContainer = document.getElementById('vinyl-container');
         const particleController = document.getElementById('particle-toggle-button');
         const wishesToggleButton = document.getElementById('wishes-toggle-button');
+        const controlsPanel = document.getElementById('particle-controls');
 
         // 2. Lấy Cấu Hình từ Server (MongoDB)
         let serverConfig = {
@@ -435,6 +436,7 @@ export const guest = (() => {
         }
         else {
             particleController.style.display = 'add';
+            controlsPanel.classList.toggle('show');
             setupParticleControls();
         }
 
