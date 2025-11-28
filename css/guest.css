@@ -769,10 +769,11 @@ svg {
   top: 70px;
   /* Vị trí so với đỉnh */
   right: 20px;
-  z-index: 1030;
+  z-index: 99999;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  pointer-events: auto; 
 
   /* THÊM DÒNG NÀY ĐỂ TẠO KHOẢNG CÁCH ĐỀU */
   gap: 15px;

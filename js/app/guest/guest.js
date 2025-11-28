@@ -632,6 +632,7 @@ export const guest = (() => {
             if (window.musicPlayer && typeof window.musicPlayer.closePanel === 'function') {
                 window.musicPlayer.closePanel();
             }
+            console.log("Toggling particle controls panel.");
 
             // Sau đó mới mở/đóng bảng pháo hoa
             controlsPanel.classList.toggle('show');
