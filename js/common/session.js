@@ -1,7 +1,6 @@
-// File js/common/session.js
+// File js/common/session.js (BẢN FIX CHUẨN 100%)
 import { util } from './util.js';
 import { storage } from './storage.js';
-// import { dto } from '../connection/dto.js'; // <-- QUAN TRỌNG: BỎ DÒNG NÀY ĐI
 import { request, HTTP_POST, HTTP_GET, HTTP_STATUS_OK } from '../connection/request.js';
 
 export const session = (() => {
@@ -10,41 +9,6 @@ export const session = (() => {
 
     const getToken = () => ses.get('token');
     const setToken = (token) => ses.set('token', token);
-
-    // --- HÀM XỬ LÝ RESPONSE (Định nghĩa tại chỗ) ---
-    // Hàm này sẽ đọc JSON trả về từ API login mới
-    const parseLoginResponse = (data) => {
-        // API trả về: { result: "success", token: "..." }
-        if (data && data.result === 'success' && data.token) {
-            return { token: data.token };
-        }
-        return { token: null };
-    };
-
-    /**
-     * @param {object} body
-     * @param {string} serverUrl
-     * @returns {Promise<boolean>}
-     */
-    const login = (body, serverUrl = '/api/session') => {
-        return request(HTTP_POST, serverUrl)
-            .body(body)
-            // Dùng hàm parseLoginResponse thay vì dto.tokenResponse
-            .send(parseLoginResponse) 
-            .then((res) => {
-                // Kiểm tra cả mã HTTP 200 và có token hợp lệ
-                if (res.code === HTTP_STATUS_OK && res.data && res.data.token) {
-                    setToken(res.data.token);
-                    return true; // Trả về TRUE -> auth.js sẽ reload trang
-                }
-                return false; // Trả về FALSE -> auth.js báo sai pass
-            })
-            .catch(err => {
-                console.error("Session Login Error:", err);
-                return false;
-            });
-    };
-
     const logout = () => ses.unset('token');
 
     const isAdmin = () => {
@@ -52,6 +16,30 @@ export const session = (() => {
         if (!token) return false;
         if (token === "VERCEL_ADMIN_TOKEN") return true;
         return token.split('.').length === 3;
+    };
+
+    // --- HÀM LOGIN ĐÃ SỬA ---
+    const login = (body, serverUrl) => {
+        // KHÔNG dùng hàm parseLoginResponse nữa để tránh lỗi undefined
+        return request(HTTP_POST, serverUrl)
+            .body(body)
+            .send() // <-- ĐỂ TRỐNG: Để lấy toàn bộ JSON từ server
+            .then((res) => {
+                console.log("Login Response:", res); // Dòng này để debug nếu cần
+
+                // Vì không dùng transform, res chính là object trả về từ server gộp với {code: 200}
+                // API trả về: { result: "success", token: "...", code: 200 }
+                
+                if (res.code === HTTP_STATUS_OK && res.token) {
+                    setToken(res.token);
+                    return true;
+                }
+                return false;
+            })
+            .catch(err => {
+                console.error("Lỗi Login:", err);
+                return false;
+            });
     };
 
     const guest = (token) => {
@@ -76,7 +64,6 @@ export const session = (() => {
 
     const isValid = () => {
         if (!isAdmin()) return false;
-        // Token cứng luôn valid, token JWT check exp
         if (getToken() === "VERCEL_ADMIN_TOKEN") return true;
         return (decode()?.exp ?? 0) > (Date.now() / 1000);
     };
