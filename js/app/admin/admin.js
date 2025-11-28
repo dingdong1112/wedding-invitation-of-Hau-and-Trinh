@@ -514,9 +514,24 @@ export const admin = (() => {
             pageData.forEach(item => {
                 const id = item.id || item._id;
                 const starClass = item.is_highlight ? 'text-warning' : 'text-secondary';
-                const presenceBadge = item.presence ?
-                    '<span class="badge bg-success-subtle text-success rounded-pill me-1"><i class="fa-solid fa-check"></i> Tham dự</span>' :
-                    '<span class="badge bg-danger-subtle text-danger rounded-pill me-1"><i class="fa-solid fa-xmark"></i> Vắng</span>';
+                let presenceBadge = '';
+
+                // Chuẩn hóa dữ liệu về chữ thường để so sánh (nếu là string)
+                const presenceVal = String(item.presence).toLowerCase();
+
+                if (['có', '1', 'true'].includes(presenceVal)) {
+                    // TRƯỜNG HỢP: THAM DỰ
+                    presenceBadge = '<span class="badge bg-success-subtle text-success rounded-pill me-1 border border-success-subtle"><i class="fa-solid fa-check me-1"></i>Tham dự</span>';
+                }
+                else if (['không', '0', 'false'].includes(presenceVal)) {
+                    // TRƯỜNG HỢP: VẮNG MẶT
+                    presenceBadge = '<span class="badge bg-danger-subtle text-danger rounded-pill me-1 border border-danger-subtle"><i class="fa-solid fa-xmark me-1"></i>Vắng mặt</span>';
+                }
+                else {
+                    // TRƯỜNG HỢP: KHÁC (Admin thêm, Chưa biết, v.v...)
+                    // Dùng màu xám hoặc vàng cho trung tính
+                    presenceBadge = `<span class="badge bg-secondary-subtle text-secondary rounded-pill me-1 border border-secondary-subtle"><i class="fa-solid fa-question me-1"></i>${util.escapeHtml(item.presence || 'Khác')}</span>`;
+                }
 
                 // Encode dữ liệu để truyền vào hàm view
                 const safeName = util.escapeHtml(item.name);
