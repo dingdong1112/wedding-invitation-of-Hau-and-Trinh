@@ -30,11 +30,28 @@ export const session = (() => {
             .body(body)
             .send() 
             .then((res) => {
-                // API trả về: { result: "success", token: "..." }
-                if (res.code === HTTP_STATUS_OK && res.data && res.data.token) {
+                console.log("Full Response:", res); // Bật F12 để xem cái này
+
+                // TRƯỜNG HỢP 1: Response chuẩn { code: 200, data: { token: "..." } }
+                if (res.code === 200 && res.data && res.data.token) {
                     setToken(res.data.token);
                     return true;
                 }
+
+                // TRƯỜNG HỢP 2: Response bị lồng data { code: 200, data: { data: { token: "..." } } }
+                // (Do một số thư viện tự bọc data)
+                if (res.code === 200 && res.data && res.data.data && res.data.data.token) {
+                    setToken(res.data.data.token);
+                    return true;
+                }
+
+                // TRƯỜNG HỢP 3: Response trực tiếp (ít gặp nhưng có thể)
+                if (res.token) {
+                    setToken(res.token);
+                    return true;
+                }
+
+                console.error("Cấu trúc response lạ:", res);
                 return false;
             })
             .catch(err => {
