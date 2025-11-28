@@ -240,6 +240,54 @@ export const admin = (() => {
         session.init();
         // ... (logic clear storage) ...
 
+        // --- THÊM CÁC HÀM GLOBAL CHO DASHBOARD HTML GỌI ---
+        
+        // 1. Hàm Ẩn/Hiện Token
+        window.toggleTokenVisibility = () => {
+            const input = document.getElementById('dashboard-accesskey');
+            const icon = document.getElementById('eye-icon');
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.className = "fa-solid fa-eye-slash";
+            } else {
+                input.type = "password";
+                icon.className = "fa-solid fa-eye";
+            }
+        };
+
+        // 2. Hàm Copy Token
+        window.copyToken = () => {
+            const token = document.getElementById('dashboard-accesskey').value;
+            if(!token) return;
+            navigator.clipboard.writeText(token);
+            util.notify("Đã copy Token!").success();
+        };
+
+        // 3. Hàm Regenerate Token
+        window.regenerateToken = async () => {
+            if(!util.ask("Tạo token mới sẽ làm phiên đăng nhập cũ hết hạn. Tiếp tục?")) return;
+            
+            // Gọi API regenerate (Bạn cần tạo file api/admin/regenerate.js trước nhé)
+            try {
+                const res = await request(HTTP_POST, SERVER_URL + '/api/admin/regenerate')
+                                    .token(session.getToken())
+                                    .send();
+                
+                if(res.code === 200) {
+                    const newToken = res.data.token;
+                    session.setToken(newToken); // Cập nhật localStorage
+                    document.getElementById('dashboard-accesskey').value = newToken; // Cập nhật giao diện
+                    util.notify("Token mới đã được tạo!").success();
+                } else {
+                    util.notify("Phiên hết hạn, vui lòng đăng nhập lại.").error();
+                    setTimeout(() => auth.clearSession(), 1000);
+                }
+            } catch (e) {
+                util.notify("Lỗi kết nối").error();
+            }
+        };
+
         window.addEventListener('load', () => pool.init(pageLoaded, ['gif']));
 
         return {
