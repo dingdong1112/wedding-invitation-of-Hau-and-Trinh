@@ -74,22 +74,34 @@ export const admin = (() => {
      */
     const changeCheckboxValue = (checkbox, type) => {
         const label = util.disableCheckbox(checkbox);
-        const body = {};
 
         const fieldMap = {
             'confettiAnimation': 'confetti_enabled',
             'deleteComment': 'can_delete',
+            'replyComment': 'can_reply',
+            'editComment': 'can_edit',
+            'filterBadWord': 'is_filter'
         };
         const mongoField = fieldMap[checkbox.id] || type;
+        const body = {};
         body[mongoField] = checkbox.checked;
 
-        request(HTTP_PATCH, SERVER_URL + '/api/admin/settings')
+        request(HTTP_PATCH, SERVER_URL + '/api/admin/settings') // Gửi URL đầy đủ
             .token(session.getToken())
             .body(body)
             .send()
-            .then(() => {
-                // Cập nhật local storage sau khi server thành công
-                storage('config').set(mongoField, checkbox.checked);
+            .then((res) => {
+                if (res.code === 200) {
+                    storage('config').set(mongoField, checkbox.checked);
+                    util.notify("Lưu cấu hình thành công").success();
+                } else {
+                    util.notify("Lỗi lưu cấu hình").error();
+                    checkbox.checked = !checkbox.checked; // Revert nếu lỗi
+                }
+            })
+            .catch(() => {
+                util.notify("Lỗi mạng").error();
+                checkbox.checked = !checkbox.checked;
             })
             .finally(() => label.restore());
     };
@@ -97,7 +109,6 @@ export const admin = (() => {
     // Vô hiệu hóa các hàm không dùng đến
     const tenor = () => util.notify("Tính năng không được hỗ trợ.").warning();
     const regenerate = () => util.notify("Tính năng không được hỗ trợ.").warning();
-    const changePassword = () => util.notify("Sửa mật khẩu trong Cấu hình Server.").warning();
     const changeName = () => util.notify("Đổi tên trong Cấu hình Server.").warning();
     const download = () => util.notify("Vui lòng tải thủ công từ MongoDB Atlas.").warning();
     const enableButtonName = () => { };
@@ -106,10 +117,29 @@ export const admin = (() => {
     const changeTz = () => util.notify("Tính năng không được hỗ trợ.").warning();
 
     const logout = () => {
-        if (!util.ask('Are you sure?')) return;
-        auth.clearSession();
+        if (util.ask("Bạn muốn đăng xuất?")) {
+            auth.clearSession();
+        }
     };
 
+    const changePassword = (button) => {
+        const newPass = document.getElementById('new_password').value;
+        if (!newPass) return util.notify("Nhập mật khẩu mới").warning();
+
+        const btn = util.disableButton(button);
+
+        request(HTTP_PATCH, SERVER_URL + '/api/admin/settings')
+            .token(session.getToken())
+            .body({ admin_password: newPass })
+            .send()
+            .then((res) => {
+                if (res.code === 200) {
+                    util.notify("Đổi mật khẩu thành công. Vui lòng đăng nhập lại.").success();
+                    setTimeout(() => auth.clearSession(), 1500);
+                }
+            })
+            .finally(() => btn.restore());
+    };
 
     /**
      * @returns {void}

@@ -5,10 +5,10 @@ export const comment = (() => {
     // --- DÁN URL MỚI VÀO ĐÂY (URL BẠN VỪA DEPLOY NEW VERSION) ---
     const SCRIPT_URL = '/api/wishes';
 
-     let wishesData = [];
+    let wishesData = [];
     let currentIndex = 0;
     let isWishesActive = true;
-    
+
     // Biến lưu bộ đếm giờ
     let hideTimer = null;
     let nextTimer = null;
@@ -28,9 +28,9 @@ export const comment = (() => {
         // A. DÀNH CHO LAPTOP (Chuột)
         // Khi chuột vào: Hủy lệnh ẩn -> Giữ nguyên hiển thị
         box.addEventListener('mouseenter', () => {
-            clearTimeout(hideTimer); 
+            clearTimeout(hideTimer);
             // Đảm bảo trạng thái rõ nét
-            box.classList.add('is-hovered'); 
+            box.classList.add('is-hovered');
         });
 
         // Khi chuột ra: Đếm ngược 2s rồi ẩn
@@ -47,17 +47,17 @@ export const comment = (() => {
         box.addEventListener('touchstart', () => {
             clearTimeout(hideTimer);
             box.classList.add('is-touched');
-        }, {passive: true});
+        }, { passive: true });
 
         // Thả tay ra: Đếm ngược 5s rồi ẩn
         box.addEventListener('touchend', () => {
             setTimeout(() => {
                 box.classList.remove('is-touched');
                 if (box.classList.contains('show')) {
-                    startHideTimer(5000); 
+                    startHideTimer(5000);
                 }
             }, 200); // Delay nhỏ để mượt UI
-        }, {passive: true});
+        }, { passive: true });
     };
 
     // --- 2. HÀM BẮT ĐẦU ĐẾM NGƯỢC ĐỂ ẨN ---
@@ -75,9 +75,9 @@ export const comment = (() => {
 
         // Bắt đầu trượt ra
         box.classList.remove('show');
-        
+
         // Reset các trạng thái sáng (để lần sau hiện lên là mờ)
-        box.classList.remove('is-touched'); 
+        box.classList.remove('is-touched');
         box.classList.remove('is-hovered');
 
         // Đợi 0.8s cho CSS trượt xong hẳn rồi mới gọi cái mới
@@ -86,8 +86,8 @@ export const comment = (() => {
         nextTimer = setTimeout(() => {
             currentIndex++;
             if (currentIndex >= wishesData.length) currentIndex = 0;
-            if (currentIndex === 0) shuffleArray(wishesData); 
-            
+            if (currentIndex === 0) shuffleArray(wishesData);
+
             // Gọi cái tiếp theo
             showNextWish();
         }, 3000); // Nghỉ 3s giữa 2 tin
@@ -127,7 +127,7 @@ export const comment = (() => {
     };
 
     // ... (Các phần fetchWishes, shuffleArray, setupFormSubmit giữ nguyên) ...
-    
+
     const shuffleArray = (array) => {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -144,7 +144,7 @@ export const comment = (() => {
                 let rawData = json.data.filter(item => item.message && item.message.trim() !== "");
                 wishesData = shuffleArray(rawData);
                 if (wishesData.length > 0) {
-                    if(isWishesActive) setTimeout(showNextWish, 4000);
+                    if (isWishesActive) setTimeout(showNextWish, 4000);
                 }
             }
         } catch (error) { console.error(error); }
@@ -161,7 +161,7 @@ export const comment = (() => {
                     showNextWish();
                 } else {
                     btn.classList.remove('active');
-                    if(box) box.classList.remove('show');
+                    if (box) box.classList.remove('show');
                     clearTimeout(hideTimer);
                     clearTimeout(nextTimer);
                 }
@@ -169,22 +169,48 @@ export const comment = (() => {
         }
     };
 
+    // --- 5. HÀM XÓA COMMENT ---
+    const remove = async (button) => {
+        if (!util.ask("Bạn chắc chắn muốn xóa?")) return;
+
+        const id = button.getAttribute('data-uuid'); // Lấy ID MongoDB
+        const btn = util.disableButton(button);
+
+        // GỌI API XÓA MỚI
+        // URL: /api/wishes/:id
+        const res = await request(HTTP_DELETE, `${SERVER_URL}/api/wishes/${id}`)
+            .token(session.getToken())
+            .send();
+
+        if (res.code === 200) {
+            document.getElementById(id).remove(); // Xóa khỏi giao diện
+            util.notify("Đã xóa thành công").success();
+
+            // Cập nhật lại số lượng comment trên Dashboard nếu cần
+            // ...
+        } else {
+            btn.restore();
+            util.notify("Xóa thất bại").error();
+        }
+    };
+    //--------------------
+
     const setupFormSubmit = () => {
         const form = document.getElementById('wishes-form');
         const btn = document.getElementById('btn-send-wish');
         const successMsg = document.getElementById('success-msg');
-        
+
         if (form) {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const originalBtnText = btn.innerHTML;
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang gửi...';
-                
+
                 // --- 1. ĐỌC FORM DATA VÀ CHUYỂN THÀNH OBJECT JSON ---
                 const data = new FormData(form);
                 const formDataObject = {};
-                
+
                 // Chuyển FormData sang Object JS
                 data.forEach((value, key) => {
                     // Chúng ta chỉ cần Ten, ThamDu và LoiChuc
@@ -192,42 +218,42 @@ export const comment = (() => {
                 });
 
                 // --- 2. THỰC HIỆN FETCH GỬI JSON ---
-                fetch(SCRIPT_URL, { 
+                fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json' // Báo cho Server biết đây là JSON
                     },
                     body: JSON.stringify(formDataObject) // Gửi dữ liệu JSON
                 })
-                .then(response => response.json()) // Đọc Response dưới dạng JSON
-                .then(json => {
-                    if (json.result !== 'success') {
-                         throw new Error(json.error || "Lỗi gửi không xác định.");
-                    }
-                    
-                    form.reset();
-                    successMsg.classList.remove('d-none');
-                    setTimeout(() => successMsg.classList.add('d-none'), 5000);
-                    
-                    // Logic hiển thị lời chúc mới
-                    const tempWish = { name: formDataObject.Ten, message: formDataObject.LoiChuc };
-                    wishesData.unshift(tempWish);
-                    if(isWishesActive) {
-                        currentIndex = 0;
-                        clearTimeout(hideTimer);
-                        clearTimeout(nextTimer);
-                        document.getElementById('wish-notification')?.classList.remove('show');
-                        setTimeout(showNextWish, 600);
-                    }
-                })
-                .catch(error => { util.notify("Lỗi gửi lời chúc: " + error.message).error(); })
-                .finally(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = originalBtnText;
-                });
+                    .then(response => response.json()) // Đọc Response dưới dạng JSON
+                    .then(json => {
+                        if (json.result !== 'success') {
+                            throw new Error(json.error || "Lỗi gửi không xác định.");
+                        }
+
+                        form.reset();
+                        successMsg.classList.remove('d-none');
+                        setTimeout(() => successMsg.classList.add('d-none'), 5000);
+
+                        // Logic hiển thị lời chúc mới
+                        const tempWish = { name: formDataObject.Ten, message: formDataObject.LoiChuc };
+                        wishesData.unshift(tempWish);
+                        if (isWishesActive) {
+                            currentIndex = 0;
+                            clearTimeout(hideTimer);
+                            clearTimeout(nextTimer);
+                            document.getElementById('wish-notification')?.classList.remove('show');
+                            setTimeout(showNextWish, 600);
+                        }
+                    })
+                    .catch(error => { util.notify("Lỗi gửi lời chúc: " + error.message).error(); })
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = originalBtnText;
+                    });
             });
         }
     };
 
-    return { init, show: () => {}, send: () => {} };
+    return { init, show: () => { }, send: () => { } };
 })();
