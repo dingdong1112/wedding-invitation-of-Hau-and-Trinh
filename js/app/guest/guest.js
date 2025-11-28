@@ -16,6 +16,7 @@ import { pool } from '../../connection/request.js';
 
 export const guest = (() => {
 
+    let isConfettiOn = true; 
     /**
      * @type {ReturnType<typeof storage>|null}
      */
@@ -342,25 +343,26 @@ export const guest = (() => {
         information = storage('information');
         let isConfettiOn = true;
         // GỌI API LẤY CẤU HÌNH
-        try {
+       try {
             const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
-            if (res.ok) {
+            if (res.status === 200) {
                 const json = await res.json();
-                // Lấy giá trị từ DB
-                isConfettiOn = json.data.confetti_enabled;
+                isConfettiOn = json.data.confetti_enabled; // Cập nhật giá trị
+                // ...
             }
-        } catch (e) { console.log("Dùng config mặc định"); }
+        } catch (e) {
+            console.warn("Dùng config mặc định");
+        }
 
         // LOAD TÀI NGUYÊN
         vid.load();
         img.load();
         aud.load();
 
-        lib.load({
+       lib.load({ 
             aos: true,
-            confetti: isConfettiOn // Chỉ load thư viện confetti nếu được bật
+            confetti: isConfettiOn 
         });
-
 
         const token = document.body.getAttribute('data-key');
         const params = new URLSearchParams(window.location.search);
