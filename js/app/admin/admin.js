@@ -489,47 +489,91 @@ export const admin = (() => {
         let currentPage = 1;
         let itemsPerPage = 10;
 
+        // --- HÀM UI: ẨN HIỆN BỘ LỌC THỜI GIAN ---
+        const toggleTimeFilter = () => {
+            const type = document.getElementById('time-filter-type').value;
+            const monthGroup = document.getElementById('filter-month-group');
+            const rangeGroup = document.getElementById('filter-range-group');
+
+            // Reset giá trị cũ để tránh lọc sai
+            if (type !== 'month') document.getElementById('filter-month').value = '';
+            if (type !== 'range') {
+                document.getElementById('filter-date-start').value = '';
+                document.getElementById('filter-date-end').value = '';
+            }
+
+            // Ẩn hiện
+            if (type === 'month') {
+                monthGroup.classList.remove('d-none');
+                rangeGroup.classList.add('d-none');
+            } else if (type === 'range') {
+                monthGroup.classList.add('d-none');
+                rangeGroup.classList.remove('d-none');
+                rangeGroup.classList.add('d-flex'); // Cần d-flex cho layout ngang
+            } else {
+                monthGroup.classList.add('d-none');
+                rangeGroup.classList.add('d-none');
+                rangeGroup.classList.remove('d-flex');
+                applyFilters(); // Gọi lọc lại ngay khi về "None"
+            }
+        };
+
         // --- HÀM LỌC DỮ LIỆU ---
         const applyFilters = () => {
             const statusFilter = document.getElementById('filter-presence').value;
-            const dateFilter = document.getElementById('filter-date').value; // Format: YYYY-MM
             const searchFilter = document.getElementById('filter-search').value.toLowerCase();
 
+            // Lấy giá trị thời gian
+            const timeType = document.getElementById('time-filter-type').value;
+            const monthVal = document.getElementById('filter-month').value;
+            const startVal = document.getElementById('filter-date-start').value;
+            const endVal = document.getElementById('filter-date-end').value;
+
             filteredData = allWishesData.filter(item => {
-                // 1. Lọc Trạng thái
+                const itemDate = new Date(item.created_at);
+
+                // 1. Lọc Trạng thái (Giữ nguyên)
                 const p = String(item.presence).toLowerCase();
                 let matchStatus = true;
                 if (statusFilter === 'yes') matchStatus = ['có', '1', 'true'].includes(p);
                 else if (statusFilter === 'no') matchStatus = ['không', '0', 'false'].includes(p);
                 else if (statusFilter === 'other') matchStatus = !['có', '1', 'true', 'không', '0', 'false'].includes(p);
 
-                // 2. Lọc Thời gian (Tháng)
-                let matchDate = true;
-                if (dateFilter) {
-                    const itemDate = new Date(item.created_at);
-                    const itemMonth = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}`;
-                    matchDate = itemMonth === dateFilter;
+                // 2. Lọc Thời Gian (MỚI)
+                let matchTime = true;
+                if (timeType === 'month' && monthVal) {
+                    // So sánh YYYY-MM
+                    const itemMonth = itemDate.toISOString().slice(0, 7); // "2025-12"
+                    matchTime = itemMonth === monthVal;
+                }
+                else if (timeType === 'range') {
+                    // So sánh khoảng ngày (chỉ tính ngày, bỏ qua giờ)
+                    const itemTime = new Date(itemDate.toDateString()).getTime();
+                    const startTime = startVal ? new Date(startVal).getTime() : -Infinity;
+                    const endTime = endVal ? new Date(endVal).getTime() : Infinity;
+
+                    matchTime = itemTime >= startTime && itemTime <= endTime;
                 }
 
-                // 3. Tìm kiếm từ khóa
+                // 3. Tìm kiếm (Giữ nguyên)
                 let matchSearch = true;
                 if (searchFilter) {
                     matchSearch = (item.name && item.name.toLowerCase().includes(searchFilter)) ||
                         (item.message && item.message.toLowerCase().includes(searchFilter));
                 }
 
-                return matchStatus && matchDate && matchSearch;
+                return matchStatus && matchTime && matchSearch;
             });
 
-            currentPage = 1; // Reset về trang 1 khi lọc
-            renderWishesPage(); // Render lại
+            currentPage = 1;
+            renderWishesPage();
         };
 
         const resetFilters = () => {
             document.getElementById('filter-presence').value = 'all';
-            document.getElementById('filter-date').value = '';
             document.getElementById('filter-search').value = '';
-            applyFilters();
+            document.getElementById('time-filter-type').value = 'none';
+            toggleTimeFilter(); // Hàm này sẽ tự reset input ngày tháng và gọi applyFilters
         };
 
         // --- HÀM MỚI: RENDER DANH SÁCH THEO TRANG ---
@@ -1032,6 +1076,7 @@ export const admin = (() => {
                 viewWishDetail,
                 applyFilters,
                 resetFilters,
+                toggleTimeFilter,
             },
         };
     };

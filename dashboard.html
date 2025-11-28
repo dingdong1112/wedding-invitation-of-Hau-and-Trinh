@@ -166,13 +166,22 @@
                     <!-- 2. WISHES MANAGER -->
                     <section class="tab-pane fade" id="pills-wishes">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <!-- THANH CÔNG CỤ LỌC -->
+                            <!-- THANH CÔNG CỤ LỌC (Nâng Cao) -->
                             <div class="card border-0 shadow-sm mb-3 bg-body-tertiary">
-                                <div class="card-body p-2">
-                                    <div class="row g-2 align-items-center">
-                                        <!-- Lọc Trạng Thái -->
-                                        <div class="col-auto">
-                                            <select class="form-select form-select-sm shadow-none border-0 bg-white"
+                                <div class="card-body p-3">
+                                    <!-- Dòng 1: Tìm kiếm & Trạng thái -->
+                                    <div class="row g-3 mb-2">
+                                        <div class="col-12 col-md">
+                                            <div class="input-group">
+                                                <span class="input-group-text border-0 bg-white"><i
+                                                        class="fa-solid fa-search text-muted"></i></span>
+                                                <input type="text" class="form-control border-0 bg-white shadow-none"
+                                                    id="filter-search" placeholder="Tìm tên, nội dung..."
+                                                    oninput="undangan.admin.applyFilters()">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-auto">
+                                            <select class="form-select border-0 bg-white shadow-none"
                                                 id="filter-presence" onchange="undangan.admin.applyFilters()">
                                                 <option value="all">Tất cả trạng thái</option>
                                                 <option value="yes">✅ Tham dự</option>
@@ -180,31 +189,45 @@
                                                 <option value="other">❔ Khác</option>
                                             </select>
                                         </div>
+                                    </div>
 
-                                        <!-- Lọc Thời Gian (Tháng/Năm) -->
-                                        <div class="col-auto">
+                                    <!-- Dòng 2: Bộ lọc Thời gian -->
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-12 col-md-auto">
+                                            <select
+                                                class="form-select form-select-sm border-0 bg-white shadow-none text-primary fw-bold"
+                                                id="time-filter-type" onchange="undangan.admin.toggleTimeFilter()">
+                                                <option value="none">🕒 Tất cả thời gian</option>
+                                                <option value="month">📅 Lọc theo Tháng</option>
+                                                <option value="range">fw ↔ Lọc theo Khoảng Ngày</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Input: Tháng (Ẩn mặc định) -->
+                                        <div class="col-auto d-none" id="filter-month-group">
                                             <input type="month"
-                                                class="form-control form-control-sm shadow-none border-0 bg-white"
-                                                id="filter-date" onchange="undangan.admin.applyFilters()"
-                                                title="Lọc theo tháng">
+                                                class="form-control form-control-sm border-0 bg-white shadow-none"
+                                                id="filter-month" onchange="undangan.admin.applyFilters()">
                                         </div>
 
-                                        <!-- Tìm kiếm Tên/Lời chúc -->
-                                        <div class="col">
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text border-0 bg-white"><i
-                                                        class="fa-solid fa-search text-muted"></i></span>
-                                                <input type="text" class="form-control shadow-none border-0 bg-white"
-                                                    id="filter-search" placeholder="Tìm tên hoặc lời chúc..."
-                                                    oninput="undangan.admin.applyFilters()">
-                                            </div>
+                                        <!-- Input: Khoảng Ngày (Ẩn mặc định) -->
+                                        <div class="col-auto d-none d-flex align-items-center gap-2"
+                                            id="filter-range-group">
+                                            <input type="date"
+                                                class="form-control form-control-sm border-0 bg-white shadow-none"
+                                                id="filter-date-start" onchange="undangan.admin.applyFilters()"
+                                                title="Từ ngày">
+                                            <span class="text-muted">-</span>
+                                            <input type="date"
+                                                class="form-control form-control-sm border-0 bg-white shadow-none"
+                                                id="filter-date-end" onchange="undangan.admin.applyFilters()"
+                                                title="Đến ngày">
                                         </div>
 
-                                        <!-- Nút Reset -->
-                                        <div class="col-auto">
-                                            <button class="btn btn-light btn-sm rounded-circle"
-                                                onclick="undangan.admin.resetFilters()" title="Xóa bộ lọc">
-                                                <i class="fa-solid fa-rotate-right"></i>
+                                        <div class="col text-end">
+                                            <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm"
+                                                onclick="undangan.admin.resetFilters()">
+                                                <i class="fa-solid fa-rotate-right me-1"></i> Đặt lại
                                             </button>
                                         </div>
                                     </div>
