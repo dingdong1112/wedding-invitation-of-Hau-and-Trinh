@@ -122,50 +122,56 @@ export const admin = (() => {
     let pieChartInstance = null;
     let barChartInstance = null;
 
-    const renderPieChart = (present, absent, unknown) => {
-        const ctx = document.getElementById('attendanceChart').getContext('2d');
+    // --- CẤU HÌNH MÀU SẮC CHUNG ---
+    Chart.defaults.color = '#e0e0e0'; // Màu chữ sáng
+    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)'; // Màu đường kẻ mờ
 
-        // Hủy biểu đồ cũ nếu có (để tránh vẽ chồng lên nhau khi reload)
+    const renderPieChart = (present, absent, unknown) => {
+        const ctx = document.getElementById('attendanceChart');
+        if (!ctx) return; // Kiểm tra xem thẻ canvas có tồn tại không
+
         if (pieChartInstance) pieChartInstance.destroy();
 
         pieChartInstance = new Chart(ctx, {
-            type: 'doughnut', // Biểu đồ bánh rán (đẹp hơn pie thường)
+            type: 'doughnut',
             data: {
                 labels: ['Tham gia', 'Vắng mặt', 'Chưa rõ'],
                 datasets: [{
                     data: [present, absent, unknown],
-                    backgroundColor: ['#8573F1', '#6546B1', '#e9ecef'],
+                    backgroundColor: ['#3b82f6', '#ef4444', '#6b7280'], // Xanh dương, Đỏ, Xám
                     borderWidth: 0,
-                    hoverOffset: 4
+                    hoverOffset: 10
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' }
-                }
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20, usePointStyle: true }
+                    }
+                },
+                cutout: '70%' // Làm vòng tròn mảnh hơn cho đẹp
             }
         });
     };
 
     const renderTrendChart = (wishes) => {
-        const ctx = document.getElementById('wishesTrendChart').getContext('2d');
+        const ctx = document.getElementById('wishesTrendChart');
+        if (!ctx) return;
 
-        // Xử lý dữ liệu: Gom nhóm theo ngày
+        // ... (Phần xử lý dữ liệu giữ nguyên) ...
         const last7Days = {};
-        for (let i = 6; i >= 0; i--) {
+        for(let i=6; i>=0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
             const dateStr = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-            last7Days[dateStr] = 0; // Khởi tạo bằng 0
+            last7Days[dateStr] = 0;
         }
-
         wishes.forEach(w => {
             const wDate = new Date(w.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-            if (last7Days[wDate] !== undefined) {
-                last7Days[wDate]++;
-            }
+            if (last7Days[wDate] !== undefined) last7Days[wDate]++;
         });
 
         if (barChartInstance) barChartInstance.destroy();
@@ -177,15 +183,26 @@ export const admin = (() => {
                 datasets: [{
                     label: 'Số lời chúc',
                     data: Object.values(last7Days),
-                    backgroundColor: '#7A5CD9',
-                    borderRadius: 5,
+                    backgroundColor: '#8b5cf6', // Màu tím sáng
+                    borderRadius: 4,
+                    barThickness: 20
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false } // Ẩn chú thích thừa
+                },
                 scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } } // Trục Y chỉ hiện số nguyên
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { stepSize: 1 },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' } // Lưới mờ
+                    },
+                    x: {
+                        grid: { display: false } // Ẩn lưới dọc
+                    }
                 }
             }
         });
