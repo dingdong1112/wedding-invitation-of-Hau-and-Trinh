@@ -408,14 +408,15 @@ export const guest = (() => {
         }
 
         // 5. Tải thư viện & Chạy Pháo hoa nền
+        const shouldRunConfetti = serverConfig.confetti_enabled && serverConfig.particle_control_enabled;
+
         lib.load({
             aos: true,
-            confetti: serverConfig.confetti_enabled
+            confetti: shouldRunConfetti // Chỉ load thư viện khi cần
         });
 
-        // Nếu Admin bật pháo hoa -> Chạy vòng lặp (Loop)
-        if (serverConfig.confetti_enabled && typeof fireConfetti === 'function') {
-            // Chờ 2s cho thư viện load xong rồi mới bắn
+        // Chỉ chạy vòng lặp khi cần
+        if (shouldRunConfetti && typeof fireConfetti === 'function') {
             setTimeout(() => {
                 setInterval(fireConfetti, 2500);
             }, 2000);
