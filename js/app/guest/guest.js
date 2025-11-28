@@ -433,7 +433,7 @@ export const guest = (() => {
 
         // 6. Kích hoạt Popup Lời Chúc và hoàn tất loading
 
-        
+
 
 
         // 7. Xử lý sự kiện giao diện (Giữ nguyên)
@@ -504,6 +504,8 @@ export const guest = (() => {
         const densitySlider = document.getElementById('particle-density');
 
         if (!toggleButton || !controlsPanel) return;
+
+        console.log("Particle control button found and event listener is being attached."); // <-- DEBUG LINE
 
         // === Phần 2: Khai báo các biến trạng thái ===
         // Đặt các biến này ở phạm vi rộng hơn để chúng không bị reset
@@ -670,6 +672,11 @@ export const guest = (() => {
             storage('session').clear();
             storage('comment').clear();
         }
+        // KHÔNG CẦN CHẠY TRONG window.addEventListener('load') MÀ CHẠY NGAY SAU DOM LOAD
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCalendarLinks();
+            setupParticleControls(); // <--- GẮN SỰ KIỆN SAU KHI DOM CÓ SẴN
+        });
 
         window.addEventListener('load', () => {
             pool.init(pageLoaded, [
@@ -681,7 +688,7 @@ export const guest = (() => {
             ]);
             // CHẠY HÀM TẠO LỊCH CỦA CHÚNG TA SAU KHI MỌI THỨ ĐÃ TẢI XONG
             initializeCalendarLinks();
-            setupParticleControls();
+            //setupParticleControls();
         });
 
         return {
