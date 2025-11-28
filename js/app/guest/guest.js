@@ -398,7 +398,7 @@ export const guest = (() => {
         // C. KHÓA FORM GỬI LỜI CHÚC (comment_lock_enabled)
         const sendForm = document.getElementById('wishes-form');
         const sendBtn = document.getElementById('btn-send-wish');
-        if (serverConfig.comment_lock_enabled && sendForm) {
+        if (serverConfig.can_delete && sendForm) {
             sendForm.remove(); // Xóa form hoàn toàn (hoặc ẩn đi)
             if (sendBtn) sendBtn.disabled = true; // Khóa nút nếu vẫn giữ form
 
