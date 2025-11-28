@@ -284,7 +284,8 @@ export const admin = (() => {
                     setTimeout(() => auth.clearSession(), 1000);
                 }
             } catch (e) {
-                util.notify("Lỗi kết nối").error();
+                console.error(e); // Log lỗi ra console để debug
+                util.notify("Lỗi kết nối (Xem console)").error();
             }
         };
 
