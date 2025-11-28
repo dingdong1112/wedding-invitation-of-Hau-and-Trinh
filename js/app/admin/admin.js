@@ -18,73 +18,111 @@ const adminModule = () => {
     /**
      * @returns {Promise<void>}
      */
-    const getUserStats = () => auth.getDetailUser(SERVER_URL).then((res) => {
-
-        // --- LOGIC HIỂN THỊ THÔNG TIN ADMIN ---
+    const getUserStats = () => auth.getDetailUser(SERVER_URL).then((res) => { 
+        
+        // 1. Setup cơ bản
         util.safeInnerHTML(document.getElementById('dashboard-name'), `Admin<i class="fa-solid fa-hands text-warning ms-2"></i>`);
         const currentToken = localStorage.getItem('admin_token');
-
-        // Kiểm tra element tồn tại trước khi gán để tránh lỗi null
-        const accessKeyEl = document.getElementById('dashboard-accesskey');
-        if (accessKeyEl) accessKeyEl.value = currentToken;
-
-        const emailEl = document.getElementById('dashboard-email');
-        if (emailEl) emailEl.textContent = 'admin@wedding.app';
+        if(document.getElementById('dashboard-accesskey')) document.getElementById('dashboard-accesskey').value = currentToken;
+        if(document.getElementById('dashboard-email')) document.getElementById('dashboard-email').textContent = 'admin@wedding.app';
 
         const configStorage = storage('config');
-        const formNameEl = document.getElementById('form-name');
-        if (formNameEl) formNameEl.value = 'Admin';
-
-        // Load config UI
-        const setCheck = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+        const setCheck = (id, val) => { const el = document.getElementById(id); if(el) el.checked = !!val; };
         setCheck('confettiAnimation', configStorage.get('confetti_enabled'));
         setCheck('deleteComment', configStorage.get('can_delete'));
 
-        // Xóa các phần tử thừa (Giữ nguyên logic của bạn)
-        ['filterBadWord', 'replyComment', 'editComment', 'form-timezone', 'dashboard-tenorkey'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                const parent = el.closest('.form-check') || el.closest('.p-3') || el.parentElement;
-                if (parent) parent.remove(); else el.remove();
-            }
-        });
-
         document.dispatchEvent(new Event('undangan.session'));
 
-        // --- QUAN TRỌNG: Tải thống kê & Vẽ biểu đồ (GỘP LÀM 1 REQUEST DUY NHẤT) ---
+        // 2. Tải dữ liệu
         request(HTTP_GET, SERVER_URL + '/api/wishes')
             .token(session.getToken())
             .withCache(1000 * 30)
             .send()
             .then((resp) => {
                 const allWishes = resp.data;
-
-                // 1. Tính toán số liệu
+                
+                // Tính toán
                 const comments = allWishes.length;
                 let present = allWishes.filter(i => ['Có', '1', 'true', true, 1].includes(i.presence)).length;
                 let absent = allWishes.filter(i => ['Không', '0', 'false', false, 0].includes(i.presence)).length;
                 let unknown = comments - present - absent;
 
-                // 2. Cập nhật số liệu lên giao diện
-                const setText = (id, val) => { if (document.getElementById(id)) document.getElementById(id).textContent = val; };
-                setText('count-comment', String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                setText('count-present', String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                setText('count-absent', String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                setText('count-like', '0');
+                // --- 3. CHÈN HTML THỐNG KÊ MỚI (Thay thế phần cũ để đảm bảo có chỗ vẽ biểu đồ) ---
+                // Tìm thẻ cha chứa các ô thống kê (thường là .row hoặc #pills-home)
+                // Ở đây ta sẽ tìm thẻ có id 'count-comment' và leo lên cha của nó để chèn thêm biểu đồ xuống dưới
+                
+                const countEl = document.getElementById('count-comment');
+                if(countEl) {
+                   countEl.textContent = String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                   document.getElementById('count-present').textContent = String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                   document.getElementById('count-absent').textContent = String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                   document.getElementById('count-like').textContent = '0';
 
-                // 3. VẼ BIỂU ĐỒ (Dùng hàm tự tải thư viện)
-                loadChartJsAndRender(present, absent, unknown, allWishes);
+                   // Tìm vùng chứa các thẻ Card (row)
+                   const statsRow = countEl.closest('.row'); 
+                   
+                   // Kiểm tra xem đã có vùng biểu đồ chưa, nếu chưa thì tạo mới ngay bên dưới
+                   if (!document.getElementById('charts-area')) {
+                       const chartHTML = `
+                        <div id="charts-area" class="row mt-4">
+                            <!-- Biểu đồ tròn -->
+                            <div class="col-md-4 mb-4">
+                                <div class="card border-0 shadow-sm h-100 rounded-4 bg-dark text-light" style="border: 1px solid #333 !important;">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-chart-pie me-2"></i>Tỷ Lệ Tham Dự</h6>
+                                        <div style="height: 250px; position: relative;">
+                                            <canvas id="attendanceChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Biểu đồ cột -->
+                            <div class="col-md-8 mb-4">
+                                <div class="card border-0 shadow-sm h-100 rounded-4 bg-dark text-light" style="border: 1px solid #333 !important;">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-chart-bar me-2"></i>Xu Hướng (7 ngày)</h6>
+                                        <div style="height: 250px; width: 100%;">
+                                            <canvas id="wishesTrendChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Bảng tin mới nhất -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm rounded-4 bg-dark text-light" style="border: 1px solid #333 !important;">
+                                    <div class="card-header bg-transparent border-0 pt-3">
+                                        <h6 class="fw-bold text-secondary"><i class="fa-solid fa-clock-rotate-left me-2"></i>Mới Nhất</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-dark table-hover align-middle mb-0">
+                                                <tbody id="latest-wishes-table"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       `;
+                       // Chèn HTML mới vào sau vùng thống kê số liệu
+                       statsRow.insertAdjacentHTML('afterend', chartHTML);
+                   }
+                }
 
-                // 4. Hiển thị bảng tin mới nhất
-                renderLatestWishes(allWishes);
+                // --- 4. VẼ BIỂU ĐỒ (Sau khi đã có HTML) ---
+                // Đợi 100ms để DOM cập nhật rồi mới vẽ
+                setTimeout(() => {
+                    loadChartJsAndRender(present, absent, unknown, allWishes);
+                    renderLatestWishes(allWishes);
+                }, 100);
 
-                // 5. Load danh sách quản lý (nếu cần)
-                if (typeof loadWishesManager === 'function') loadWishesManager();
+                if(typeof loadWishesManager === 'function') loadWishesManager();
             });
 
     }).catch(err => {
         console.error("User stats failed:", err);
-        // auth.clearSession(); // Uncomment dòng này nếu muốn tự động logout khi lỗi
     });
 
 
