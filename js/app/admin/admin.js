@@ -485,8 +485,52 @@ export const admin = (() => {
 
         // --- BIẾN TOÀN CỤC CHO PHÂN TRANG ---
         let allWishesData = []; // Lưu toàn bộ dữ liệu
+        let filteredData = []; // Mới: Lưu dữ liệu sau khi lọc
         let currentPage = 1;
         let itemsPerPage = 10;
+
+        // --- HÀM LỌC DỮ LIỆU ---
+        const applyFilters = () => {
+            const statusFilter = document.getElementById('filter-presence').value;
+            const dateFilter = document.getElementById('filter-date').value; // Format: YYYY-MM
+            const searchFilter = document.getElementById('filter-search').value.toLowerCase();
+
+            filteredData = allWishesData.filter(item => {
+                // 1. Lọc Trạng thái
+                const p = String(item.presence).toLowerCase();
+                let matchStatus = true;
+                if (statusFilter === 'yes') matchStatus = ['có', '1', 'true'].includes(p);
+                else if (statusFilter === 'no') matchStatus = ['không', '0', 'false'].includes(p);
+                else if (statusFilter === 'other') matchStatus = !['có', '1', 'true', 'không', '0', 'false'].includes(p);
+
+                // 2. Lọc Thời gian (Tháng)
+                let matchDate = true;
+                if (dateFilter) {
+                    const itemDate = new Date(item.created_at);
+                    const itemMonth = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}`;
+                    matchDate = itemMonth === dateFilter;
+                }
+
+                // 3. Tìm kiếm từ khóa
+                let matchSearch = true;
+                if (searchFilter) {
+                    matchSearch = (item.name && item.name.toLowerCase().includes(searchFilter)) ||
+                        (item.message && item.message.toLowerCase().includes(searchFilter));
+                }
+
+                return matchStatus && matchDate && matchSearch;
+            });
+
+            currentPage = 1; // Reset về trang 1 khi lọc
+            renderWishesPage(); // Render lại
+        };
+
+        const resetFilters = () => {
+            document.getElementById('filter-presence').value = 'all';
+            document.getElementById('filter-date').value = '';
+            document.getElementById('filter-search').value = '';
+            applyFilters();
+        };
 
         // --- HÀM MỚI: RENDER DANH SÁCH THEO TRANG ---
         const renderWishesPage = () => {
@@ -496,9 +540,9 @@ export const admin = (() => {
             if (!container) return;
             container.innerHTML = '';
 
-            if (allWishesData.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted">Chưa có lời chúc nào.</p>';
-                paginationControls.classList.add('d-none');
+            if (filteredData.length === 0) {
+                container.innerHTML = '<div class="text-center py-5 text-muted"><i class="fa-solid fa-filter-circle-xmark fa-3x mb-3"></i><p>Không tìm thấy kết quả nào phù hợp.</p></div>';
+                document.getElementById('pagination-controls').classList.add('d-none');
                 return;
             }
 
@@ -507,8 +551,8 @@ export const admin = (() => {
             // Tính toán cắt mảng
             const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
-            const pageData = allWishesData.slice(start, end);
-            const totalPages = Math.ceil(allWishesData.length / itemsPerPage);
+            const pageData = filteredData.slice(start, end);
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
             // Render Items
             pageData.forEach(item => {
@@ -658,9 +702,8 @@ export const admin = (() => {
             try {
                 const res = await request(HTTP_GET, SERVER_URL + '/api/wishes').token(session.getToken()).send();
                 if (res.code === 200) {
-                    allWishesData = res.data; // Lưu vào biến toàn cục
-                    currentPage = 1; // Reset trang
-                    renderWishesPage(); // Render trang 1
+                    allWishesData = res.data;
+                    applyFilters();
                 }
             } catch (e) {
                 container.innerHTML = '<p class="text-center text-danger">Lỗi tải dữ liệu.</p>';
@@ -987,6 +1030,8 @@ export const admin = (() => {
                 changePage,
                 changePerPage,
                 viewWishDetail,
+                applyFilters,
+                resetFilters,
             },
         };
     };
