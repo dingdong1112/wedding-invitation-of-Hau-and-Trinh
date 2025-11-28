@@ -31,7 +31,7 @@ export const navbar = (() => {
      * @returns {void}
      */
     const buttonNavSetting = (btn) => {
-        showActiveTab(btn, 'button-setting');
+        showActiveTab(btn, 'button-setting-mobile');
     };
 
     return {

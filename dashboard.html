@@ -44,7 +44,7 @@
             </li>
             <li class="nav-item pe-2" role="presentation">
                 <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                    data-bs-toggle="pill" data-bs-target="#pills-setting" id="button-setting" type="button" role="tab"
+                    data-bs-toggle="pill" data-bs-target="#pills-setting-mobile" id="button-setting-mobile" type="button" role="tab"
                     aria-controls="pills-setting" aria-selected="false">
                     <i class="fa-solid fa-gear ms-3 me-2"></i>Setting
                 </button>
@@ -156,6 +156,51 @@
 
                     <!-- 3. SETTINGS -->
                     <section class="tab-pane fade" id="pills-setting">
+                        <div class="card p-4 shadow-sm rounded-4 border-0 bg-theme-auto">
+                            <h5 class="mb-4 fw-bold border-bottom pb-2">Điều Khiển Giao Diện Khách</h5>
+
+                            <!-- Các nút Switch -->
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-confetti"
+                                    onchange="undangan.admin.updateConfig('confetti_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-confetti">Hiệu ứng Pháo hoa
+                                    (Confetti)</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-particles"
+                                    onchange="undangan.admin.updateConfig('particle_control_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-particles">Hiển thị Đũa Thần (Chỉnh hiệu
+                                    ứng)</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-vinyl"
+                                    onchange="undangan.admin.updateConfig('vinyl_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-vinyl">Hiệu ứng Đĩa Nhạc Quay</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-music"
+                                    onchange="undangan.admin.updateConfig('music_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-music">Tự động phát nhạc & Hiển thị
+                                    Player</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-popup"
+                                    onchange="undangan.admin.updateConfig('wishes_popup_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-popup">Popup Lời Chúc Chạy Ngẫu
+                                    Nhiên</label>
+                            </div>
+                            <hr>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input bg-danger border-danger" type="checkbox" id="toggle-lock"
+                                    onchange="undangan.admin.updateConfig('can_delete', this.checked)">
+                                <label class="form-check-label text-danger fw-bold" for="toggle-lock">KHÓA chức năng Gửi
+                                    Lời Chúc (Bảo Trì)</label>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 3.2 SETTINGS MOBILE -->
+                    <section class="tab-pane fade" id="pills-setting-mobile">
                         <div class="card p-4 shadow-sm rounded-4 border-0 bg-theme-auto">
                             <h5 class="mb-4 fw-bold border-bottom pb-2">Điều Khiển Giao Diện Khách</h5>
 
