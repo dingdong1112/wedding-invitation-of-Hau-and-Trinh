@@ -22,9 +22,10 @@ export const admin = (() => {
 
         // --- LOGIC HIỂN THỊ THÔNG TIN ADMIN (GIẢ LẬP) ---
         util.safeInnerHTML(document.getElementById('dashboard-name'), `Admin<i class="fa-solid fa-hands text-warning ms-2"></i>`);
+        const currentToken = localStorage.getItem('admin_token');
+        document.getElementById('dashboard-accesskey').value = currentToken;
         document.getElementById('dashboard-email').textContent = 'admin@wedding.app';
-        document.getElementById('dashboard-accesskey').value = session.getToken();
-        document.getElementById('button-copy-accesskey').setAttribute('data-copy', session.getToken());
+        //document.getElementById('button-copy-accesskey').setAttribute('data-copy', session.getToken());
 
         const configStorage = storage('config');
         document.getElementById('form-name').value = 'Admin'; // Tên mặc định
@@ -172,21 +173,62 @@ export const admin = (() => {
             .catch(() => util.notify("Lỗi kết nối").error())
             .finally(() => btn.restore());
     };
+
+    // --- XỬ LÝ HIỂN THỊ TOKEN ---
+    function toggleTokenVisibility() {
+        const input = document.getElementById('dashboard-accesskey');
+        const icon = document.getElementById('eye-icon');
+
+        if (input.type === "password") {
+            input.type = "text"; // Hiện chữ
+            icon.className = "fa-solid fa-eye-slash";
+        } else {
+            input.type = "password"; // Hiện sao
+            icon.className = "fa-solid fa-eye";
+        }
+    }
+
+    function copyToken() {
+        const token = document.getElementById('dashboard-accesskey').value;
+        navigator.clipboard.writeText(token);
+        util.notify("Đã copy Token!").success();
+    }
+
+    // --- XỬ LÝ REGENERATE ---
+    async function regenerateToken() {
+        if (!confirm("Tạo token mới sẽ làm phiên đăng nhập cũ hết hạn. Tiếp tục?")) return;
+
+        const res = await fetch(SERVER_URL + '/api/admin/regenerate', {
+            method: 'POST',
+            headers: { 'Authorization': localStorage.getItem('admin_token') }
+        });
+
+        if (res.status === 200) {
+            const json = await res.json();
+            // Cập nhật token mới vào Storage và Giao diện
+            localStorage.setItem('admin_token', json.token);
+            document.getElementById('dashboard-accesskey').value = json.token;
+            util.notify("Token mới đã được tạo!").success();
+        } else {
+            util.notify("Phiên hết hạn, vui lòng đăng nhập lại.").error();
+            setTimeout(() => logout(), 1000);
+        }
+    }
     /**
      * @returns {void}
      */
     const pageLoaded = () => {
         lang.init();
-        // ...
-        
+        offline.init();
+
         // KIỂM TRA TOKEN
         const token = session.getToken(); // Lấy từ localStorage
-        
-        if (token === "VERCEL_ADMIN_TOKEN") {
-            // Nếu có token cứng, coi như đã đăng nhập -> Vào thẳng Dashboard
+
+        if (session.isValid()) {
+            // Nếu đã có token trong localStorage -> Vào thẳng Dashboard
             getUserStats();
         } else {
-            // Nếu không -> Hiện form đăng nhập
+            // Nếu chưa có -> Xóa sạch session cũ và hiện Login
             auth.clearSession();
         }
     };

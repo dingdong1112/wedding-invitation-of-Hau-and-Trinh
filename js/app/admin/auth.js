@@ -67,10 +67,12 @@ export const auth = (() => {
 
     /** @returns {Promise<void>} */
     const clearSession = async () => {
-        await pool.restart(cacheRequest);
-        user.clear();
-        session.logout();
-        // Hiển thị modal login khi logout hoặc chưa đăng nhập
+        // await pool.restart(cacheRequest); // Có thể bỏ dòng này nếu không cần clear cache mạng
+        
+        // Gọi hàm logout đã sửa ở Bước 1 (xóa localStorage)
+        session.logout(); 
+        
+        // Hiện lại Modal Login
         bs.modal('mainModal').show();
     };
 

@@ -5,17 +5,15 @@ import { request, HTTP_POST, HTTP_GET, HTTP_STATUS_OK } from '../connection/requ
 
 export const session = (() => {
 
-    let ses = null;
+     const TOKEN_KEY = 'admin_token'; 
 
-    const getToken = () => ses.get('token');
-    const setToken = (token) => ses.set('token', token);
-    const logout = () => ses.unset('token');
+    const getToken = () => localStorage.getItem(TOKEN_KEY);
+    const setToken = (token) => localStorage.setItem(TOKEN_KEY, token);
+    const logout = () => localStorage.removeItem(TOKEN_KEY);
 
     const isAdmin = () => {
         const token = getToken();
-        if (!token) return false;
-        if (token === "VERCEL_ADMIN_TOKEN") return true;
-        return token.split('.').length === 3;
+        return token === "VERCEL_ADMIN_TOKEN";
     };
 
     // --- HÀM LOGIN ĐÃ SỬA ---
@@ -63,14 +61,10 @@ export const session = (() => {
     };
 
     const isValid = () => {
-        if (!isAdmin()) return false;
-        if (getToken() === "VERCEL_ADMIN_TOKEN") return true;
-        return (decode()?.exp ?? 0) > (Date.now() / 1000);
+        return isAdmin(); // Nếu có token đúng thì là Valid, không cần check exp date phức tạp
     };
 
-    const init = () => {
-        ses = storage('session');
-    };
+    const init = () => {};
 
     return {
         init, guest, isValid, login, logout, decode, isAdmin, setToken, getToken,
