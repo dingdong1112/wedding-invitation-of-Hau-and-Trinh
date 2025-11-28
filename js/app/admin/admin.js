@@ -642,7 +642,10 @@ export const admin = (() => {
                     const countEl = document.getElementById('count-comment');
                     if (countEl) countEl.textContent = parseInt(countEl.textContent.replace('.', '')) - 1;
                 }
-            } catch (e) { util.notify("Lỗi xóa").error(); }
+            } catch (e) {
+                console.log(e); // <-- Bạn nên log lỗi ra để xem nó là gì
+                util.notify("Lỗi xóa").error();
+            }
         };
 
         const openEditWish = (id) => {
