@@ -35,11 +35,30 @@ export const admin = (() => {
         document.getElementById('deleteComment').checked = configStorage.get('can_delete');
 
         // Vô hiệu hóa các trường không dùng đến
-        document.getElementById('filterBadWord')?.closest('.form-check')?.remove();
-        document.getElementById('replyComment')?.closest('.form-check')?.remove();
-        document.getElementById('editComment')?.closest('.form-check')?.remove();
-        document.getElementById('form-timezone')?.closest('.p-3')?.remove();
-        document.getElementById('dashboard-tenorkey')?.closest('.p-3')?.remove();
+        [
+            'filterBadWord',
+            'replyComment',
+            'editComment',
+            'form-timezone', // Đây là ID của input, không phải checkbox
+            'dashboard-tenorkey' // Đây là ID của input
+        ].forEach(id => {
+            const el = document.getElementById(id);
+
+            if (el) {
+                // Dùng element.remove() an toàn hơn, nhưng cần tìm đúng thẻ cha
+
+                // Nếu là checkbox, tìm cha gần nhất có class .form-check
+                let parentToRemove = el.closest('.form-check') || el.closest('.p-3') || el.parentElement;
+
+                // Nếu tìm thấy cha, xóa nó đi
+                if (parentToRemove) {
+                    parentToRemove.remove();
+                } else {
+                    // Nếu không tìm thấy cha (trường hợp hiếm), xóa chính nó
+                    el.remove();
+                }
+            }
+        });
 
         document.dispatchEvent(new Event('undangan.session'));
 
