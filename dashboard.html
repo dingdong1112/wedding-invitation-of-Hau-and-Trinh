@@ -192,39 +192,67 @@
                                     </div>
 
                                     <!-- Dòng 2: Bộ lọc Thời gian -->
-                                    <div class="row g-3 align-items-center">
+                                    <div class="row g-2 align-items-center mt-1">
                                         <div class="col-12 col-md-auto">
                                             <select
                                                 class="form-select form-select-sm border-0 bg-white shadow-none text-primary fw-bold"
                                                 id="time-filter-type" onchange="undangan.admin.toggleTimeFilter()">
                                                 <option value="none">🕒 Tất cả thời gian</option>
                                                 <option value="month">📅 Lọc theo Tháng</option>
-                                                <option value="range">fw ↔ Lọc theo Khoảng Ngày</option>
+                                                <option value="range">↔ Lọc theo Khoảng Ngày</option>
                                             </select>
                                         </div>
 
-                                        <!-- Input: Tháng (Ẩn mặc định) -->
-                                        <div class="col-auto d-none" id="filter-month-group">
-                                            <input type="month"
-                                                class="form-control form-control-sm border-0 bg-white shadow-none"
-                                                id="filter-month" onchange="undangan.admin.applyFilters()">
+                                        <!-- Input: Tháng & Năm (Thay thế input month cũ) -->
+                                        <div class="col-12 col-md-auto d-none" id="filter-month-group">
+                                            <div class="d-flex gap-2">
+                                                <select class="form-select form-select-sm border-0 bg-white shadow-none"
+                                                    id="filter-month-val" onchange="undangan.admin.applyFilters()"
+                                                    style="width: 80px;">
+                                                    <option value="">Tháng...</option>
+                                                    <option value="01">Tháng 1</option>
+                                                    <option value="02">Tháng 2</option>
+                                                    <option value="03">Tháng 3</option>
+                                                    <option value="04">Tháng 4</option>
+                                                    <option value="05">Tháng 5</option>
+                                                    <option value="06">Tháng 6</option>
+                                                    <option value="07">Tháng 7</option>
+                                                    <option value="08">Tháng 8</option>
+                                                    <option value="09">Tháng 9</option>
+                                                    <option value="10">Tháng 10</option>
+                                                    <option value="11">Tháng 11</option>
+                                                    <option value="12">Tháng 12</option>
+                                                </select>
+                                                <select class="form-select form-select-sm border-0 bg-white shadow-none"
+                                                    id="filter-year-val" onchange="undangan.admin.applyFilters()"
+                                                    style="width: 90px;">
+                                                    <option value="2024">2024</option>
+                                                    <option value="2025" selected>2025</option>
+                                                    <option value="2026">2026</option>
+                                                    <option value="2027">2027</option>
+                                                    <option value="2028">2028</option>
+                                                    <option value="2029">2029</option>
+                                                    <option value="2030">2030</option>
+                                                </select>
+                                            </div>
                                         </div>
 
-                                        <!-- Input: Khoảng Ngày (Ẩn mặc định) -->
-                                        <div class="col-auto d-none d-flex align-items-center gap-2"
-                                            id="filter-range-group">
-                                            <input type="date"
-                                                class="form-control form-control-sm border-0 bg-white shadow-none"
-                                                id="filter-date-start" onchange="undangan.admin.applyFilters()"
-                                                title="Từ ngày">
-                                            <span class="text-muted">-</span>
-                                            <input type="date"
-                                                class="form-control form-control-sm border-0 bg-white shadow-none"
-                                                id="filter-date-end" onchange="undangan.admin.applyFilters()"
-                                                title="Đến ngày">
+                                        <!-- Input: Khoảng Ngày (Xuống dòng trên mobile) -->
+                                        <div class="col-12 col-md-auto d-none" id="filter-range-group">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="date"
+                                                    class="form-control form-control-sm border-0 bg-white shadow-none"
+                                                    id="filter-date-start" onchange="undangan.admin.applyFilters()"
+                                                    title="Từ ngày">
+                                                <span class="text-muted">-</span>
+                                                <input type="date"
+                                                    class="form-control form-control-sm border-0 bg-white shadow-none"
+                                                    id="filter-date-end" onchange="undangan.admin.applyFilters()"
+                                                    title="Đến ngày">
+                                            </div>
                                         </div>
 
-                                        <div class="col text-end">
+                                        <div class="col text-end ms-auto">
                                             <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm"
                                                 onclick="undangan.admin.resetFilters()">
                                                 <i class="fa-solid fa-rotate-right me-1"></i> Đặt lại

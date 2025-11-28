@@ -495,26 +495,27 @@ export const admin = (() => {
             const monthGroup = document.getElementById('filter-month-group');
             const rangeGroup = document.getElementById('filter-range-group');
 
-            // Reset giá trị cũ để tránh lọc sai
-            if (type !== 'month') document.getElementById('filter-month').value = '';
+            // Reset giá trị
+            if (type !== 'month') {
+                document.getElementById('filter-month-val').value = '';
+                // document.getElementById('filter-year-val').value = '2025'; // Giữ năm mặc định
+            }
             if (type !== 'range') {
                 document.getElementById('filter-date-start').value = '';
                 document.getElementById('filter-date-end').value = '';
             }
 
-            // Ẩn hiện
+            // Ẩn hiện (dùng class d-none của Bootstrap)
             if (type === 'month') {
                 monthGroup.classList.remove('d-none');
                 rangeGroup.classList.add('d-none');
             } else if (type === 'range') {
                 monthGroup.classList.add('d-none');
                 rangeGroup.classList.remove('d-none');
-                rangeGroup.classList.add('d-flex'); // Cần d-flex cho layout ngang
             } else {
                 monthGroup.classList.add('d-none');
                 rangeGroup.classList.add('d-none');
-                rangeGroup.classList.remove('d-flex');
-                applyFilters(); // Gọi lọc lại ngay khi về "None"
+                applyFilters();
             }
         };
 
@@ -539,12 +540,34 @@ export const admin = (() => {
                 else if (statusFilter === 'no') matchStatus = ['không', '0', 'false'].includes(p);
                 else if (statusFilter === 'other') matchStatus = !['có', '1', 'true', 'không', '0', 'false'].includes(p);
 
-                // 2. Lọc Thời Gian (MỚI)
+                // 2. Lọc Thời Gian (FIXED)
                 let matchTime = true;
-                if (timeType === 'month' && monthVal) {
-                    // So sánh YYYY-MM
-                    const itemMonth = itemDate.toISOString().slice(0, 7); // "2025-12"
-                    matchTime = itemMonth === monthVal;
+
+                if (timeType === 'month') {
+                    const m = document.getElementById('filter-month-val').value;
+                    const y = document.getElementById('filter-year-val').value;
+                    if (m && y) {
+                        const targetYM = `${y}-${m}`;
+                        // Lấy YYYY-MM từ ngày tạo
+                        const itemYM = itemDate.toISOString().slice(0, 7);
+                        matchTime = itemYM === targetYM;
+                    }
+                }
+                else if (timeType === 'range') {
+                    const startVal = document.getElementById('filter-date-start').value;
+                    const endVal = document.getElementById('filter-date-end').value;
+
+                    if (startVal || endVal) {
+                        // Chuyển itemDate về chuẩn YYYY-MM-DD (bỏ giờ phút) để so sánh chính xác
+                        // Lưu ý: toISOString() dùng giờ UTC, có thể lệch ngày nếu ở VN.
+                        // Tốt nhất dùng toLocaleDateString('en-CA') để lấy YYYY-MM-DD theo múi giờ máy.
+                        const itemDateStr = new Date(item.created_at).toLocaleDateString('en-CA'); // YYYY-MM-DD
+
+                        const isAfterStart = startVal ? itemDateStr >= startVal : true;
+                        const isBeforeEnd = endVal ? itemDateStr <= endVal : true;
+
+                        matchTime = isAfterStart && isBeforeEnd;
+                    }
                 }
                 else if (timeType === 'range') {
                     // So sánh khoảng ngày (chỉ tính ngày, bỏ qua giờ)
@@ -573,7 +596,14 @@ export const admin = (() => {
             document.getElementById('filter-presence').value = 'all';
             document.getElementById('filter-search').value = '';
             document.getElementById('time-filter-type').value = 'none';
-            toggleTimeFilter(); // Hàm này sẽ tự reset input ngày tháng và gọi applyFilters
+
+            // Reset các input con
+            document.getElementById('filter-month-val').value = '';
+            document.getElementById('filter-year-val').value = '2025';
+            document.getElementById('filter-date-start').value = '';
+            document.getElementById('filter-date-end').value = '';
+
+            toggleTimeFilter(); // Cập nhật UI
         };
 
         // --- HÀM MỚI: RENDER DANH SÁCH THEO TRANG ---
