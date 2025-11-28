@@ -236,6 +236,68 @@ export const comment = (() => {
     };
     //--------------------
 
+     /**
+     * @returns {Promise<ReturnType<typeof dto.getCommentsResponse>>}
+     */
+    const show = () => {
+
+        // remove all event listener.
+        lastRender.forEach((u) => {
+            like.removeListener(u);
+        });
+
+        if (comments.getAttribute('data-loading') === 'false') {
+            comments.setAttribute('data-loading', 'true');
+            comments.innerHTML = card.renderLoading().repeat(pagination.getPer());
+        }
+
+        return request(HTTP_GET, `/api/v2/comment?per=${pagination.getPer()}&next=${pagination.getNext()}&lang=${lang.getLanguage()}`)
+            .token(session.getToken())
+            .withCache(1000 * 30)
+            .withForceCache()
+            .send(dto.getCommentsResponseV2)
+            .then(async (res) => {
+                comments.setAttribute('data-loading', 'false');
+
+                for (const u of lastRender) {
+                    await gif.remove(u);
+                }
+
+                if (res.data.lists.length === 0) {
+                    comments.innerHTML = onNullComment();
+                    return res;
+                }
+
+                const flatten = (ii) => ii.flatMap((i) => [i.uuid, ...flatten(i.comments)]);
+                lastRender.splice(0, lastRender.length, ...flatten(res.data.lists));
+                showHide.set('hidden', traverse(res.data.lists, showHide.get('hidden')));
+
+                let data = await card.renderContentMany(res.data.lists);
+                if (res.data.lists.length < pagination.getPer()) {
+                    data += onNullComment();
+                }
+
+                util.safeInnerHTML(comments, data);
+
+                lastRender.forEach((u) => {
+                    like.addListener(u);
+                });
+
+                return res;
+            })
+            .then(async (res) => {
+                comments.dispatchEvent(new Event('undangan.comment.result'));
+
+                if (res.data.lists && session.isAdmin()) {
+                    await Promise.all(res.data.lists.map((v) => fetchTracker(v)));
+                }
+
+                pagination.setTotal(res.data.count);
+                comments.dispatchEvent(new Event('undangan.comment.done'));
+                return res;
+            });
+    };
+
     const setupFormSubmit = () => {
         const form = document.getElementById('wishes-form');
         const btn = document.getElementById('btn-send-wish');
@@ -294,7 +356,10 @@ export const comment = (() => {
                     });
             });
         }
+        return{
+            show,
+        }
     };
 
-    return { init, show: () => { }, send: () => { } };
+    return { init, send: () => { } };
 })();
