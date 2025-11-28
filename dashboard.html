@@ -30,7 +30,7 @@
     <!-- Mobile Nav -->
     <!-- Nav bottom (Mobile - Ứng với 5 tab chức năng) -->
     <nav class="navbar navbar-expand fixed-bottom rounded-top-4 border-top d-md-none d-lg-none d-xl-none p-0">
-        <ul class="navbar-nav nav-justified w-100 align-items-center">
+        <ul class="navbar-nav nav-justified w-100 align-items-center" id="mobile-nav-pills">
             <!-- 1. Thống Kê (Home) -->
             <li class="nav-item">
                 <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pills-home">
@@ -85,7 +85,7 @@
         <div class="row m-0 p-0">
             <!-- MENU TRÁI (Desktop) -->
             <div class="col-md-3 d-none d-md-block m-0 p-0">
-                <ul class="nav flex-column w-100 nav-pills pe-4" id="admin-tabs" role="tablist">
+                <ul class="nav flex-column w-100 nav-pills pe-4" id="desktop-nav-pills" role="tablist">
                     <li class="nav-item pe-2">
                         <button
                             class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
@@ -127,7 +127,7 @@
 
             <!-- NỘI DUNG PHẢI -->
             <div class="col-md-9 m-0 p-0">
-                <div class="tab-content">
+                <div class="tab-content" id="admin-tab-content">
 
                     <!-- 1. HOME -->
                     <section class="tab-pane fade show active" id="pills-home">

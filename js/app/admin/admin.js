@@ -240,6 +240,50 @@ export const admin = (() => {
         lang.init();
         offline.init();
 
+        const tabContentEl = document.getElementById('admin-tab-content');
+        const desktopNavEl = document.getElementById('desktop-nav-pills');
+        const mobileNavEl = document.getElementById('mobile-nav-pills');
+
+         // Chức năng: Khi chọn nút ở Menu Desktop, tìm nút tương ứng ở Menu Mobile và kích hoạt nó.
+        if (desktopNavEl && mobileNavEl) {
+            desktopNavEl.querySelectorAll('button').forEach(desktopBtn => {
+                const targetId = desktopBtn.getAttribute('data-bs-target');
+                
+                // Gán sự kiện cho Desktop Nav
+                desktopBtn.addEventListener('click', () => {
+                    // Kích hoạt tab content
+                    const tab = new bootstrap.Tab(desktopBtn);
+                    tab.show();
+                    
+                    // Tìm và kích hoạt nút tương ứng trên Mobile Nav
+                    const mobileBtn = mobileNavEl.querySelector(`button[data-bs-target="${targetId}"]`);
+                    if (mobileBtn) {
+                        mobileNavEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                        mobileBtn.classList.add('active');
+                    }
+                });
+            });
+            
+            // Chức năng: Khi chọn nút ở Menu Mobile, kích hoạt nút tương ứng trên Menu Desktop.
+            mobileNavEl.querySelectorAll('button').forEach(mobileBtn => {
+                const targetId = mobileBtn.getAttribute('data-bs-target');
+                
+                mobileBtn.addEventListener('click', () => {
+                    // Kích hoạt tab content
+                    const tab = new bootstrap.Tab(mobileBtn);
+                    tab.show();
+                    
+                    // Tìm và kích hoạt nút tương ứng trên Desktop Nav
+                    const desktopBtn = desktopNavEl.querySelector(`button[data-bs-target="${targetId}"]`);
+                    if (desktopBtn) {
+                        desktopNavEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                        desktopBtn.classList.add('active');
+                    }
+                });
+            });
+        }
+        // --- KẾT THÚC BƯỚC FIX QUAN TRỌNG ---
+
         // KIỂM TRA TOKEN
         const token = session.getToken(); // Lấy từ localStorage
 
