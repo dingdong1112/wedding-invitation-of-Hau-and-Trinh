@@ -672,11 +672,6 @@ export const guest = (() => {
             storage('session').clear();
             storage('comment').clear();
         }
-        // KHÔNG CẦN CHẠY TRONG window.addEventListener('load') MÀ CHẠY NGAY SAU DOM LOAD
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeCalendarLinks();
-            setupParticleControls(); // <--- GẮN SỰ KIỆN SAU KHI DOM CÓ SẴN
-        });
 
         window.addEventListener('load', () => {
             pool.init(pageLoaded, [
