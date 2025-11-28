@@ -18,72 +18,40 @@ const adminModule = () => {
     /**
      * @returns {Promise<void>}
      */
-    const getUserStats = () => auth.getDetailUser(SERVER_URL).then((res) => { // Truyền URL vào auth
+    const getUserStats = () => auth.getDetailUser(SERVER_URL).then((res) => {
 
-        // --- LOGIC HIỂN THỊ THÔNG TIN ADMIN (GIẢ LẬP) ---
+        // --- LOGIC HIỂN THỊ THÔNG TIN ADMIN ---
         util.safeInnerHTML(document.getElementById('dashboard-name'), `Admin<i class="fa-solid fa-hands text-warning ms-2"></i>`);
         const currentToken = localStorage.getItem('admin_token');
-        document.getElementById('dashboard-accesskey').value = currentToken;
-        document.getElementById('dashboard-email').textContent = 'admin@wedding.app';
-        //document.getElementById('button-copy-accesskey').setAttribute('data-copy', session.getToken());
+
+        // Kiểm tra element tồn tại trước khi gán để tránh lỗi null
+        const accessKeyEl = document.getElementById('dashboard-accesskey');
+        if (accessKeyEl) accessKeyEl.value = currentToken;
+
+        const emailEl = document.getElementById('dashboard-email');
+        if (emailEl) emailEl.textContent = 'admin@wedding.app';
 
         const configStorage = storage('config');
-        document.getElementById('form-name').value = 'Admin'; // Tên mặc định
+        const formNameEl = document.getElementById('form-name');
+        if (formNameEl) formNameEl.value = 'Admin';
 
+        // Load config UI
+        const setCheck = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+        setCheck('confettiAnimation', configStorage.get('confetti_enabled'));
+        setCheck('deleteComment', configStorage.get('can_delete'));
 
-
-        // Load config
-        document.getElementById('confettiAnimation').checked = configStorage.get('confetti_enabled');
-        document.getElementById('deleteComment').checked = configStorage.get('can_delete');
-
-        // Vô hiệu hóa các trường không dùng đến
-        [
-            'filterBadWord',
-            'replyComment',
-            'editComment',
-            'form-timezone', // Đây là ID của input, không phải checkbox
-            'dashboard-tenorkey' // Đây là ID của input
-        ].forEach(id => {
+        // Xóa các phần tử thừa (Giữ nguyên logic của bạn)
+        ['filterBadWord', 'replyComment', 'editComment', 'form-timezone', 'dashboard-tenorkey'].forEach(id => {
             const el = document.getElementById(id);
-
             if (el) {
-                // Dùng element.remove() an toàn hơn, nhưng cần tìm đúng thẻ cha
-
-                // Nếu là checkbox, tìm cha gần nhất có class .form-check
-                //let parentToRemove = el.closest('.form-check') || el.closest('.p-3') || el.parentElement;
-
-                // Nếu tìm thấy cha, xóa nó đi
-                if (parentToRemove) {
-                    parentToRemove.remove();
-                } else {
-                    // Nếu không tìm thấy cha (trường hợp hiếm), xóa chính nó
-                    el.remove();
-                }
+                const parent = el.closest('.form-check') || el.closest('.p-3') || el.parentElement;
+                if (parent) parent.remove(); else el.remove();
             }
         });
 
         document.dispatchEvent(new Event('undangan.session'));
 
-        // Tải thống kê (GỌI ĐÚNG API MỚI)
-        request(HTTP_GET, SERVER_URL + '/api/wishes')
-            .token(session.getToken())
-            .withCache(1000 * 30)
-            .send()
-            .then((resp) => {
-                const comments = resp.data.length;
-                let present = resp.data.filter(i => i.presence === 'Có').length;
-                let absent = resp.data.filter(i => i.presence === 'Không').length;
-
-                document.getElementById('count-comment').textContent = String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                document.getElementById('count-present').textContent = String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                document.getElementById('count-absent').textContent = String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                document.getElementById('count-like').textContent = '0'; // Giả lập
-
-                // Khởi tạo hiển thị lời chúc (cần viết lại comment.js sau)
-                // comment.show(); // Tạm thời comment nếu chưa sửa comment.js Admin
-            });
-
-        // Tải thống kê & Vẽ biểu đồ
+        // --- QUAN TRỌNG: Tải thống kê & Vẽ biểu đồ (GỘP LÀM 1 REQUEST DUY NHẤT) ---
         request(HTTP_GET, SERVER_URL + '/api/wishes')
             .token(session.getToken())
             .withCache(1000 * 30)
@@ -91,166 +59,150 @@ const adminModule = () => {
             .then((resp) => {
                 const allWishes = resp.data;
 
-                // 1. TÍNH TOÁN SỐ LIỆU CƠ BẢN
+                // 1. Tính toán số liệu
                 const comments = allWishes.length;
-                let present = allWishes.filter(i => i.presence === 'Có' || i.presence === '1' || i.presence === true).length;
-                let absent = allWishes.filter(i => i.presence === 'Không' || i.presence === '2' || i.presence === false).length;
-                let unknown = comments - present - absent; // Số người chưa xác định
+                let present = allWishes.filter(i => ['Có', '1', 'true', true, 1].includes(i.presence)).length;
+                let absent = allWishes.filter(i => ['Không', '0', 'false', false, 0].includes(i.presence)).length;
+                let unknown = comments - present - absent;
 
-                document.getElementById('count-comment').textContent = comments;
-                document.getElementById('count-present').textContent = present;
-                document.getElementById('count-absent').textContent = absent;
+                // 2. Cập nhật số liệu lên giao diện
+                const setText = (id, val) => { if (document.getElementById(id)) document.getElementById(id).textContent = val; };
+                setText('count-comment', String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                setText('count-present', String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                setText('count-absent', String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                setText('count-like', '0');
 
-                // 2. VẼ BIỂU ĐỒ TRÒN (PIE CHART) - Tỷ lệ tham dự
-                renderPieChart(present, absent, unknown);
+                // 3. VẼ BIỂU ĐỒ (Dùng hàm tự tải thư viện)
+                loadChartJsAndRender(present, absent, unknown, allWishes);
 
-                // 3. VẼ BIỂU ĐỒ CỘT (BAR CHART) - Xu hướng theo ngày
-                renderTrendChart(allWishes);
-
-                // 4. HIỂN THỊ BẢNG LỜI CHÚC MỚI NHẤT
+                // 4. Hiển thị bảng tin mới nhất
                 renderLatestWishes(allWishes);
+
+                // 5. Load danh sách quản lý (nếu cần)
+                if (typeof loadWishesManager === 'function') loadWishesManager();
             });
 
-        // comment.show();
     }).catch(err => {
-        // Nếu get user thất bại (token hết hạn), nó sẽ bị chuyển hướng login
-        console.error("User stats failed, redirecting to login:", err);
+        console.error("User stats failed:", err);
+        // auth.clearSession(); // Uncomment dòng này nếu muốn tự động logout khi lỗi
     });
+
 
     // --- CÁC HÀM HỖ TRỢ VẼ BIỂU ĐỒ (Thêm vào bên dưới getUserStats) ---
 
+     // --- HÀM TỰ ĐỘNG TẢI THƯ VIỆN CHART.JS (FIX LỖI KHÔNG HIỆN) ---
+    const loadChartJsAndRender = (present, absent, unknown, wishes) => {
+        // Kiểm tra: Nếu thư viện đã có -> Vẽ luôn
+        if (typeof Chart !== 'undefined') {
+            doRenderCharts(present, absent, unknown, wishes);
+            return;
+        }
+
+        // Nếu chưa có -> Tự động tạo thẻ script để tải về
+        console.log("Đang tải thư viện Chart.js...");
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script.onload = () => {
+            console.log("Đã tải xong Chart.js -> Bắt đầu vẽ");
+            doRenderCharts(present, absent, unknown, wishes);
+        };
+        document.head.appendChild(script);
+    };
+
+    // --- HÀM VẼ BIỂU ĐỒ THỰC TẾ ---
     let pieChartInstance = null;
     let barChartInstance = null;
 
-    // --- CẤU HÌNH MÀU SẮC CHUNG ---
-    //Chart.defaults.color = '#e0e0e0'; // Màu chữ sáng
-    //Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)'; // Màu đường kẻ mờ
+    const doRenderCharts = (present, absent, unknown, wishes) => {
+        // Cấu hình màu sắc cho giao diện tối (Dark Admin)
+        const textColor = '#cbd5e1'; 
+        const gridColor = 'rgba(255, 255, 255, 0.05)';
 
-    const renderPieChart = (present, absent, unknown) => {
-        // 1. KIỂM TRA AN TOÀN: Nếu Chart chưa tải xong, đợi 0.5s rồi thử lại
-        if (typeof Chart === 'undefined') {
-            setTimeout(() => renderPieChart(present, absent, unknown), 500);
-            return;
-        }
-
-        const ctx = document.getElementById('attendanceChart');
-        if (!ctx) return;
-
-        if (pieChartInstance) pieChartInstance.destroy();
-
-        pieChartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Tham gia', 'Vắng mặt', 'Chưa rõ'],
-                datasets: [{
-                    data: [present, absent, unknown],
-                    backgroundColor: ['#3b82f6', '#ef4444', '#6b7280'],
-                    borderWidth: 0, // Không viền
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                // --- CẤU HÌNH MÀU SẮC TRỰC TIẾP TẠI ĐÂY ---
-                color: '#e0e0e0', 
-                borderColor: 'rgba(255, 255, 255, 0.1)',
-                // -------------------------------------------
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { padding: 20, usePointStyle: true, color: '#e0e0e0' } // Màu chữ chú thích
-                    }
+        // 1. VẼ BIỂU ĐỒ TRÒN
+        const ctxPie = document.getElementById('attendanceChart');
+        if (ctxPie) {
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Tham gia', 'Vắng mặt', 'Chưa rõ'],
+                    datasets: [{
+                        data: [present, absent, unknown],
+                        backgroundColor: ['#8b5cf6', '#ef4444', '#64748b'], // Tím, Đỏ, Xám
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
                 },
-                cutout: '70%'
-            }
-        });
-    };
-
-    const renderTrendChart = (wishes) => {
-        // 1. KIỂM TRA AN TOÀN
-        if (typeof Chart === 'undefined') {
-            setTimeout(() => renderTrendChart(wishes), 500);
-            return;
-        }
-
-        const ctx = document.getElementById('wishesTrendChart');
-        if (!ctx) return;
-
-        // Xử lý dữ liệu (Giữ nguyên logic cũ)
-        const last7Days = {};
-        for(let i=6; i>=0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            const dateStr = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-            last7Days[dateStr] = 0;
-        }
-        wishes.forEach(w => {
-            const wDate = new Date(w.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-            if (last7Days[wDate] !== undefined) last7Days[wDate]++;
-        });
-
-        if (barChartInstance) barChartInstance.destroy();
-
-        barChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(last7Days),
-                datasets: [{
-                    label: 'Số lời chúc',
-                    data: Object.values(last7Days),
-                    backgroundColor: '#8b5cf6',
-                    borderRadius: 4,
-                    barThickness: 20
-                }]
-            },
-            options: {
-                // --- CẤU HÌNH MÀU SẮC TRỰC TIẾP TẠI ĐÂY ---
-                color: '#e0e0e0',
-                borderColor: 'rgba(255, 255, 255, 0.1)',
-                // -------------------------------------------
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        ticks: { stepSize: 1, color: '#e0e0e0' }, // Màu số trục Y
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' } 
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: textColor, padding: 20, usePointStyle: true }
+                        }
                     },
-                    x: {
-                        ticks: { color: '#e0e0e0' }, // Màu chữ trục X
-                        grid: { display: false } 
+                    cutout: '75%'
+                }
+            });
+        }
+
+        // 2. VẼ BIỂU ĐỒ CỘT
+        const ctxBar = document.getElementById('wishesTrendChart');
+        if (ctxBar) {
+            // Xử lý dữ liệu 7 ngày
+            const last7Days = {};
+            const labels = [];
+            const data = [];
+            
+            for(let i=6; i>=0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+                labels.push(dateStr);
+                last7Days[dateStr] = 0;
+            }
+
+            wishes.forEach(w => {
+                const wDate = new Date(w.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+                if (last7Days[wDate] !== undefined) last7Days[wDate]++;
+            });
+            
+            // Map dữ liệu vào mảng đúng thứ tự ngày
+            labels.forEach(day => data.push(last7Days[day]));
+
+            if (barChartInstance) barChartInstance.destroy();
+            barChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Lời chúc',
+                        data: data,
+                        backgroundColor: '#3b82f6', // Xanh dương
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { stepSize: 1, color: textColor },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { display: false }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     };
-
-    const renderLatestWishes = (wishes) => {
-        const tbody = document.getElementById('latest-wishes-table');
-        tbody.innerHTML = '';
-        // Lấy 5 tin mới nhất
-        const latest = wishes.slice(0, 5);
-
-        latest.forEach(w => {
-            let badgeClass = 'bg-secondary';
-            let badgeText = 'Chưa rõ';
-
-            if (w.presence === 'Có' || w.presence === true) { badgeClass = 'bg-success'; badgeText = 'Tham gia'; }
-            else if (w.presence === 'Không' || w.presence === false) { badgeClass = 'bg-danger'; badgeText = 'Vắng mặt'; }
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="fw-bold text-truncate" style="max-width: 150px;">${util.escapeHtml(w.name)}</td>
-                <td><span class="badge ${badgeClass} rounded-pill">${badgeText}</span></td>
-                <td class="text-truncate" style="max-width: 200px;">${util.escapeHtml(w.message)}</td>
-                <td class="text-muted small">${new Date(w.created_at).toLocaleDateString('vi-VN')}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    };
-
 
     /**
      * @param {HTMLElement} checkbox
@@ -1273,9 +1225,8 @@ const adminModule = () => {
                 applyFilters,
                 resetFilters,
                 toggleTimeFilter,
-                renderPieChart,
-                renderTrendChart,
-                renderLatestWishes,
+                loadChartJsAndRender,
+                doRenderCharts,
             },
         };
     };
