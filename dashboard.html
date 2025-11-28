@@ -198,6 +198,7 @@
 
                                 <!-- Dòng 2: Bộ lọc Thời gian -->
                                 <div class="row g-2 align-items-center mt-1">
+                                    <!-- Thêm mt-1 hoặc mt-2 nếu cần giãn dòng -->
                                     <div class="col-12 col-md-auto">
                                         <select
                                             class="form-select form-select-sm border-0 bg-white shadow-none text-primary fw-bold"
@@ -210,10 +211,11 @@
 
                                     <!-- Input: Tháng & Năm -->
                                     <div class="col-12 col-md-auto d-none" id="filter-month-group">
-                                        <div class="d-flex gap-2">
+                                        <div class="d-flex gap-2 mt-2 mt-md-0"> <!-- Thêm margin-top trên mobile -->
                                             <select class="form-select form-select-sm border-0 bg-white shadow-none"
                                                 id="filter-month-val" onchange="undangan.admin.applyFilters()"
                                                 style="width: 80px;">
+                                                <!-- ... options giữ nguyên ... -->
                                                 <option value="">Tháng...</option>
                                                 <option value="01">Tháng 1</option>
                                                 <option value="02">Tháng 2</option>
@@ -238,31 +240,37 @@
                                         </div>
                                     </div>
 
-                                    <!-- Input: Khoảng Ngày -->
+                                    <!-- Input: Khoảng Ngày (Đã sửa layout) -->
                                     <div class="col-12 col-md-auto d-none" id="filter-range-group">
-                                        <div class="d-flex flex-wrap align-items-center gap-2">
-                                            <div class="input-group input-group-sm" style="width: 140px;">
-                                                <span class="input-group-text bg-white border-0"><i
-                                                        class="fa-solid fa-calendar-days text-muted"></i></span>
-                                                <input type="date" class="form-control border-0 bg-white shadow-none"
-                                                    id="filter-date-start" onchange="undangan.admin.applyFilters()"
-                                                    title="Từ ngày">
+                                        <div class="d-flex align-items-center gap-2 mt-2 mt-md-0 w-100">
+                                            <!-- Thêm margin top -->
+                                            <!-- Ô ngày bắt đầu (Chiếm 50% - khoảng cách) -->
+                                            <div class="input-group input-group-sm flex-grow-1">
+                                                <span class="input-group-text bg-white border-0 ps-2 pe-1"><i
+                                                        class="fa-solid fa-calendar small text-muted"></i></span>
+                                                <input type="date"
+                                                    class="form-control border-0 bg-white shadow-none ps-1"
+                                                    id="filter-date-start" onchange="undangan.admin.applyFilters()">
                                             </div>
-                                            <span class="text-muted d-none d-sm-block">-</span>
-                                            <div class="input-group input-group-sm" style="width: 140px;">
-                                                <span class="input-group-text bg-white border-0"><i
-                                                        class="fa-solid fa-calendar-days text-muted"></i></span>
-                                                <input type="date" class="form-control border-0 bg-white shadow-none"
-                                                    id="filter-date-end" onchange="undangan.admin.applyFilters()"
-                                                    title="Đến ngày">
+
+                                            <span class="text-muted">-</span>
+
+                                            <!-- Ô ngày kết thúc (Chiếm 50% - khoảng cách) -->
+                                            <div class="input-group input-group-sm flex-grow-1">
+                                                <span class="input-group-text bg-white border-0 ps-2 pe-1"><i
+                                                        class="fa-solid fa-calendar small text-muted"></i></span>
+                                                <input type="date"
+                                                    class="form-control border-0 bg-white shadow-none ps-1"
+                                                    id="filter-date-end" onchange="undangan.admin.applyFilters()">
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="col text-end ms-auto">
-                                        <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm"
+                                    <div class="col-12 text-end mt-2">
+                                        <!-- Đưa nút reset xuống dòng riêng và căn phải -->
+                                        <button class="btn btn-light btn-sm rounded-pill px-4 shadow-sm"
                                             onclick="undangan.admin.resetFilters()">
-                                            <i class="fa-solid fa-rotate-right me-1"></i> Đặt lại
+                                            <i class="fa-solid fa-rotate-right me-2"></i> Đặt lại
                                         </button>
                                     </div>
                                 </div>
