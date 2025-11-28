@@ -508,7 +508,7 @@ export const guest = (() => {
         const sizeSlider = document.getElementById('particle-size');
         const densitySlider = document.getElementById('particle-density');
 
-        if (!toggleButton) return;
+        if (!toggleButton || !controlsPanel) return;
 
         // === Phần 2: Khai báo các biến trạng thái ===
         // Đặt các biến này ở phạm vi rộng hơn để chúng không bị reset
