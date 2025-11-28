@@ -344,7 +344,6 @@ export const guest = (() => {
         offline.init();
         comment.init();
         progress.init();
-
         const vid = video.init();
         const img = image.init();
         const aud = audio.init();
@@ -353,79 +352,41 @@ export const guest = (() => {
         config = storage('config');
         information = storage('information');
 
-        // 2. Lấy Cấu Hình từ Server (MongoDB)
-        let serverConfig = {
-            confetti_enabled: true,
-            particle_control_enabled: true,
-            wishes_popup_enabled: true,
-            vinyl_enabled: true,
-            music_enabled: true
-        };
+        if (!config.get('vinyl_enabled')) {
+            document.getElementById('vinyl-container').style.display = 'none';
+        }
+        if (!config.get('particle_control_enabled')) {
+            document.getElementById('particle-controller').style.display = 'none';
+        }
 
+        // 2. Lấy Cấu Hình từ Server (MongoDB)
         try {
             const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
             if (res.status === 200) {
                 const json = await res.json();
-                // Gộp config server vào config mặc định
-                serverConfig = { ...serverConfig, ...json.data };
+                // Cập nhật biến toàn cục để hàm open() dùng
+                isConfettiOn = json.data.confetti_enabled;
 
-                // Lưu vào storage để dùng cho các module khác
-                Object.entries(serverConfig).forEach(([k, v]) => config.set(k, v));
+                // Lưu các cấu hình khác vào storage (ví dụ: can_delete để khóa form)
+                Object.entries(json.data).forEach(([k, v]) => config.set(k, v));
             }
         } catch (e) {
             console.warn("Lỗi tải config, dùng mặc định.");
         }
 
-        // --- 3. ÁP DỤNG CẤU HÌNH GIAO DIỆN ---
-
-        // A. Đĩa Than (Vinyl)
-        const vinyl = document.getElementById('vinyl-container');
-        if (vinyl) {
-            vinyl.style.display = serverConfig.vinyl_enabled ? 'block' : 'none';
-        }
-
-        // B. Cụm Pháo Hoa (Nút Đũa Thần)
-        const confettiWrapper = document.getElementById('confetti-wrapper');
-        if (confettiWrapper) {
-            // Dùng class d-none để ẩn/hiện chuẩn hơn
-            serverConfig.particle_control_enabled ? confettiWrapper.classList.remove('d-none') : confettiWrapper.classList.add('d-none');
-        }
-
-        // C. Nút Lời Chúc (Wishes Button)
-        const wishBtn = document.getElementById('wishes-toggle-button');
-        if (wishBtn) {
-            if (serverConfig.wishes_popup_enabled) {
-                wishBtn.classList.remove('d-none');
-            } else {
-                wishBtn.classList.add('d-none');
-                // Tắt luôn popup nếu đang hiện
-                const popup = document.getElementById('wish-notification');
-                if (popup) popup.classList.remove('show');
-            }
-        }
-
-        // 4. Tải tài nguyên
+        // 3. Tải tài nguyên (Chạy song song cho nhanh)
         vid.load();
         img.load();
+        aud.load();
 
-        // Xử lý nhạc (Music Player)
-        if (serverConfig.music_enabled) {
-            aud.load();
-        } else {
-            const player = document.getElementById('music-player-container');
-            if (player) player.classList.add('d-none');
-            progress.complete('audio'); // Báo xong để không kẹt loading
-        }
+        // 4. Tải thư viện phụ trợ
+        // Chỉ tải confetti nếu Admin bật
+        lib.load({
+            aos: true,
+            confetti: isConfettiOn
+        });
 
-        // 5. Tải thư viện & Chạy Pháo hoa nền
-        // Bỏ qua logic cũ, thay thế bằng:
-        if (serverConfig.confetti_enabled) {
-            lib.load({ aos: true, confetti: true });
-        } else {
-            lib.load({ aos: true, confetti: false }); // Vẫn tải AOS, không tải Confetti
-        }
-
-        // 6. Xử lý sự kiện giao diện
+        // 5. Xử lý sự kiện giao diện
         window.addEventListener('resize', util.debounce(slide));
         document.addEventListener('undangan.progress.done', () => booting());
         document.addEventListener('hide.bs.modal', () => document.activeElement?.blur());
@@ -437,18 +398,13 @@ export const guest = (() => {
             });
         }
 
-        // 7. Kích hoạt Popup Lời Chúc (Chỉ chạy nếu Admin cho phép)
-        if (serverConfig.wishes_popup_enabled) {
-            // Nếu bạn dùng module comment cũ, hãy thay bằng hàm fetchWishes mới của mình
-            // Và gọi progress.complete ở cuối hàm fetchWishes
-            // Nếu bạn đang dùng logic popup ngẫu nhiên, chỉ cần gọi fetchWishes() là đủ
-            if (typeof fetchWishes === 'function') {
-                fetchWishes(); // Hàm này sẽ tự gọi startWishLoop() nếu thành công
-            }
-        } else {
-            progress.complete('comment'); // Nếu không dùng thì báo hoàn thành luôn
-        }
-        progress.complete('config');
+        // 6. Kích hoạt Popup Lời Chúc (Luôn chạy vì là khách vãng lai)
+        comment.show();
+
+        // Vì không còn token, ta coi như đã load xong config & comment
+        // Gọi complete thủ công để thanh loading chạy hết
+        progress.complete('config'); // Giả lập
+        progress.complete('comment'); // Giả lập
     };
 
 
