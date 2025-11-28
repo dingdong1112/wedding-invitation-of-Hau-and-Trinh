@@ -419,7 +419,7 @@ export const guest = (() => {
         img.load();
 
         // QUAN TRỌNG: Truyền cờ autoplay vào audio.load()
-        aud.load(serverConfig.autoplay_enabled);
+        aud.load(serverConfig.music_enabled);
 
         // 5. Tải thư viện phụ trợ
         lib.load({
