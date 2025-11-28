@@ -33,7 +33,7 @@
         <ul class="navbar-nav nav-justified w-100 align-items-center" id="mobile-nav-pills">
             <!-- 1. Thống Kê (Home) -->
             <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pills-home">
+                <button class="nav-link active" data-bs-target="#pills-home">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span class="d-block" style="font-size: 0.7rem;">Thống Kê</span>
                 </button>
@@ -41,8 +41,7 @@
 
             <!-- 2. Quản Lý Lời Chúc -->
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-wishes"
-                    onclick="undangan.admin.loadWishesManager()">
+                <button class="nav-link" data-bs-target="#pills-wishes" onclick="undangan.admin.loadWishesManager()">
                     <i class="fa-solid fa-comments"></i>
                     <span class="d-block" style="font-size: 0.7rem;">Lời Chúc</span>
                 </button>
@@ -50,7 +49,7 @@
 
             <!-- 3. Cài Đặt Trang Khách -->
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-setting">
+                <button class="nav-link" data-bs-target="#pills-setting">
                     <i class="fa-solid fa-sliders"></i>
                     <span class="d-block" style="font-size: 0.7rem;">Cài Đặt</span>
                 </button>
@@ -58,7 +57,7 @@
 
             <!-- 4. Bảo Mật & Token -->
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-security">
+                <button class="nav-link" data-bs-target="#pills-security">
                     <i class="fa-solid fa-user-shield"></i>
                     <span class="d-block" style="font-size: 0.7rem;">Bảo Mật</span>
                 </button>
@@ -85,30 +84,29 @@
         <div class="row m-0 p-0">
             <!-- MENU TRÁI (Desktop) -->
             <div class="col-md-3 d-none d-md-block m-0 p-0">
-                <ul class="nav flex-column w-100 nav-pills pe-4" id="desktop-nav-pills" role="tablist">
+                <ul class="nav flex-column w-100 pe-4 custom-nav-list" id="desktop-nav-pills" role="tablist">
                     <li class="nav-item pe-2">
                         <button
                             class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
-                            data-bs-toggle="pill" data-bs-target="#pills-home">
+                            data-bs-target="#pills-home">
                             <i class="fa-solid fa-chart-pie ms-3 me-2"></i>Thống Kê
                         </button>
                     </li>
                     <li class="nav-item pe-2">
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                            data-bs-toggle="pill" data-bs-target="#pills-wishes"
-                            onclick="undangan.admin.loadWishesManager()">
+                            data-bs-target="#pills-wishes" onclick="undangan.admin.loadWishesManager()">
                             <i class="fa-solid fa-comments ms-3 me-2"></i>Quản Lý Lời Chúc
                         </button>
                     </li>
                     <li class="nav-item pe-2">
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                            data-bs-toggle="pill" data-bs-target="#pills-setting">
+                            data-bs-target="#pills-setting">
                             <i class="fa-solid fa-sliders ms-3 me-2"></i>Cài Đặt Trang Khách
                         </button>
                     </li>
                     <li class="nav-item pe-2">
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                            data-bs-toggle="pill" data-bs-target="#pills-security">
+                            data-bs-target="#pills-security">
                             <i class="fa-solid fa-user-shield ms-3 me-2"></i>Bảo Mật & Token
                         </button>
                     </li>

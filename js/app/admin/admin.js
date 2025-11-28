@@ -244,54 +244,56 @@ export const admin = (() => {
         const desktopNavEl = document.getElementById('desktop-nav-pills');
         const mobileNavEl = document.getElementById('mobile-nav-pills');
 
-         // Chức năng: Khi chọn nút ở Menu Desktop, tìm nút tương ứng ở Menu Mobile và kích hoạt nó.
-        if (desktopNavEl && mobileNavEl) {
-            desktopNavEl.querySelectorAll('button').forEach(desktopBtn => {
-                const targetId = desktopBtn.getAttribute('data-bs-target');
-                
-                // Gán sự kiện cho Desktop Nav
-                desktopBtn.addEventListener('click', () => {
-                    // Kích hoạt tab content
-                    const tab = new bootstrap.Tab(desktopBtn);
-                    tab.show();
-                    
-                    // Tìm và kích hoạt nút tương ứng trên Mobile Nav
-                    const mobileBtn = mobileNavEl.querySelector(`button[data-bs-target="${targetId}"]`);
-                    if (mobileBtn) {
-                        mobileNavEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-                        mobileBtn.classList.add('active');
-                    }
-                });
-            });
+        // HÀM CHUYỂN TAB TỔNG HỢP AN TOÀN
+        const switchTab = (button, navContainer) => {
+            const targetId = button.getAttribute('data-target-tab');
+            const targetPane = document.querySelector(targetId);
+            const allPanes = document.querySelectorAll('.tab-content .tab-pane');
             
-            // Chức năng: Khi chọn nút ở Menu Mobile, kích hoạt nút tương ứng trên Menu Desktop.
-            mobileNavEl.querySelectorAll('button').forEach(mobileBtn => {
-                const targetId = mobileBtn.getAttribute('data-bs-target');
-                
-                mobileBtn.addEventListener('click', () => {
-                    // Kích hoạt tab content
-                    const tab = new bootstrap.Tab(mobileBtn);
-                    tab.show();
-                    
-                    // Tìm và kích hoạt nút tương ứng trên Desktop Nav
-                    const desktopBtn = desktopNavEl.querySelector(`button[data-bs-target="${targetId}"]`);
-                    if (desktopBtn) {
-                        desktopNavEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-                        desktopBtn.classList.add('active');
-                    }
-                });
+            if (!targetPane) return;
+
+            // 1. Kích hoạt nội dung (Xóa active cũ, thêm active mới)
+            allPanes.forEach(pane => pane.classList.remove('show', 'active'));
+            targetPane.classList.add('show', 'active');
+
+            // 2. Đồng bộ các nút (Set active cho nút bấm)
+            desktopNavEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            mobileNavEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            
+            // Tìm và kích hoạt nút trên cả hai thanh điều hướng
+            const allNavButtons = document.querySelectorAll(`button[data-target-tab="${targetId}"]`);
+            allNavButtons.forEach(b => b.classList.add('active'));
+
+            // 3. Nếu là tab Wishes, gọi hàm load
+            if (targetId === '#pills-wishes') {
+                undangan.admin.loadWishesManager();
+            }
+        };
+
+        // Gán sự kiện cho Menu Desktop
+        if (desktopNavEl) {
+            desktopNavEl.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn, desktopNavEl));
             });
         }
-        // --- KẾT THÚC BƯỚC FIX QUAN TRỌNG ---
+
+        // Gán sự kiện cho Menu Mobile
+        if (mobileNavEl) {
+            mobileNavEl.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn, mobileNavEl));
+            });
+        }        
 
         // KIỂM TRA TOKEN
         const token = session.getToken(); // Lấy từ localStorage
 
         if (session.isValid()) {
             // Nếu đã có token trong localStorage -> Vào thẳng Dashboard
-            getUserStats();
+            getUserStats().then(() => {
+                const homeBtn = document.querySelector('[data-target-tab="#pills-home"]');
+                if (homeBtn) switchTab(homeBtn, desktopNavEl); // Khởi tạo giao diện lần đầu
+            });
         } else {
-            // Nếu chưa có -> Xóa sạch session cũ và hiện Login
             auth.clearSession();
         }
     };
