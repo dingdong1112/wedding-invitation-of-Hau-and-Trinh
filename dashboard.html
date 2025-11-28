@@ -6,92 +6,63 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Dashboard Ulems">
-    <title>Dashboard Ulems</title>
+    <title>Dashboard Quản Trị</title>
 
     <!-- Appearance -->
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Dashboard Ulems">
     <meta name="theme-color" content="#f8f9fa">
-    <meta name="color-scheme" content="dark light">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" type="image/png" sizes="192x192" href="https://ulems.my.id/assets/images/icon-95x95.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="https://ulems.my.id/assets/images/icon-95x95.png">
 
-    <!-- Preconnect CDN -->
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-
-    <!-- Preload Resources -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap" as="style">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=" crossorigin="anonymous" as="style">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"
-        integrity="sha256-4rTIfo5GQTi/7UJqoyUJQKzxW8VN/YBH31+Cy+vTZj4=" crossorigin="anonymous" as="style">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous" as="script">
-
-    <!-- Font -->
+    <!-- Font & CSS -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap">
-
-    <!-- Dependencies CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        integrity="sha256-2FMn2Zx6PuH5tdBQDRNwrOo60ts5wWPC9R8jK67b3t4=" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"
-        integrity="sha256-4rTIfo5GQTi/7UJqoyUJQKzxW8VN/YBH31+Cy+vTZj4=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./css/admin.css">
 
-    <!-- Dependencies JS -->
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous"></script>
+    <!-- JS Dependencies -->
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./dist/admin.js"></script>
 </head>
 
-<!-- <html lang="en" data-bs-theme="auto"> ['auto', 'dark', 'light'] -->
+<!-- Thay link Vercel của bạn vào đây -->
 
 <body data-url="https://wedding-invitation-of-hau-and-chin.vercel.app/">
 
-    <!-- Nav bottom -->
-    <nav class="navbar navbar-expand fixed-bottom rounded-top-4 border-top d-md-none d-lg-none d-xl-none p-0">
+    <!-- Mobile Nav -->
+    <nav class="navbar navbar-expand fixed-bottom rounded-top-4 border-top d-md-none p-0 bg-body-tertiary">
         <ul class="navbar-nav nav-justified w-100 align-items-center">
             <li class="nav-item">
-                <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavHome(this)">
-                    <i class="fa-solid fa-house"></i>
-                    <span class="d-block" style="font-size: 0.7rem;">Home</span>
+                <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavHome(this)"
+                    data-bs-toggle="pill" data-bs-target="#pills-home">
+                    <i class="fa-solid fa-chart-pie"></i><span class="d-block small">Thống kê</span>
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" onclick="undangan.admin.navbar.buttonNavSetting(this)">
-                    <i class="fa-solid fa-gear"></i>
-                    <span class="d-block" style="font-size: 0.7rem;">Setting</span>
+                <button class="nav-link" onclick="undangan.admin.navbar.buttonNavSetting(this)" data-bs-toggle="pill"
+                    data-bs-target="#pills-wishes">
+                    <i class="fa-solid fa-comments"></i><span class="d-block small">Lời chúc</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" onclick="undangan.admin.navbar.buttonNavSetting(this)" data-bs-toggle="pill"
+                    data-bs-target="#pills-setting">
+                    <i class="fa-solid fa-gear"></i><span class="d-block small">Cài đặt</span>
                 </button>
             </li>
         </ul>
     </nav>
 
-    <!-- Main -->
+    <!-- Main Content -->
     <main class="container mt-4 mb-5">
-
         <!-- Header -->
         <div class="d-none d-sm-flex justify-content-between align-items-center mt-4 mb-5 pt-1">
-            <h4 class="m-0 p-0 flex-grow-1 fw-bold">Undangan<i class="fa-solid fa-fire text-danger ms-2"></i></h4>
-            <div class="m-0 p-0 flex-grow-1 text-end" id="dashboard-name" style="font-size: 1.4rem;">
-                <div class="placeholder-wave">
-                    <span class="placeholder col-6 rounded-4"></span>
-                </div>
-            </div>
+            <h4 class="m-0 p-0 flex-grow-1 fw-bold">Admin Panel <i class="fa-solid fa-fire text-danger ms-2"></i></h4>
+            <div class="m-0 p-0 flex-grow-1 text-end" id="dashboard-name" style="font-size: 1.4rem;">Admin</div>
         </div>
 
-        <!-- Body -->
         <div class="row m-0 p-0">
-
-            <!-- MENU CỘT TRÁI -->
+            <!-- MENU TRÁI (Desktop) -->
             <div class="col-md-3 d-none d-md-block m-0 p-0">
                 <ul class="nav flex-column w-100 nav-pills pe-4" id="admin-tabs" role="tablist">
-                    <!-- Tab 1: Home (Thống kê) -->
                     <li class="nav-item pe-2">
                         <button
                             class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
@@ -99,25 +70,23 @@
                             <i class="fa-solid fa-chart-pie ms-3 me-2"></i>Thống Kê
                         </button>
                     </li>
-                    <!-- Tab 2: Wishes (Quản lý lời chúc) -->
                     <li class="nav-item pe-2">
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                            data-bs-toggle="pill" data-bs-target="#pills-wishes">
+                            data-bs-toggle="pill" data-bs-target="#pills-wishes"
+                            onclick="undangan.admin.loadWishesManager()">
                             <i class="fa-solid fa-comments ms-3 me-2"></i>Quản Lý Lời Chúc
                         </button>
                     </li>
-                    <!-- Tab 3: Setting (Cài đặt Guest) -->
                     <li class="nav-item pe-2">
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
                             data-bs-toggle="pill" data-bs-target="#pills-setting">
                             <i class="fa-solid fa-sliders ms-3 me-2"></i>Cài Đặt Trang Khách
                         </button>
                     </li>
-                    <!-- Tab 4: Security (Admin) -->
                     <li class="nav-item pe-2">
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
                             data-bs-toggle="pill" data-bs-target="#pills-security">
-                            <i class="fa-solid fa-user-shield ms-3 me-2"></i>Admin & Bảo Mật
+                            <i class="fa-solid fa-user-shield ms-3 me-2"></i>Bảo Mật & Token
                         </button>
                     </li>
                     <li class="nav-item pe-2">
@@ -130,404 +99,204 @@
                             <i class="fa-solid fa-right-from-bracket ms-3 me-2"></i>Đăng Xuất
                         </button>
                     </li>
-                    <!-- Tab 5: Thông tin dự án -->
-                    <li class="nav-item pe-2">
-                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                            data-bs-toggle="pill" data-bs-target="#info-project">
-                            <i class="fa-solid fa-comments ms-3 me-2"></i>Thông tin dự án
-                        </button>
-                    </li>
                 </ul>
             </div>
 
-            <!-- CONTENT CỘT PHẢI -->
+            <!-- NỘI DUNG PHẢI -->
             <div class="col-md-9 m-0 p-0">
                 <div class="tab-content">
 
-                    <!-- 1. HOME: Thống kê (Giữ nguyên code cũ của bạn ở đây) -->
-                    <section class="tab-pane fade show active" id="pills-home" role="tabpanel" tabindex="0">
-
-                        <!-- Sub Header -->
-                        <div class="rounded-4 p-2 mb-4 shadow" style="background-color: var(--bs-gray-200)">
-                            <div class="d-flex justify-content-between">
-                                <h5 class="fw-bold my-1 ms-0 p-0" style="color: var(--bs-gray-900); font-size: 1rem;"><i
-                                        class="fa-solid fa-home mx-2"></i>Home</h5>
-                                <div class="d-flex">
-                                    <button class="btn btn-success rounded-3 btn-sm shadow-sm my-0 ms-0 me-2 pb-0"
-                                        onclick="undangan.admin.download(this)" data-offline-disabled="false"
-                                        aria-label="Download comment">
-                                        <i class="fa-solid fa-download"></i><span
-                                            class="d-none d-sm-inline ms-2">Download</span>
-                                    </button>
-                                    <button class="btn btn-secondary rounded-3 btn-sm shadow-sm m-0 pb-0"
-                                        onclick="undangan.theme.change()" aria-label="Change theme">
-                                        <i class="fa-solid fa-circle-half-stroke"></i><span
-                                            class="d-none d-sm-inline ms-2">Theme</span>
-                                    </button>
-                                </div>
-                            </div>
+                    <!-- 1. HOME -->
+                    <section class="tab-pane fade show active" id="pills-home">
+                        <div class="rounded-4 p-3 mb-4 shadow bg-body-secondary">
+                            <h5 class="fw-bold m-0"><i class="fa-solid fa-home me-2"></i>Tổng Quan</h5>
                         </div>
 
-                        <!-- Stats -->
-                        <div class="row">
-                            <div class="col col-xl-3 col-6 mb-3">
-                                <div class="rounded-4 shadow p-3 border-0" style="background: #8573F1;">
-                                    <div class="row align-items-center" style="color: var(--bs-gray-100);">
-                                        <div class="col-9">
-                                            <p class="fw-bold m-0 p-0">Comments</p>
-                                            <div class="fw-bold m-0 p-0" id="count-comment">
-                                                <div class="placeholder-wave">
-                                                    <span class="placeholder col-8 rounded-3"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-3 p-0">
-                                            <div class="d-block d-sm-none">
-                                                <i class="fa-solid fa-comments me-2" style="font-size: 1.5rem;"></i>
-                                            </div>
-                                            <div class="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                                                <i class="fa-solid fa-comments fa-2xl me-2"></i>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <!-- Stats Cards -->
+                        <div class="row g-3">
+                            <div class="col-6 col-xl-3">
+                                <div class="rounded-4 shadow p-3 border-0 text-white" style="background: #8573F1;">
+                                    <p class="fw-bold m-0">Tổng Lời Chúc</p>
+                                    <h3 class="fw-bold m-0" id="count-comment">0</h3>
                                 </div>
                             </div>
-                            <div class="col col-xl-3 col-6 mb-3">
-                                <div class="rounded-4 shadow p-3 border-0" style="background: #7A5CD9;">
-                                    <div class="row align-items-center" style="color: var(--bs-gray-100);">
-                                        <div class="col-9">
-                                            <p class="fw-bold m-0 p-0">Present</p>
-                                            <div class="fw-bold m-0 p-0" id="count-present">
-                                                <div class="placeholder-wave">
-                                                    <span class="placeholder col-8 rounded-3"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-3 p-0">
-                                            <div class="d-block d-sm-none">
-                                                <i class="fa-solid fa-circle-check me-2" style="font-size: 1.5rem;"></i>
-                                            </div>
-                                            <div class="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                                                <i class="fa-solid fa-circle-check fa-2xl me-2"></i>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="col-6 col-xl-3">
+                                <div class="rounded-4 shadow p-3 border-0 text-white" style="background: #7A5CD9;">
+                                    <p class="fw-bold m-0">Tham Dự</p>
+                                    <h3 class="fw-bold m-0" id="count-present">0</h3>
                                 </div>
                             </div>
-                            <div class="col col-xl-3 col-6 mb-3">
-                                <div class="rounded-4 shadow p-3 border-0" style="background: #6546B1;">
-                                    <div class="row align-items-center" style="color: var(--bs-gray-100);">
-                                        <div class="col-9">
-                                            <p class="fw-bold m-0 p-0">Absent</p>
-                                            <div class="fw-bold m-0 p-0" id="count-absent">
-                                                <div class="placeholder-wave">
-                                                    <span class="placeholder col-8 rounded-3"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-3 p-0">
-                                            <div class="d-block d-sm-none">
-                                                <i class="fa-solid fa-circle-xmark me-2" style="font-size: 1.5rem;"></i>
-                                            </div>
-                                            <div class="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                                                <i class="fa-solid fa-circle-xmark fa-2xl me-2"></i>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="col-6 col-xl-3">
+                                <div class="rounded-4 shadow p-3 border-0 text-white" style="background: #6546B1;">
+                                    <p class="fw-bold m-0">Vắng Mặt</p>
+                                    <h3 class="fw-bold m-0" id="count-absent">0</h3>
                                 </div>
                             </div>
-                            <div class="col col-xl-3 col-6 mb-3">
-                                <div class="rounded-4 shadow p-3 border-0" style="background: #4F3392;">
-                                    <div class="row align-items-center" style="color: var(--bs-gray-100);">
-                                        <div class="col-9">
-                                            <p class="fw-bold m-0 p-0">Likes</p>
-                                            <div class="fw-bold m-0 p-0" id="count-like">
-                                                <div class="placeholder-wave">
-                                                    <span class="placeholder col-8 rounded-3"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-3 p-0">
-                                            <div class="d-block d-sm-none">
-                                                <i class="fa-solid fa-heart me-2" style="font-size: 1.5rem;"></i>
-                                            </div>
-                                            <div class="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                                                <i class="fa-solid fa-heart fa-2xl me-2"></i>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="col-6 col-xl-3">
+                                <div class="rounded-4 shadow p-3 border-0 text-white" style="background: #4F3392;">
+                                    <p class="fw-bold m-0">Thích</p>
+                                    <h3 class="fw-bold m-0" id="count-like">0</h3>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-2">
-                            <div class="col-lg-6 col-12">
-                                <!-- Form -->
-                                <div class="bg-theme-auto p-3 mb-3 rounded-4 shadow">
-                                    <div class="d-block" id="comment-form-default">
-                                        <label for="form-comment" class="form-label fw-bold my-1"><i
-                                                class="fa-solid fa-comment me-2"></i>Comment</label>
-
-                                        <div class="position-relative">
-                                            <button
-                                                class="btn btn-secondary btn-sm rounded-4 shadow-sm me-1 my-1 position-absolute bottom-0 end-0"
-                                                onclick="undangan.comment.gif.open(undangan.comment.gif.default)"
-                                                aria-label="button gif" data-offline-disabled="false"><i
-                                                    class="fa-solid fa-photo-film"></i></button>
-                                            <textarea dir="auto" class="form-control shadow-sm mb-3 rounded-4"
-                                                id="form-comment" name="form-comment" rows="3" minlength="1"
-                                                maxlength="1000" placeholder="Type to comment"
-                                                data-offline-disabled="false"></textarea>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-none mb-3" id="gif-form-default"></div>
-
-                                    <div class="d-flex justify-content-end mb-0">
-                                        <button onclick="undangan.comment.send(this)"
-                                            class="btn btn-primary btn-sm rounded-4 shadow-sm"
-                                            data-offline-disabled="false"><i
-                                                class="fa-solid fa-paper-plane me-2"></i>Send</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 col-12">
-                                <!-- Comments -->
-                                <div class="mb-2" id="comments" data-loading="false"></div>
-
-                                <!-- Pagination -->
-                                <nav class="d-flex d-none justify-content-center py-3 mb-4" id="pagination"></nav>
                             </div>
                         </div>
                     </section>
 
-                    <!-- 2. WISHES: Quản lý lời chúc -->
+                    <!-- 2. WISHES MANAGER -->
                     <section class="tab-pane fade" id="pills-wishes">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold"><i class="fa-solid fa-comments me-2"></i>Danh sách lời chúc</h5>
-                            <button class="btn btn-success btn-sm rounded-pill"
+                            <h5 class="fw-bold"><i class="fa-solid fa-comments me-2"></i>Danh Sách Lời Chúc</h5>
+                            <button class="btn btn-success btn-sm rounded-pill shadow-sm"
                                 onclick="undangan.admin.openAddWishModal()">
-                                <i class="fa-solid fa-plus me-1"></i>Thêm thủ công
+                                <i class="fa-solid fa-plus me-1"></i>Thêm Mới
                             </button>
                         </div>
-                        <div id="wishes-manager-list" class="d-flex flex-column gap-3">
-                            <!-- JS sẽ render danh sách vào đây -->
-                        </div>
+                        <div id="wishes-manager-list" class="d-flex flex-column gap-3"></div>
                     </section>
 
-                    <!-- 3. SETTING: Cài đặt trang khách -->
+                    <!-- 3. SETTINGS -->
                     <section class="tab-pane fade" id="pills-setting">
                         <div class="card p-4 shadow-sm rounded-4 border-0 bg-theme-auto">
-                            <h5 class="mb-3 fw-bold">Điều khiển giao diện Khách</h5>
+                            <h5 class="mb-4 fw-bold border-bottom pb-2">Điều Khiển Giao Diện Khách</h5>
 
+                            <!-- Các nút Switch -->
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="toggle-confetti"
-                                    onchange="updateConfig('confetti_enabled', this.checked)">
+                                    onchange="undangan.admin.updateConfig('confetti_enabled', this.checked)">
                                 <label class="form-check-label" for="toggle-confetti">Hiệu ứng Pháo hoa
                                     (Confetti)</label>
                             </div>
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="toggle-particles"
-                                    onchange="updateConfig('particle_control_enabled', this.checked)">
-                                <label class="form-check-label" for="toggle-particles">Hiển thị nút chỉnh hiệu ứng (Đũa
-                                    thần)</label>
+                                    onchange="undangan.admin.updateConfig('particle_control_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-particles">Hiển thị Đũa Thần (Chỉnh hiệu
+                                    ứng)</label>
                             </div>
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="toggle-vinyl"
-                                    onchange="updateConfig('vinyl_enabled', this.checked)">
-                                <label class="form-check-label" for="toggle-vinyl">Hiệu ứng Đĩa nhạc quay</label>
+                                    onchange="undangan.admin.updateConfig('vinyl_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-vinyl">Hiệu ứng Đĩa Nhạc Quay</label>
                             </div>
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="toggle-music"
-                                    onchange="updateConfig('music_enabled', this.checked)">
-                                <label class="form-check-label" for="toggle-music">Tự động phát nhạc & Hiển thị trình
-                                    phát</label>
+                                    onchange="undangan.admin.updateConfig('music_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-music">Tự động phát nhạc & Hiển thị
+                                    Player</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-popup"
+                                    onchange="undangan.admin.updateConfig('wishes_popup_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-popup">Popup Lời Chúc Chạy Ngẫu
+                                    Nhiên</label>
                             </div>
                             <hr>
                             <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="toggle-popup"
-                                    onchange="updateConfig('wishes_popup_enabled', this.checked)">
-                                <label class="form-check-label" for="toggle-popup">Popup chạy lời chúc ngẫu
-                                    nhiên</label>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="toggle-lock"
-                                    onchange="updateConfig('can_delete', this.checked)">
-                                <label class="form-check-label text-danger fw-bold" for="toggle-lock">KHÓA chức năng gửi
-                                    lời chúc (Maintenance)</label>
-                            </div>
-                            <!-- Time Zone -->
-                            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-location-dot me-2"></i>Time
-                                    Zone
-                                </p>
-                                <form>
-                                    <div class="position-relative mb-3">
-                                        <input type="text" class="form-control form-control-sm rounded-4 shadow-sm"
-                                            id="form-timezone" oninput="undangan.admin.openLists(this, this.value)"
-                                            onclick="undangan.admin.openLists(this)" autocomplete="off"
-                                            data-offline-disabled="false">
-                                        <div id="dropdown-tz-list"
-                                            class="d-none list-group position-absolute w-100 shadow-sm rounded-4 overflow-y-scroll z-3"
-                                            style="max-height: 15rem;"></div>
-                                    </div>
-                                </form>
-
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
-                                        id="button-timezone" onclick="undangan.admin.changeTz(this)" disabled
-                                        data-offline-disabled="false">Change</button>
-                                </div>
-                            </div>
-
-                            <!-- Tenor Key -->
-                            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-photo-film me-2"></i>Tenor
-                                    Key
-                                </p>
-
-                                <div class="input-group input-group-sm mb-3">
-                                    <input type="text" class="form-control form-control-sm rounded-start-4 shadow-sm"
-                                        id="dashboard-tenorkey" placeholder="Api key tenor" autocomplete="off">
-                                    <button class="btn btn-sm btn-outline-secondary rounded-end-4 shadow-sm"
-                                        type="button"
-                                        onclick="document.getElementById('dashboard-tenorkey').value = null"><i
-                                            class="fa-solid fa-trash-can"></i></button>
-                                </div>
-
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
-                                        onclick="undangan.admin.tenor(this)" data-offline-disabled="false">Save</button>
-                                </div>
+                                <input class="form-check-input bg-danger border-danger" type="checkbox" id="toggle-lock"
+                                    onchange="undangan.admin.updateConfig('can_delete', this.checked)">
+                                <label class="form-check-label text-danger fw-bold" for="toggle-lock">KHÓA chức năng Gửi
+                                    Lời Chúc (Bảo Trì)</label>
                             </div>
                         </div>
                     </section>
-                    <section class="tab-pane fade" id="pills-security">
-                        <!-- Phần Access Key cũ -->
-                        <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="fw-bold"><i class="fa-solid fa-key me-2"></i>Access Key (Token)</p>
-                            <div class="input-group input-group-sm mb-3">
-                                <!-- Input để type="password" để hiện dấu sao -->
-                                <input type="password" class="form-control rounded-start-4 shadow-sm"
-                                    id="dashboard-accesskey" readonly value="">
 
-                                <!-- Nút hiện/ẩn -->
+                    <!-- 4. SECURITY -->
+                    <section class="tab-pane fade" id="pills-security">
+                        <div class="p-4 bg-theme-auto mb-3 rounded-4 shadow">
+                            <p class="fw-bold border-bottom pb-2"><i class="fa-solid fa-key me-2"></i>Access Key (Token)
+                            </p>
+                            <div class="input-group mb-3">
+                                <input type="password" class="form-control" id="dashboard-accesskey" readonly value="">
                                 <button class="btn btn-outline-secondary" type="button"
-                                    onclick="toggleTokenVisibility()">
+                                    onclick="window.toggleTokenVisibility()">
                                     <i class="fa-solid fa-eye" id="eye-icon"></i>
                                 </button>
-
-                                <!-- Nút copy -->
-                                <button class="btn btn-outline-secondary rounded-end-4" type="button"
-                                    onclick="copyToken()">
+                                <button class="btn btn-outline-secondary" type="button" onclick="window.copyToken()">
                                     <i class="fa-solid fa-copy"></i>
                                 </button>
                             </div>
-
-                            <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-warning rounded-4 shadow-sm"
-                                    onclick="regenerateToken()">
-                                    <i class="fa-solid fa-rotate me-1"></i> Regenerate
+                            <div class="text-end">
+                                <button class="btn btn-warning btn-sm rounded-pill shadow-sm"
+                                    onclick="window.regenerateToken()">
+                                    <i class="fa-solid fa-rotate me-1"></i> Tạo Token Mới
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Phần Đổi Mật Khẩu cũ -->
-                        <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="fw-bold"><i class="fa-solid fa-lock me-2"></i>Đổi Mật Khẩu</p>
-                            <form>
-                                <input hidden type="text" name="username" autocomplete="username" value="...">
-                                <div class="my-2">
-                                    <input type="password" class="form-control form-control-sm rounded-4 shadow-sm"
-                                        id="old_password" minlength="8" maxlength="20" name="old_password"
-                                        placeholder="Old Password" autocomplete="current-password"
-                                        data-offline-disabled="false">
-                                </div>
-                                <div class="mb-3">
-                                    <input type="password" class="form-control form-control-sm rounded-4 shadow-sm"
-                                        id="new_password" minlength="8" maxlength="20" name="new_password"
-                                        oninput="undangan.admin.enableButtonPassword()" placeholder="New Password"
-                                        autocomplete="new-password" data-offline-disabled="false">
-                                </div>
-                            </form>
-
-                            <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
-                                    id="button-change-password" onclick="undangan.admin.changePassword(this)" disabled
-                                    data-offline-disabled="false">Change</button>
+                        <div class="p-4 bg-theme-auto mb-3 rounded-4 shadow">
+                            <p class="fw-bold border-bottom pb-2"><i class="fa-solid fa-lock me-2"></i>Đổi Mật Khẩu
+                                Admin</p>
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Mật khẩu cũ</label>
+                                <input type="password" class="form-control rounded-4" id="old_password">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Mật khẩu mới</label>
+                                <input type="password" class="form-control rounded-4" id="new_password">
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-primary btn-sm rounded-pill shadow-sm"
+                                    onclick="undangan.admin.changePassword(this)">
+                                    Lưu Mật Khẩu
+                                </button>
                             </div>
                         </div>
                     </section>
-                    <section class="tab-pane fade" id="info-project">
-                        <div class="p-3 bg-theme-auto mb-4 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-heart me-2"></i>Love Project</p>
-                            <p class="m-0 p-0">Discover and support this project on <i
-                                    class="fa-brands fa-github me-1"></i><a target="_blank"
-                                    href="https://github.com/dewanakl/undangan">GitHub</a></p>
-                        </div>
-                    </section>
+
                 </div>
             </div>
+        </div>
+    </main>
 
-            <!-- MODAL SỬA LỜI CHÚC -->
-            <div class="modal fade" id="editWishModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content rounded-4">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Sửa Lời Chúc</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <input type="hidden" id="edit-wish-id">
-                            <div class="mb-3">
-                                <label class="form-label">Tên khách:</label>
-                                <input type="text" class="form-control" id="edit-wish-name">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Lời chúc:</label>
-                                <textarea class="form-control" id="edit-wish-msg" rows="4"></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary rounded-pill"
-                                data-bs-dismiss="modal">Hủy</button>
-                            <button type="button" class="btn btn-primary rounded-pill"
-                                onclick="undangan.admin.saveWish()">Lưu thay đổi</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-    <!-- Modal login -->
-    <div class="modal fade" id="mainModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-label="modal login"
-        tabindex="-1" aria-hidden="true">
+    <!-- MODAL LOGIN -->
+    <div class="modal fade" id="mainModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4">
-                <div class="modal-body">
-                    <form id="admin-login-form" onsubmit="event.preventDefault();
-                        undangan.admin.auth.login(this.querySelector('button[type=submit]'))">
-
-                        <div class="mb-3">
-                            <label for="admin-pass" class="form-label my-1"><i class="fa-solid fa-lock me-2"></i>Mật
-                                khẩu Admin</label>
-                            <input type="password" class="form-control shadow-sm rounded-4" id="admin-pass"
-                                name="admin-pass" minlength="8" maxlength="20" placeholder="Enter your password"
-                                required autocomplete="current-password" data-offline-disabled="false">
+            <div class="modal-content rounded-4 shadow-lg">
+                <div class="modal-body p-4">
+                    <h4 class="text-center fw-bold mb-4">Đăng Nhập Admin</h4>
+                    <form id="admin-login-form"
+                        onsubmit="event.preventDefault(); undangan.admin.auth.login(this.querySelector('button[type=submit]'))">
+                        <div class="mb-4">
+                            <label for="admin-pass" class="form-label fw-bold">Mật khẩu</label>
+                            <input type="password" class="form-control form-control-lg rounded-4" id="admin-pass"
+                                placeholder="••••••••" required autocomplete="current-password">
                         </div>
-
                         <div class="d-grid">
-                            <!-- NÚT CHỈ CẦN TYPE SUBMIT, KHÔNG CẦN ONCLICK -->
-                            <button type="submit" class="btn btn-primary shadow-sm rounded-4"
-                                data-offline-disabled="false">
-                                <i class="fa-solid fa-right-to-bracket me-2"></i>Login
-                            </button>
+                            <button type="submit" class="btn btn-primary btn-lg rounded-4 fw-bold">Login</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- MODAL SỬA/THÊM LỜI CHÚC -->
+    <div class="modal fade" id="editWishModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Thông Tin Lời Chúc</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-wish-id">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Tên Khách</label>
+                        <input type="text" class="form-control rounded-4" id="edit-wish-name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Lời Chúc</label>
+                        <textarea class="form-control rounded-4" id="edit-wish-msg" rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4"
+                        onclick="undangan.admin.saveWish()">Lưu Lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
