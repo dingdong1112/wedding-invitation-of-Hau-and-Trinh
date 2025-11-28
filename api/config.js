@@ -20,8 +20,9 @@ export default async function handler(req, res) {
         return res.status(200).json({
             result: 'success',
             data: {
+                 can_delete: mainConfig.can_delete || false,
                 // Cấu hình cũ
-                confetti_enabled: mainConfig.confetti_enabled || false,
+                 confetti_enabled: mainConfig.confetti_enabled !== false, // Mặc định true
                 form_locked: mainConfig.can_delete || false, // Đổi tên biến cho dễ hiểu ở Client (can_delete cũ)
                 
                 // Cấu hình mới

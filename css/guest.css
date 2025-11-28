@@ -777,3 +777,17 @@ svg {
   /* THÊM DÒNG NÀY ĐỂ TẠO KHOẢNG CÁCH ĐỀU */
   gap: 15px;
 }
+
+/* --- THANH CÔNG CỤ BÊN PHẢI --- */
+#right-toolbar {
+    /* Vị trí đã set inline trong HTML, ở đây chỉ xử lý hiển thị */
+    pointer-events: none; /* Để click xuyên qua vùng trống */
+}
+
+#right-toolbar button, 
+#right-toolbar .control-group {
+    pointer-events: auto; /* Bật lại click cho nút và bảng */
+}
+
+/* Ẩn hiện mượt mà */
+.d-none { display: none !important; }

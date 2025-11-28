@@ -102,8 +102,10 @@ const adminModule = () => {
         const label = util.disableCheckbox(checkbox);
 
         const fieldMap = {
-            'confettiAnimation': 'confetti_enabled',
-            'deleteComment': 'can_delete',
+            'toggle-confetti': 'confetti_enabled',
+            'toggle-particles': 'particle_control_enabled',
+            'toggle-popup': 'wishes_popup_enabled',
+            'toggle-lock': 'can_delete',
             'replyComment': 'can_reply',
             'editComment': 'can_edit',
             'filterBadWord': 'is_filter'
