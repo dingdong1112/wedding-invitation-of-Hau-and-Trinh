@@ -15,9 +15,9 @@ const adminModule = () => {
     // ĐỊNH NGHĨA SERVER URL 
     const SERVER_URL = "https://wedding-invitation-of-hau-and-chin.vercel.app";
 
-    /**
+    /*
      * @returns {Promise<void>}
-     */
+     *
     const getUserStats = () => auth.getDetailUser(SERVER_URL).then((res) => {
 
         // --- LOGIC HIỂN THỊ THÔNG TIN ADMIN ---
@@ -85,7 +85,7 @@ const adminModule = () => {
     }).catch(err => {
         console.error("User stats failed:", err);
         // auth.clearSession(); // Uncomment dòng này nếu muốn tự động logout khi lỗi
-    });
+    });*/
 
 
     // --- CÁC HÀM HỖ TRỢ VẼ BIỂU ĐỒ (Thêm vào bên dưới getUserStats) ---
@@ -822,27 +822,32 @@ const adminModule = () => {
                 .withCache(1000 * 30)
                 .send()
                 .then((resp) => {
-                    const comments = resp.data.length;
-                    let present = resp.data.filter(i => i.presence === true || i.presence == 1 || i.presence === 'Có').length;
-                    let absent = resp.data.filter(i => i.presence === false || i.presence == 2 || i.presence === 'Không').length;
+                    const allWishes = resp.data;
+                    // 1. TÍNH TOÁN SỐ LIỆU CƠ BẢN
+                    const comments = allWishes.length;
+                    let present = allWishes.filter(i => i.presence === 'Có' || i.presence === '1' || i.presence === true).length;
+                    let absent = allWishes.filter(i => i.presence === 'Không' || i.presence === '2' || i.presence === false).length;
+                    let unknown = comments - present - absent; // Số người chưa xác định
 
                     setText('count-comment', String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
                     setText('count-present', String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
                     setText('count-absent', String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
                     setText('count-like', '0');
 
-                    // 3. VẼ BIỂU ĐỒ (Dùng hàm tự tải thư viện)
-                    loadChartJsAndRender(present, absent, unknown, allWishes);
+                    // 2. VẼ BIỂU ĐỒ TRÒN (PIE CHART) - Tỷ lệ tham dự
+                    renderPieChart(present, absent, unknown);
 
-                    // 4. Hiển thị bảng tin mới nhất
+                    // 3. VẼ BIỂU ĐỒ CỘT (BAR CHART) - Xu hướng theo ngày
+                    renderTrendChart(allWishes);
+
+                    // 4. HIỂN THỊ BẢNG LỜI CHÚC MỚI NHẤT
                     renderLatestWishes(allWishes);
-
                     // QUAN TRỌNG: Gọi hàm load list sau khi đã có dữ liệu
                     loadWishesManager();
                 });
 
         }).catch(err => {
-            console.error("User stats failed:", err);
+            console.error("Lỗi tải thống kê:", err);
         });
 
         // VẼ BIÊU ĐỒ
