@@ -33,15 +33,33 @@
             <li class="nav-item">
                 <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavHome(this)">
                     <i class="fa-solid fa-house"></i>
-                    <span class="d-block" style="font-size: 0.7rem;">Home</span>
+                    <span class="d-block" style="font-size: 0.4rem;">Thống Kê</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavComments(this)">
+                    <i class="fa-solid fa-comments"></i>
+                    <span class="d-block" style="font-size: 0.4rem;">Quản Lý Lời Chúc</span>
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link" onclick="undangan.admin.navbar.buttonNavSetting(this)">
                     <i class="fa-solid fa-gear"></i>
-                    <span class="d-block" style="font-size: 0.7rem;">Setting</span>
+                    <span class="d-block" style="font-size: 0.4rem;">Cài Đặt Trang Khách</span>
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavSecurity(this)">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span class="d-block" style="font-size: 0.4rem;">Bảo Mật & Token</span>
+                </button>
+            </li>
+            <li class="nav-item">
+            <button class="nav-link logout" onclick="undangan.admin.logout()">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="d-block" style="font-size: 0.7rem;">Logout</span>
+            </button>
+        </li>
         </ul>
     </nav>
 
@@ -62,19 +80,13 @@
                             class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
                             data-bs-toggle="pill" data-bs-target="#pills-home" id="button-home" type="button" role="tab"
                             aria-controls="pills-home" aria-selected="true">
-                            <i class="fa-solid fa-house ms-3 me-2"></i>Home
+                            <i class="fa-solid fa-house ms-3 me-2"></i>Thống Kê
                         </button>
                     </li>
-                    <!--li class="nav-item pe-2">
-                        <button
-                            class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
-                            data-bs-toggle="pill" data-bs-target="#pills-home">
-                            <i class="fa-solid fa-chart-pie ms-3 me-2"></i>Thống Kê
-                        </button>
-                    </li-->
-                    <li class="nav-item pe-2">
-                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                            data-bs-toggle="pill" data-bs-target="#pills-wishes"
+                    <li class="nav-item pe-2" role="presentation">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-wishes" id="button-wishes" type="button"
+                            role="tab" aria-controls="pills-wishes" aria-selected="true"
                             onclick="undangan.admin.loadWishesManager()">
                             <i class="fa-solid fa-comments ms-3 me-2"></i>Quản Lý Lời Chúc
                         </button>
@@ -89,12 +101,13 @@
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
                             data-bs-toggle="pill" data-bs-target="#pills-setting" id="button-setting" type="button"
                             role="tab" aria-controls="pills-setting" aria-selected="false">
-                            <i class="fa-solid fa-gear ms-3 me-2"></i>Setting
+                            <i class="fa-solid fa-gear ms-3 me-2"></i>Cài Đặt Trang Khách
                         </button>
                     </li>
                     <li class="nav-item pe-2">
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                            data-bs-toggle="pill" data-bs-target="#pills-security">
+                            data-bs-toggle="pill" data-bs-target="#pills-security" id="button-security" type="button"
+                            role="tab" aria-controls="pills-security" aria-selected="false">
                             <i class="fa-solid fa-user-shield ms-3 me-2"></i>Bảo Mật & Token
                         </button>
                     </li>
@@ -206,51 +219,6 @@
                             </div>
                         </div>
                     </section>
-
-                    <!-- 3.2 SETTINGS MOBILE >
-                    <section class="tab-pane fade" id="pills-setting-mobile">
-                        <div class="card p-4 shadow-sm rounded-4 border-0 bg-theme-auto">
-                            <h5 class="mb-4 fw-bold border-bottom pb-2">Điều Khiển Giao Diện Khách</h5>
-
-                            <-- Các nút Switch >
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="toggle-confetti"
-                                    onchange="undangan.admin.updateConfig('confetti_enabled', this.checked)">
-                                <label class="form-check-label" for="toggle-confetti">Hiệu ứng Pháo hoa
-                                    (Confetti)</label>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="toggle-particles"
-                                    onchange="undangan.admin.updateConfig('particle_control_enabled', this.checked)">
-                                <label class="form-check-label" for="toggle-particles">Hiển thị Đũa Thần (Chỉnh hiệu
-                                    ứng)</label>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="toggle-vinyl"
-                                    onchange="undangan.admin.updateConfig('vinyl_enabled', this.checked)">
-                                <label class="form-check-label" for="toggle-vinyl">Hiệu ứng Đĩa Nhạc Quay</label>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="toggle-music"
-                                    onchange="undangan.admin.updateConfig('music_enabled', this.checked)">
-                                <label class="form-check-label" for="toggle-music">Tự động phát nhạc & Hiển thị
-                                    Player</label>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="toggle-popup"
-                                    onchange="undangan.admin.updateConfig('wishes_popup_enabled', this.checked)">
-                                <label class="form-check-label" for="toggle-popup">Popup Lời Chúc Chạy Ngẫu
-                                    Nhiên</label>
-                            </div>
-                            <hr>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input bg-danger border-danger" type="checkbox" id="toggle-lock"
-                                    onchange="undangan.admin.updateConfig('can_delete', this.checked)">
-                                <label class="form-check-label text-danger fw-bold" for="toggle-lock">KHÓA chức năng Gửi
-                                    Lời Chúc (Bảo Trì)</label>
-                            </div>
-                        </div>
-                    </section-->
 
                     <!-- 4. SECURITY -->
                     <section class="tab-pane fade" id="pills-security">

@@ -33,9 +33,25 @@ export const navbar = (() => {
     const buttonNavSetting = (btn) => {
         showActiveTab(btn, 'button-setting');
     };
+    /**
+     * @param {HTMLElement} btn
+     * @returns {void}
+     */
+    const buttonNavComments = (btn) => {
+        showActiveTab(btn, 'button-wishes');
+    };
+    /**
+     * @param {HTMLElement} btn
+     * @returns {void}
+     */
+    const buttonNavSecurity = (btn) => {
+        showActiveTab(btn, 'button-security');
+    };
 
     return {
         buttonNavHome,
         buttonNavSetting,
+        buttonNavComments,
+        buttonNavSecurity
     };
 })();
