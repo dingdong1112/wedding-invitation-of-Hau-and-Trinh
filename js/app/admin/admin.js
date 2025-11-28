@@ -10,7 +10,7 @@ import { offline } from '../../common/offline.js';
 import { comment } from '../components/comment.js';
 import { pool, request, HTTP_GET, HTTP_PATCH, HTTP_PUT, HTTP_POST, HTTP_DELETE } from '../../connection/request.js';
 
-export const admin = (() => {
+const adminModule = () => {
 
     // ĐỊNH NGHĨA SERVER URL 
     const SERVER_URL = "https://wedding-invitation-of-hau-and-chin.vercel.app";
@@ -1262,4 +1262,6 @@ export const admin = (() => {
     };
 
     return { init };
-})();
+};
+
+export const admin = adminModule(); 
