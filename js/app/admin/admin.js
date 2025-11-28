@@ -247,19 +247,25 @@ export const admin = (() => {
         // HÀM CHUYỂN TAB TỔNG HỢP AN TOÀN
         const switchTab = (button, navContainer) => {
             const targetId = button.getAttribute('data-target-tab');
-            const targetPane = document.querySelector(targetId);
+            const targetPane = document.querySelector(`.tab-content ${targetId}`); // SỬA Ở ĐÂY: Tìm chính xác trong tab-content
             const allPanes = document.querySelectorAll('.tab-content .tab-pane');
-            
-            if (!targetPane) return;
+
+            if (!targetPane) {
+                console.error("Target pane not found for:", targetId);
+                return;
+            }
 
             // 1. Kích hoạt nội dung (Xóa active cũ, thêm active mới)
             allPanes.forEach(pane => pane.classList.remove('show', 'active'));
             targetPane.classList.add('show', 'active');
 
             // 2. Đồng bộ các nút (Set active cho nút bấm)
+            const desktopNavEl = document.getElementById('desktop-nav-pills');
+            const mobileNavEl = document.getElementById('mobile-nav-pills');
+
             desktopNavEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
             mobileNavEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            
+
             // Tìm và kích hoạt nút trên cả hai thanh điều hướng
             const allNavButtons = document.querySelectorAll(`button[data-target-tab="${targetId}"]`);
             allNavButtons.forEach(b => b.classList.add('active'));
@@ -273,25 +279,28 @@ export const admin = (() => {
         // Gán sự kiện cho Menu Desktop
         if (desktopNavEl) {
             desktopNavEl.querySelectorAll('button').forEach(btn => {
-                btn.addEventListener('click', () => switchTab(btn, desktopNavEl));
+                // Sửa sự kiện click để gọi hàm switchTab chỉ với button
+                btn.addEventListener('click', () => switchTab(btn));
             });
         }
 
         // Gán sự kiện cho Menu Mobile
         if (mobileNavEl) {
             mobileNavEl.querySelectorAll('button').forEach(btn => {
-                btn.addEventListener('click', () => switchTab(btn, mobileNavEl));
+                // Sửa sự kiện click để gọi hàm switchTab chỉ với button
+                btn.addEventListener('click', () => switchTab(btn));
             });
-        }        
+        }
+
 
         // KIỂM TRA TOKEN
         const token = session.getToken(); // Lấy từ localStorage
-
+        
         if (session.isValid()) {
-            // Nếu đã có token trong localStorage -> Vào thẳng Dashboard
             getUserStats().then(() => {
+                // Sau khi tải config xong, kích hoạt Tab đầu tiên (#pills-home)
                 const homeBtn = document.querySelector('[data-target-tab="#pills-home"]');
-                if (homeBtn) switchTab(homeBtn, desktopNavEl); // Khởi tạo giao diện lần đầu
+                if (homeBtn) switchTab(homeBtn); // Kích hoạt Home tab
             });
         } else {
             auth.clearSession();
