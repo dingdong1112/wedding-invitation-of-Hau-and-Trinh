@@ -338,11 +338,12 @@ export const guest = (() => {
     /**
      * @returns {void}
      */
-    const pageLoaded = async () => {
+   const pageLoaded = async () => {
         // 1. Khởi tạo các module cơ bản
         lang.init();
         offline.init();
-        comment.init();
+        // Comment.init phải chạy trước khi tải config vì nó cần progress.add
+        comment.init(); 
         progress.init();
         const vid = video.init();
         const img = image.init();
@@ -351,60 +352,96 @@ export const guest = (() => {
 
         config = storage('config');
         information = storage('information');
-
-        if (!config.get('vinyl_enabled')) {
-            document.getElementById('vinyl-container').style.display = 'none';
-        }
-        if (!config.get('particle_control_enabled')) {
-            document.getElementById('particle-controller').style.display = 'none';
-        }
+        
+        // Cần đảm bảo các element có sẵn để tránh lỗi JS
+        const vinylContainer = document.getElementById('vinyl-container');
+        const particleController = document.getElementById('particle-controller');
+        const wishesToggleButton = document.getElementById('wishes-toggle-button');
 
         // 2. Lấy Cấu Hình từ Server (MongoDB)
+        let serverConfig = { 
+            confetti_enabled: document.body.getAttribute('data-confetti') === 'true' 
+        };
+
         try {
-            const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
+            // Serverless Function sẽ tự thêm hostname
+            const res = await fetch('/api/config'); 
             if (res.status === 200) {
                 const json = await res.json();
-                // Cập nhật biến toàn cục để hàm open() dùng
-                isConfettiOn = json.data.confetti_enabled;
-
-                // Lưu các cấu hình khác vào storage (ví dụ: can_delete để khóa form)
-                Object.entries(json.data).forEach(([k, v]) => config.set(k, v));
+                serverConfig = json.data;
+                // Lưu cấu hình vào storage để các module khác sử dụng
+                Object.entries(serverConfig).forEach(([k, v]) => config.set(k, v));
             }
         } catch (e) {
             console.warn("Lỗi tải config, dùng mặc định.");
         }
+        
+        // ----------------------------------------------------
+        // 3. ĐỒNG BỘ HÓA GIAO DIỆN (DỰA TRÊN serverConfig)
+        // ----------------------------------------------------
 
-        // 3. Tải tài nguyên (Chạy song song cho nhanh)
+        // A. HIỆU ỨNG ĐĨA THAN (vinyl_enabled)
+        if (vinylContainer) {
+            if (!serverConfig.vinyl_enabled) {
+                vinylContainer.style.display = 'none';
+            }
+        }
+        
+        // B. NÚT ĐIỀU KHIỂN PHÁO HOA (particle_control_enabled)
+        if (particleController) {
+            if (!serverConfig.particle_control_enabled) {
+                particleController.style.display = 'none';
+            }
+        }
+        
+        // C. KHÓA FORM GỬI LỜI CHÚC (comment_lock_enabled)
+        const sendForm = document.getElementById('wishes-form');
+        const sendBtn = document.getElementById('btn-send-wish');
+        if (serverConfig.comment_lock_enabled && sendForm) {
+            sendForm.remove(); // Xóa form hoàn toàn (hoặc ẩn đi)
+            if (sendBtn) sendBtn.disabled = true; // Khóa nút nếu vẫn giữ form
+            
+            // Thêm thông báo bảo trì nếu cần
+            const container = document.getElementById('comment')?.querySelector('.container');
+            if (container) {
+                 container.insertAdjacentHTML('afterbegin', 
+                 '<div class="alert alert-danger rounded-4 shadow-sm text-center">Chức năng Gửi Lời Chúc đang bảo trì.</div>');
+            }
+        }
+        
+        // D. POPUP LỜI CHÚC NGẪU NHIÊN (popup_wishes_enabled)
+        // Logic này cần được xử lý trong hàm fetchWishes của comment.js.
+        
+        // 4. Tải tài nguyên (Chạy song song cho nhanh)
         vid.load();
         img.load();
-        aud.load();
+        
+        // QUAN TRỌNG: Truyền cờ autoplay vào audio.load()
+        aud.load(serverConfig.autoplay_enabled);
 
-        // 4. Tải thư viện phụ trợ
-        // Chỉ tải confetti nếu Admin bật
+        // 5. Tải thư viện phụ trợ
         lib.load({
             aos: true,
-            confetti: isConfettiOn
+            confetti: serverConfig.confetti_enabled
         });
+        
+        // 6. Kích hoạt Popup Lời Chúc và hoàn tất loading
+        comment.show(); // Hàm này sẽ tự động gọi fetchWishes
 
-        // 5. Xử lý sự kiện giao diện
+        progress.complete('config'); 
+        progress.complete('comment'); 
+        
+        // 7. Xử lý sự kiện giao diện (Giữ nguyên)
         window.addEventListener('resize', util.debounce(slide));
         document.addEventListener('undangan.progress.done', () => booting());
         document.addEventListener('hide.bs.modal', () => document.activeElement?.blur());
-
+        
         const btnDownload = document.getElementById('button-modal-download');
         if (btnDownload) {
             btnDownload.addEventListener('click', (e) => {
                 img.download(e.currentTarget.getAttribute('data-src'));
             });
         }
-
-        // 6. Kích hoạt Popup Lời Chúc (Luôn chạy vì là khách vãng lai)
-        comment.show();
-
-        // Vì không còn token, ta coi như đã load xong config & comment
-        // Gọi complete thủ công để thanh loading chạy hết
-        progress.complete('config'); // Giả lập
-        progress.complete('comment'); // Giả lập
     };
 
 

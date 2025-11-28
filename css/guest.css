@@ -790,4 +790,4 @@ svg {
 }
 
 /* Ẩn hiện mượt mà */
-.d-none { display: none !important; }
+.d-none { display: none  }
