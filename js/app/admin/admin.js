@@ -116,6 +116,7 @@ const adminModule = () => {
                 setTimeout(() => {
                     loadChartJsAndRender(present, absent, unknown, allWishes);
                     renderLatestWishes(allWishes);
+                    console.error("Rendering charts with data:", present, absent, unknown, allWishes);
                 }, 100);
 
                 if(typeof loadWishesManager === 'function') loadWishesManager();
