@@ -5,7 +5,8 @@ import { request, HTTP_POST, HTTP_GET, HTTP_STATUS_OK } from '../connection/requ
 
 export const session = (() => {
 
-     const TOKEN_KEY = 'admin_token'; 
+    // Dùng localStorage để lưu token vĩnh viễn
+    const TOKEN_KEY = 'admin_token'; 
 
     const getToken = () => localStorage.getItem(TOKEN_KEY);
     const setToken = (token) => localStorage.setItem(TOKEN_KEY, token);
@@ -13,23 +14,25 @@ export const session = (() => {
 
     const isAdmin = () => {
         const token = getToken();
-        return token === "VERCEL_ADMIN_TOKEN";
+        // Chỉ cần có token (khác null/empty) là coi như Admin ở phía Client
+        // Việc token đúng hay sai sẽ do API Backend quyết định khi gửi request
+        return !!token && token.length > 0;
     };
 
+    const isValid = () => {
+        return isAdmin();
+    };
+    // --------------------------------
+
     // --- HÀM LOGIN ĐÃ SỬA ---
-    const login = (body, serverUrl) => {
-        // KHÔNG dùng hàm parseLoginResponse nữa để tránh lỗi undefined
+     const login = (body, serverUrl) => {
         return request(HTTP_POST, serverUrl)
             .body(body)
-            .send() // <-- ĐỂ TRỐNG: Để lấy toàn bộ JSON từ server
+            .send() 
             .then((res) => {
-                console.log("Login Response:", res); // Dòng này để debug nếu cần
-
-                // Vì không dùng transform, res chính là object trả về từ server gộp với {code: 200}
-                // API trả về: { result: "success", token: "...", code: 200 }
-                
-                if (res.code === HTTP_STATUS_OK && res.token) {
-                    setToken(res.token);
+                // API trả về: { result: "success", token: "..." }
+                if (res.code === HTTP_STATUS_OK && res.data && res.data.token) {
+                    setToken(res.data.token);
                     return true;
                 }
                 return false;
@@ -40,28 +43,11 @@ export const session = (() => {
             });
     };
 
-    const guest = (token) => {
-        return request(HTTP_GET, '/api/v2/config')
-            .withCache(1000 * 60 * 30)
-            .withForceCache()
-            .token(token)
-            .send()
-            .then((res) => {
-                if (res.code !== HTTP_STATUS_OK) throw new Error('failed to get config.');
-                const config = storage('config');
-                for (const [k, v] of Object.entries(res.data)) config.set(k, v);
-                setToken(token);
-                return res;
-            });
-    };
+     const guest = (token) => Promise.resolve(); 
 
     const decode = () => {
         if (!isAdmin()) return null;
         try { return JSON.parse(util.base64Decode(getToken().split('.')[1])); } catch { return null; }
-    };
-
-    const isValid = () => {
-        return isAdmin(); // Nếu có token đúng thì là Valid, không cần check exp date phức tạp
     };
 
     const init = () => {};
