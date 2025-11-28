@@ -823,34 +823,34 @@ const adminModule = () => {
 
             // Load dữ liệu thống kê
             request(HTTP_GET, SERVER_URL + '/api/wishes')
-            .token(session.getToken())
-            .withCache(1000 * 30)
-            .send()
-            .then((resp) => {
-                const allWishes = resp.data;
-                cachedWishesData = allWishes; // <--- LƯU LẠI DỮ LIỆU ĐỂ LỌC SAU
+                .token(session.getToken())
+                .withCache(1000 * 30)
+                .send()
+                .then((resp) => {
+                    const allWishes = resp.data;
+                    cachedWishesData = allWishes; // <--- LƯU LẠI DỮ LIỆU ĐỂ LỌC SAU
 
-                // 1. TÍNH TOÁN SỐ LIỆU CƠ BẢN
-                const comments = allWishes.length;
-                let present = allWishes.filter(i => ['Có', '1', 'true', true, 1].includes(i.presence)).length;
-                let absent = allWishes.filter(i => ['Không', '0', 'false', false, 0].includes(i.presence)).length;
-                let unknown = comments - present - absent;
+                    // 1. TÍNH TOÁN SỐ LIỆU CƠ BẢN
+                    const comments = allWishes.length;
+                    let present = allWishes.filter(i => ['Có', '1', 'true', true, 1].includes(i.presence)).length;
+                    let absent = allWishes.filter(i => ['Không', '0', 'false', false, 0].includes(i.presence)).length;
+                    let unknown = comments - present - absent;
 
-                // Cập nhật UI số liệu
-                setText('count-comment', String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                setText('count-present', String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                setText('count-absent', String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
-                setText('count-like', '0');
+                    // Cập nhật UI số liệu
+                    setText('count-comment', String(comments).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                    setText('count-present', String(present).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                    setText('count-absent', String(absent).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+                    setText('count-like', '0');
 
-                   // 3. VẼ BIỂU ĐỒ
-                renderPieChart(present, absent, unknown);
-                renderTrendChart(allWishes, 'week'); // Mặc định vẽ 7 ngày
+                    // 3. VẼ BIỂU ĐỒ
+                    renderPieChart(present, absent, unknown);
+                    renderTrendChart(allWishes, 'week'); // Mặc định vẽ 7 ngày
 
-                // 4. HIỂN THỊ BẢNG LỜI CHÚC MỚI NHẤT
-                renderLatestWishes(allWishes);
-                
-                // 5. Load danh sách quản lý
-                if(typeof loadWishesManager === 'function') loadWishesManager();
+                    // 4. HIỂN THỊ BẢNG LỜI CHÚC MỚI NHẤT
+                    renderLatestWishes(allWishes);
+
+                    // 5. Load danh sách quản lý
+                    if (typeof loadWishesManager === 'function') loadWishesManager();
                 });
 
         }).catch(err => {
@@ -863,13 +863,18 @@ const adminModule = () => {
         //Chart.defaults.color = '#e0e0e0'; // Màu chữ sáng
         //Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)'; // Màu đường kẻ mờ
 
+        // Hàm gọi từ HTML khi chọn Dropdown
+        window.updateTrendChart = (type) => {
+            if (cachedWishesData.length > 0) {
+                renderTrendChart(cachedWishesData, type);
+            }
+        };
+
         const renderPieChart = (present, absent, unknown) => {
-            // 1. KIỂM TRA AN TOÀN: Nếu Chart chưa tải xong, đợi 0.5s rồi thử lại
             if (typeof Chart === 'undefined') {
                 setTimeout(() => renderPieChart(present, absent, unknown), 500);
                 return;
             }
-
             const ctx = document.getElementById('attendanceChart');
             if (!ctx) return;
 
@@ -882,81 +887,121 @@ const adminModule = () => {
                     datasets: [{
                         data: [present, absent, unknown],
                         backgroundColor: ['#3b82f6', '#ef4444', '#6b7280'],
-                        borderWidth: 0, // Không viền
+                        borderWidth: 0,
                         hoverOffset: 10
                     }]
                 },
                 options: {
-                    // --- CẤU HÌNH MÀU SẮC TRỰC TIẾP TẠI ĐÂY ---
                     color: '#e0e0e0',
                     borderColor: 'rgba(255, 255, 255, 0.1)',
-                    // -------------------------------------------
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { padding: 20, usePointStyle: true, color: '#e0e0e0' } // Màu chữ chú thích
-                        }
+                        legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, color: '#e0e0e0' } }
                     },
                     cutout: '70%'
                 }
             });
         };
 
-        const renderTrendChart = (wishes) => {
-            // 1. KIỂM TRA AN TOÀN
+        // HÀM VẼ BIỂU ĐỒ XU HƯỚNG (ĐÃ NÂNG CẤP)
+        const renderTrendChart = (wishes, filterType = 'week') => {
             if (typeof Chart === 'undefined') {
-                setTimeout(() => renderTrendChart(wishes), 500);
+                setTimeout(() => renderTrendChart(wishes, filterType), 500);
                 return;
             }
-
             const ctx = document.getElementById('wishesTrendChart');
             if (!ctx) return;
 
-            // Xử lý dữ liệu (Giữ nguyên logic cũ)
-            const last7Days = {};
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                const dateStr = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-                last7Days[dateStr] = 0;
+            const dataMap = {};
+            const labels = [];
+            const dataPoints = [];
+
+            // --- LOGIC XỬ LÝ DỮ LIỆU ---
+            if (filterType === 'week') {
+                // 7 ngày qua
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const key = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+                    labels.push(key);
+                    dataMap[key] = 0;
+                }
+                wishes.forEach(w => {
+                    const d = new Date(w.created_at);
+                    const diffTime = Math.abs(new Date() - d);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays <= 7) {
+                        const key = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+                        if (dataMap[key] !== undefined) dataMap[key]++;
+                    }
+                });
             }
-            wishes.forEach(w => {
-                const wDate = new Date(w.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-                if (last7Days[wDate] !== undefined) last7Days[wDate]++;
-            });
+            else if (filterType === 'month') {
+                // 30 ngày qua
+                for (let i = 29; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const key = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+                    labels.push(key);
+                    dataMap[key] = 0;
+                }
+                wishes.forEach(w => {
+                    const d = new Date(w.created_at);
+                    const diffTime = Math.abs(new Date() - d);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays <= 30) {
+                        const key = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+                        if (dataMap[key] !== undefined) dataMap[key]++;
+                    }
+                });
+            }
+            else if (filterType === 'year') {
+                // 12 tháng qua
+                for (let i = 11; i >= 0; i--) {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - i);
+                    const key = `T${d.getMonth() + 1}/${d.getFullYear()}`;
+                    labels.push(key);
+                    dataMap[key] = 0;
+                }
+                wishes.forEach(w => {
+                    const d = new Date(w.created_at);
+                    const key = `T${d.getMonth() + 1}/${d.getFullYear()}`;
+                    if (labels.includes(key)) dataMap[key]++;
+                });
+            }
+
+            labels.forEach(lbl => dataPoints.push(dataMap[lbl]));
 
             if (barChartInstance) barChartInstance.destroy();
 
             barChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(last7Days),
+                    labels: labels,
                     datasets: [{
                         label: 'Số lời chúc',
-                        data: Object.values(last7Days),
-                        backgroundColor: '#8b5cf6',
+                        data: dataPoints,
+                        backgroundColor: filterType === 'year' ? '#10b981' : (filterType === 'month' ? '#f59e0b' : '#8b5cf6'),
                         borderRadius: 4,
-                        barThickness: 20
+                        barPercentage: filterType === 'month' ? 0.8 : 0.6
                     }]
                 },
                 options: {
-                    // --- CẤU HÌNH MÀU SẮC TRỰC TIẾP TẠI ĐÂY ---
                     color: '#e0e0e0',
                     borderColor: 'rgba(255, 255, 255, 0.1)',
-                    // -------------------------------------------
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { stepSize: 1, color: '#e0e0e0' }, // Màu số trục Y
+                            ticks: { stepSize: 1, color: '#e0e0e0' },
                             grid: { color: 'rgba(255, 255, 255, 0.05)' }
                         },
                         x: {
-                            ticks: { color: '#e0e0e0' }, // Màu chữ trục X
+                            ticks: { color: '#e0e0e0', maxRotation: 45, minRotation: 45 },
                             grid: { display: false }
                         }
                     }
