@@ -237,18 +237,27 @@
                                             </div>
                                         </div>
 
-                                        <!-- Input: Khoảng Ngày (Xuống dòng trên mobile) -->
+                                        <!-- Input: Khoảng Ngày (Fix tràn mobile) -->
                                         <div class="col-12 col-md-auto d-none" id="filter-range-group">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <input type="date"
-                                                    class="form-control form-control-sm border-0 bg-white shadow-none"
-                                                    id="filter-date-start" onchange="undangan.admin.applyFilters()"
-                                                    title="Từ ngày">
-                                                <span class="text-muted">-</span>
-                                                <input type="date"
-                                                    class="form-control form-control-sm border-0 bg-white shadow-none"
-                                                    id="filter-date-end" onchange="undangan.admin.applyFilters()"
-                                                    title="Đến ngày">
+                                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                                <div class="input-group input-group-sm" style="width: 140px;">
+                                                    <span class="input-group-text bg-white border-0"><i
+                                                            class="fa-solid fa-calendar-days text-muted"></i></span>
+                                                    <input type="date"
+                                                        class="form-control border-0 bg-white shadow-none"
+                                                        id="filter-date-start" onchange="undangan.admin.applyFilters()"
+                                                        title="Từ ngày">
+                                                </div>
+                                                <span class="text-muted d-none d-sm-block">-</span>
+                                                <!-- Ẩn dấu gạch trên mobile cực nhỏ -->
+                                                <div class="input-group input-group-sm" style="width: 140px;">
+                                                    <span class="input-group-text bg-white border-0"><i
+                                                            class="fa-solid fa-calendar-days text-muted"></i></span>
+                                                    <input type="date"
+                                                        class="form-control border-0 bg-white shadow-none"
+                                                        id="filter-date-end" onchange="undangan.admin.applyFilters()"
+                                                        title="Đến ngày">
+                                                </div>
                                             </div>
                                         </div>
 

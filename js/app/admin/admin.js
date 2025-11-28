@@ -520,48 +520,56 @@ export const admin = (() => {
         };
 
         // --- HÀM LỌC DỮ LIỆU ---
+        // --- HÀM LỌC DỮ LIỆU (SAFE VERSION) ---
         const applyFilters = () => {
-            const statusFilter = document.getElementById('filter-presence').value;
-            const searchFilter = document.getElementById('filter-search').value.toLowerCase();
+            // Helper lấy giá trị an toàn (tránh lỗi null)
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value : '';
+            };
+
+            const statusFilter = getVal('filter-presence');
+            const searchFilter = getVal('filter-search').toLowerCase();
+            const timeType = getVal('time-filter-type');
 
             // Lấy giá trị thời gian
-            const timeType = document.getElementById('time-filter-type').value;
-            const monthVal = document.getElementById('filter-month').value;
-            const startVal = document.getElementById('filter-date-start').value;
-            const endVal = document.getElementById('filter-date-end').value;
+            const monthVal = getVal('filter-month-val');
+            const yearVal = getVal('filter-year-val');
+            const startVal = getVal('filter-date-start');
+            const endVal = getVal('filter-date-end');
 
             filteredData = allWishesData.filter(item => {
                 const itemDate = new Date(item.created_at);
 
-                // 1. Lọc Trạng thái (Giữ nguyên)
+                // 1. Lọc Trạng thái
                 const p = String(item.presence).toLowerCase();
                 let matchStatus = true;
                 if (statusFilter === 'yes') matchStatus = ['có', '1', 'true'].includes(p);
                 else if (statusFilter === 'no') matchStatus = ['không', '0', 'false'].includes(p);
                 else if (statusFilter === 'other') matchStatus = !['có', '1', 'true', 'không', '0', 'false'].includes(p);
 
-                // 2. Lọc Thời Gian (FIXED)
+                // 2. Lọc Thời Gian
                 let matchTime = true;
 
-                if (timeType === 'month') {
-                    const m = document.getElementById('filter-month-val').value;
-                    const y = document.getElementById('filter-year-val').value;
-                    if (m && y) {
-                        const targetYM = `${y}-${m}`;
-                        // Lấy YYYY-MM từ ngày tạo
-                        const itemYM = itemDate.toISOString().slice(0, 7);
-                        matchTime = itemYM === targetYM;
-                    }
+                // Chỉ lọc khi người dùng chọn loại và có dữ liệu đầu vào
+                if (timeType === 'month' && monthVal && yearVal) {
+                    const targetYM = `${yearVal}-${monthVal}`;
+                    // Lấy YYYY-MM từ ngày tạo (cắt chuỗi ISO)
+                    // Lưu ý: itemDate.toISOString() trả về giờ UTC.
+                    // Nếu muốn chính xác giờ VN, nên dùng logic bên dưới:
+                    const year = itemDate.getFullYear();
+                    const month = String(itemDate.getMonth() + 1).padStart(2, '0');
+                    const itemYM = `${year}-${month}`;
+
+                    matchTime = itemYM === targetYM;
                 }
                 else if (timeType === 'range') {
-                    const startVal = document.getElementById('filter-date-start').value;
-                    const endVal = document.getElementById('filter-date-end').value;
-
                     if (startVal || endVal) {
-                        // Chuyển itemDate về chuẩn YYYY-MM-DD (bỏ giờ phút) để so sánh chính xác
-                        // Lưu ý: toISOString() dùng giờ UTC, có thể lệch ngày nếu ở VN.
-                        // Tốt nhất dùng toLocaleDateString('en-CA') để lấy YYYY-MM-DD theo múi giờ máy.
-                        const itemDateStr = new Date(item.created_at).toLocaleDateString('en-CA'); // YYYY-MM-DD
+                        // Chuyển itemDate về YYYY-MM-DD theo múi giờ địa phương
+                        const year = itemDate.getFullYear();
+                        const month = String(itemDate.getMonth() + 1).padStart(2, '0');
+                        const day = String(itemDate.getDate()).padStart(2, '0');
+                        const itemDateStr = `${year}-${month}-${day}`; // YYYY-MM-DD
 
                         const isAfterStart = startVal ? itemDateStr >= startVal : true;
                         const isBeforeEnd = endVal ? itemDateStr <= endVal : true;
@@ -569,16 +577,8 @@ export const admin = (() => {
                         matchTime = isAfterStart && isBeforeEnd;
                     }
                 }
-                else if (timeType === 'range') {
-                    // So sánh khoảng ngày (chỉ tính ngày, bỏ qua giờ)
-                    const itemTime = new Date(itemDate.toDateString()).getTime();
-                    const startTime = startVal ? new Date(startVal).getTime() : -Infinity;
-                    const endTime = endVal ? new Date(endVal).getTime() : Infinity;
 
-                    matchTime = itemTime >= startTime && itemTime <= endTime;
-                }
-
-                // 3. Tìm kiếm (Giữ nguyên)
+                // 3. Tìm kiếm
                 let matchSearch = true;
                 if (searchFilter) {
                     matchSearch = (item.name && item.name.toLowerCase().includes(searchFilter)) ||
