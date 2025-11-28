@@ -392,8 +392,10 @@ export const guest = (() => {
 
         // B. NÚT ĐIỀU KHIỂN PHÁO HOA (particle_control_enabled)
         if (particleController) {
-            if (!serverConfig.particle_control_enabled) {
-                particleController.style.display = 'none';
+            if (serverConfig.confetti_enabled) { // Dùng confetti_enabled để kiểm tra bật/tắt nút
+                particleController.style.display = 'flex'; // Hiện nút
+            } else {
+                particleController.style.display = 'none'; // Ẩn nút nếu config tắt
             }
         }
 
@@ -426,19 +428,12 @@ export const guest = (() => {
         // 5. Tải thư viện phụ trợ
         lib.load({
             aos: true,
-            confetti: serverConfig.confetti_enabled
+            confetti: serverConfig.confetti_enabled // Chỉ tải thư viện nếu được bật
         });
 
         // 6. Kích hoạt Popup Lời Chúc và hoàn tất loading
 
-        if (!serverConfig.particle_control_enabled) {
-            particleController.style.display = 'remove';
-        }
-        else {
-            particleController.style.display = 'add';
-            controlsPanel.classList.toggle('show');
-            setupParticleControls();
-        }
+        
 
 
         // 7. Xử lý sự kiện giao diện (Giữ nguyên)
@@ -685,7 +680,7 @@ export const guest = (() => {
             ]);
             // CHẠY HÀM TẠO LỊCH CỦA CHÚNG TA SAU KHI MỌI THỨ ĐÃ TẢI XONG
             initializeCalendarLinks();
-            //setupParticleControls();
+            setupParticleControls();
         });
 
         return {
