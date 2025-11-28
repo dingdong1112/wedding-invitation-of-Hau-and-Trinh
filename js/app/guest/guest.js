@@ -171,12 +171,13 @@ export const guest = (() => {
         theme.spyTop();
 
         const config = storage('config');
-        const isConfettiOn = config.get('confetti_enabled');
-
-        if (isConfettiOn && typeof window.confetti === 'function') {
-            // Chỉ chạy nếu Admin bật
+        if (typeof window.confetti === 'function' && config.get('particle_control_enabled')) {
             window.confetti();
             util.timeOut(window.confetti, 1500);
+
+            // Nếu có animation rơi (ve), cũng phải kiểm tra config
+            // Ve là animation rơi liên tục.
+            util.timeOut(ve, 1500);
         }
 
         document.dispatchEvent(new Event('undangan.open'));
@@ -424,14 +425,14 @@ export const guest = (() => {
         // 5. Tải thư viện phụ trợ
         lib.load({
             aos: true,
-            confetti: serverConfig.confetti_enabled
+            confetti: serverConfig.particle_control_enabled
         });
 
         // 6. Kích hoạt Popup Lời Chúc và hoàn tất loading
 
         if (serverConfig.particle_control_enabled) {
-                particleController.style.display = 'remove';
-            }
+            particleController.style.display = 'remove';
+        }
 
 
         // 7. Xử lý sự kiện giao diện (Giữ nguyên)
