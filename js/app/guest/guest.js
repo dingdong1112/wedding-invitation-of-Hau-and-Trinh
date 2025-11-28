@@ -355,7 +355,7 @@ export const guest = (() => {
 
         // Cần đảm bảo các element có sẵn để tránh lỗi JS
         const vinylContainer = document.getElementById('vinyl-container');
-        const particleController = document.getElementById('particle-controller');
+        const particleController = document.getElementById('particle-toggle-button');
         const wishesToggleButton = document.getElementById('wishes-toggle-button');
 
         // 2. Lấy Cấu Hình từ Server (MongoDB)
@@ -428,6 +428,10 @@ export const guest = (() => {
         });
 
         // 6. Kích hoạt Popup Lời Chúc và hoàn tất loading
+
+        if (serverConfig.particle_control_enabled) {
+                particleController.style.display = 'remove';
+            }
 
 
         // 7. Xử lý sự kiện giao diện (Giữ nguyên)
