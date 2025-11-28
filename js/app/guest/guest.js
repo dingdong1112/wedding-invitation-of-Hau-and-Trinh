@@ -170,9 +170,11 @@ export const guest = (() => {
         slide();
         theme.spyTop();
 
-        //confetti.basicAnimation();
-        //util.timeOut(confetti.openAnimation, 1500);
+        const config = storage('config');
+        const isConfettiOn = config.get('confetti_enabled');
+
         if (isConfettiOn && typeof window.confetti === 'function') {
+            // Chỉ chạy nếu Admin bật
             window.confetti();
             util.timeOut(window.confetti, 1500);
         }
@@ -303,7 +305,15 @@ export const guest = (() => {
      * @returns {Promise<void>}
      */
     const booting = async () => {
-        animateSvg();
+        //animateSvg();
+
+        const config = storage('config');
+        const isConfettiOn = config.get('confetti_enabled');
+
+        if (isConfettiOn) {
+            animateSvg(); // Chỉ chạy animation SVG nếu confetti được bật
+        }
+
         countDownDate();
         showGuestName();
         modalImageClick();
@@ -408,18 +418,11 @@ export const guest = (() => {
         }
 
         // 5. Tải thư viện & Chạy Pháo hoa nền
-        const shouldRunConfetti = serverConfig.confetti_enabled && serverConfig.particle_control_enabled;
-
-        lib.load({
-            aos: true,
-            confetti: shouldRunConfetti // Chỉ load thư viện khi cần
-        });
-
-        // Chỉ chạy vòng lặp khi cần
-        if (shouldRunConfetti && typeof fireConfetti === 'function') {
-            setTimeout(() => {
-                setInterval(fireConfetti, 2500);
-            }, 2000);
+        // Bỏ qua logic cũ, thay thế bằng:
+        if (serverConfig.confetti_enabled) {
+            lib.load({ aos: true, confetti: true });
+        } else {
+            lib.load({ aos: true, confetti: false }); // Vẫn tải AOS, không tải Confetti
         }
 
         // 6. Xử lý sự kiện giao diện
@@ -436,12 +439,16 @@ export const guest = (() => {
 
         // 7. Kích hoạt Popup Lời Chúc (Chỉ chạy nếu Admin cho phép)
         if (serverConfig.wishes_popup_enabled) {
-            comment.show();
+            // Nếu bạn dùng module comment cũ, hãy thay bằng hàm fetchWishes mới của mình
+            // Và gọi progress.complete ở cuối hàm fetchWishes
+            // Nếu bạn đang dùng logic popup ngẫu nhiên, chỉ cần gọi fetchWishes() là đủ
+            if (typeof fetchWishes === 'function') {
+                fetchWishes(); // Hàm này sẽ tự gọi startWishLoop() nếu thành công
+            }
+        } else {
+            progress.complete('comment'); // Nếu không dùng thì báo hoàn thành luôn
         }
-
-        // Giả lập hoàn thành các bước cũ
         progress.complete('config');
-        progress.complete('comment');
     };
 
 
