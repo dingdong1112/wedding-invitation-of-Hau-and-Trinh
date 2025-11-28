@@ -1367,65 +1367,67 @@
             </button>
         </div>
 
-        <!-- THANH CÔNG CỤ BÊN PHẢI -->
-    <div id="right-toolbar" class="d-flex flex-column align-items-end position-fixed" style="top: 70px; right: 20px; z-index: 1030; gap: 15px; pointer-events: none;">
-        
-        <!-- 1. CỤM PHÁO HOA (Nút + Bảng điều khiển) -->
-        <div id="confetti-wrapper" class="position-relative">
-            <!-- Nút Mở/Đóng Bảng Chỉnh Hiệu Ứng -->
-            <button type="button" id="particle-toggle-button" 
-                class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm" 
-                style="pointer-events: auto;"
-                title="Chỉnh hiệu ứng">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-            </button>
-            
-            <!-- Bảng điều khiển (Ẩn mặc định) -->
-            <div id="particle-controls" class="shadow-lg rounded-4 border position-absolute bg-body p-3" 
-                style="top: 0; right: 50px; width: 240px; display: none; pointer-events: auto;">
-                
-                <div class="control-group mb-2">
-                    <label for="particle-shape" class="form-label small fw-bold">Biểu tượng:</label>
-                    <select id="particle-shape" class="form-select form-select-sm">
-                        <option value="confetti">Kim tuyến</option>
-                        <option value="svg-heart" selected>Trái tim ❤️</option>
-                        <option value="snow">Tuyết ❄️</option>
-                        <option value="stars">Ngôi sao ✨</option>
-                    </select>
-                </div>
-                
-                <div class="control-group mb-2">
-                    <label for="particle-duration" class="form-label small fw-bold">Thời gian rơi:</label>
-                    <select id="particle-duration" class="form-select form-select-sm">
-                        <option value="0">Dừng lại</option>
-                        <option value="60">1 phút</option>
-                        <option value="300">5 phút</option>
-                        <option value="600">10 phút</option>
-                        <option value="-1" selected>Rơi mãi</option>
-                    </select>
-                </div>
-                
-                <div class="control-group mb-2">
-                    <label for="particle-size" class="form-label small fw-bold">Kích thước:</label>
-                    <input type="range" id="particle-size" class="form-range" min="0.5" max="2.5" step="0.1" value="1">
-                </div>
-                
-                <div class="control-group">
-                    <label for="particle-density" class="form-label small fw-bold">Mật độ rơi:</label>
-                    <input type="range" id="particle-density" class="form-range" min="10" max="200" step="10" value="50">
+        <!-- BẮT ĐẦU BẢNG ĐIỀU KHIỂN HIỆU ỨNG RƠI -->
+        <div id="right-toolbar" class="d-flex flex-column align-items-end position-fixed"
+            style="top: 70px; right: 20px; z-index: 1030; gap: 15px; pointer-events: none;">
+
+            <!-- 1. CỤM PHÁO HOA (Nút + Bảng điều khiển) -->
+            <div id="confetti-wrapper" class="position-relative">
+                <!-- Nút Mở/Đóng Bảng Chỉnh Hiệu Ứng -->
+                <button type="button" id="particle-toggle-button"
+                    class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm"
+                    style="pointer-events: auto;" title="Chỉnh hiệu ứng">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </button>
+
+                <!-- Bảng điều khiển (Ẩn mặc định) -->
+                <div id="particle-controls" class="shadow-lg rounded-4 border position-absolute bg-body p-3"
+                    style="top: 0; right: 50px; width: 240px; display: none; pointer-events: auto;">
+
+                    <div class="control-group mb-2">
+                        <label for="particle-shape" class="form-label small fw-bold">Biểu tượng:</label>
+                        <select id="particle-shape" class="form-select form-select-sm">
+                            <option value="confetti">Kim tuyến</option>
+                            <option value="svg-heart" selected>Trái tim ❤️</option>
+                            <option value="snow">Tuyết ❄️</option>
+                            <option value="stars">Ngôi sao ✨</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group mb-2">
+                        <label for="particle-duration" class="form-label small fw-bold">Thời gian rơi:</label>
+                        <select id="particle-duration" class="form-select form-select-sm">
+                            <option value="0">Dừng lại</option>
+                            <option value="60">1 phút</option>
+                            <option value="300">5 phút</option>
+                            <option value="600">10 phút</option>
+                            <option value="-1" selected>Rơi mãi</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group mb-2">
+                        <label for="particle-size" class="form-label small fw-bold">Kích thước:</label>
+                        <input type="range" id="particle-size" class="form-range" min="0.5" max="2.5" step="0.1"
+                            value="1">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="particle-density" class="form-label small fw-bold">Mật độ rơi:</label>
+                        <input type="range" id="particle-density" class="form-range" min="10" max="200" step="10"
+                            value="50">
+                    </div>
                 </div>
             </div>
+
+            <!-- 2. NÚT BẬT/TẮT LỜI CHÚC (Độc lập) -->
+            <button type="button" id="wishes-toggle-button"
+                class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm active"
+                style="pointer-events: auto;" title="Bật/Tắt lời chúc">
+                <i class="fa-solid fa-comment-dots"></i>
+            </button>
+
         </div>
-
-        <!-- 2. NÚT BẬT/TẮT LỜI CHÚC (Độc lập) -->
-        <button type="button" id="wishes-toggle-button" 
-            class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm active" 
-            style="pointer-events: auto;"
-            title="Bật/Tắt lời chúc">
-            <i class="fa-solid fa-comment-dots"></i>
-        </button>
-
-    </div>
+        <!-- KẾT THÚC BẢNG ĐIỀU KHIỂN -->
 
         <!--
 <div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
