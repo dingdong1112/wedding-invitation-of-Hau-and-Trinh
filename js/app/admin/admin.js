@@ -48,7 +48,7 @@ export const admin = (() => {
                 // Dùng element.remove() an toàn hơn, nhưng cần tìm đúng thẻ cha
 
                 // Nếu là checkbox, tìm cha gần nhất có class .form-check
-                let parentToRemove = el.closest('.form-check') || el.closest('.p-3') || el.parentElement;
+                //let parentToRemove = el.closest('.form-check') || el.closest('.p-3') || el.parentElement;
 
                 // Nếu tìm thấy cha, xóa nó đi
                 if (parentToRemove) {
@@ -558,11 +558,11 @@ export const admin = (() => {
             setCheck('toggle-lock', configStorage.get('can_delete'));
 
             // Xóa phần tử thừa
-            document.getElementById('filterBadWord')?.closest('.form-check')?.remove();
+            /*document.getElementById('filterBadWord')?.closest('.form-check')?.remove();
             document.getElementById('replyComment')?.closest('.form-check')?.remove();
             document.getElementById('editComment')?.closest('.form-check')?.remove();
             document.getElementById('form-timezone')?.closest('.p-3')?.remove();
-            document.getElementById('dashboard-tenorkey')?.closest('.p-3')?.remove();
+            document.getElementById('dashboard-tenorkey')?.closest('.p-3')?.remove();*/
 
             document.dispatchEvent(new Event('undangan.session'));
 
