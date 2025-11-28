@@ -16,7 +16,7 @@ import { pool } from '../../connection/request.js';
 
 export const guest = (() => {
 
-    let isConfettiOn = true; 
+    let isConfettiOn = true;
     /**
      * @type {ReturnType<typeof storage>|null}
      */
@@ -334,14 +334,21 @@ export const guest = (() => {
         offline.init();
         comment.init();
         progress.init();
-        
+
         const vid = video.init();
         const img = image.init();
         const aud = audio.init();
         const lib = loaderLibs();
-        
+
         config = storage('config');
         information = storage('information');
+
+        if (!config.get('vinyl_enabled')) {
+            document.getElementById('vinyl-container').style.display = 'none';
+        }
+        if (!config.get('particle_control_enabled')) {
+            document.getElementById('particle-controller').style.display = 'none';
+        }
 
         // 2. Lấy Cấu Hình từ Server (MongoDB)
         try {
@@ -349,8 +356,8 @@ export const guest = (() => {
             if (res.status === 200) {
                 const json = await res.json();
                 // Cập nhật biến toàn cục để hàm open() dùng
-                isConfettiOn = json.data.confetti_enabled; 
-                
+                isConfettiOn = json.data.confetti_enabled;
+
                 // Lưu các cấu hình khác vào storage (ví dụ: can_delete để khóa form)
                 Object.entries(json.data).forEach(([k, v]) => config.set(k, v));
             }
@@ -365,26 +372,26 @@ export const guest = (() => {
 
         // 4. Tải thư viện phụ trợ
         // Chỉ tải confetti nếu Admin bật
-        lib.load({ 
+        lib.load({
             aos: true,
-            confetti: isConfettiOn 
+            confetti: isConfettiOn
         });
 
         // 5. Xử lý sự kiện giao diện
         window.addEventListener('resize', util.debounce(slide));
         document.addEventListener('undangan.progress.done', () => booting());
         document.addEventListener('hide.bs.modal', () => document.activeElement?.blur());
-        
+
         const btnDownload = document.getElementById('button-modal-download');
-        if(btnDownload) {
+        if (btnDownload) {
             btnDownload.addEventListener('click', (e) => {
                 img.download(e.currentTarget.getAttribute('data-src'));
             });
         }
 
         // 6. Kích hoạt Popup Lời Chúc (Luôn chạy vì là khách vãng lai)
-        comment.show(); 
-        
+        comment.show();
+
         // Vì không còn token, ta coi như đã load xong config & comment
         // Gọi complete thủ công để thanh loading chạy hết
         progress.complete('config'); // Giả lập

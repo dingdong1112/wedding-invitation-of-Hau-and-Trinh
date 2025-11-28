@@ -1,6 +1,7 @@
 import { progress } from './progress.js';
 import { util } from '../../common/util.js';
 import { cache } from '../../connection/cache.js';
+import { storage } from '../../common/storage.js'; // Thêm import storage
 
 export const audio = (() => {
 
@@ -80,9 +81,28 @@ export const audio = (() => {
 
     const init = () => {
         progress.add();
+
+        // 1. KIỂM TRA CONFIG TRƯỚC
+        // Lưu ý: Phải đảm bảo file này đã import { storage } from '../../common/storage.js';
+        const config = storage('config');
         
-        // Map elements (Giữ nguyên như cũ)
+        // Mặc định là TRUE (nếu chưa có config thì vẫn hiện nhạc)
+        const isMusicEnabled = config.get('music_enabled') !== false; 
+
+        // Lấy Widget ngay đầu để xử lý ẩn
         els.widget = document.getElementById('music-player-container');
+        
+        // --- TRƯỜNG HỢP TẮT NHẠC ---
+        if (!isMusicEnabled) {
+            console.log("Music is disabled by Admin.");
+            if (els.widget) els.widget.classList.add('d-none'); // Ẩn giao diện
+            progress.complete('audio'); // Báo load xong để không kẹt Loading
+            return { load: () => {} }; // THOÁT NGAY LẬP TỨC
+        }
+
+        // --- TRƯỜNG HỢP BẬT NHẠC (Chạy tiếp xuống dưới) ---
+        
+        // Map các element còn lại (Bỏ dòng els.widget đi vì đã lấy ở trên rồi)
         els.toggleBtn = document.getElementById('music-toggle-btn');
         els.panel = document.getElementById('music-panel');
         els.playBtn = document.getElementById('btn-play-pause');
@@ -93,6 +113,7 @@ export const audio = (() => {
         els.shuffleBtn = document.getElementById('btn-shuffle');
         els.loopBtn = document.getElementById('btn-loop');
 
+        // Sự kiện click nút Toggle
         if (els.toggleBtn) {
             els.toggleBtn.addEventListener('click', () => {
                 if (!isPanelOpen) {
@@ -100,6 +121,8 @@ export const audio = (() => {
                     els.panel.classList.remove('d-none');
                     els.toggleBtn.classList.remove('spin-slow'); 
                     els.toggleBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                    
+                    // Đóng bảng pháo hoa nếu đang mở (Tương tác chéo)
                     const particlePanel = document.getElementById('particle-controls');
                     if (particlePanel) particlePanel.classList.remove('show');
                 } else {
@@ -108,11 +131,13 @@ export const audio = (() => {
             });
         }
 
+        // Xử lý Playlist mặc định
         const defaultUrl = document.body.getAttribute('data-audio');
         if(defaultUrl && playlist.length === 0) {
             playlist.push({ title: "Nhạc nền", src: defaultUrl });
         }
 
+        // Sự kiện hết bài (Next / Loop)
         audioEl.addEventListener('ended', () => {
             if (loopMode === 2) {
                 audioEl.currentTime = 0;
@@ -122,19 +147,20 @@ export const audio = (() => {
             }
         });
 
+        // Render giao diện lần đầu
         renderPlaylist();
         loadTrack(0);
         updateModeButtons();
 
         progress.complete('audio');
 
+        // Sự kiện mở thiệp -> Tự động phát
         document.addEventListener('undangan.open', () => {
             els.widget?.classList.remove('d-none');
-            // Khởi tạo Audio Context ngay khi mở thiệp
             try {
-                initAudioContext();
+                initAudioContext(); // Kích hoạt Web Audio API
                 play();
-            } catch(e) { console.log("Audio Context init failed on auto-play", e); }
+            } catch(e) { console.log("Autoplay blocked", e); }
         });
 
         return { load: () => {} };

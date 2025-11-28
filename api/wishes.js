@@ -71,6 +71,32 @@ export default async function handler(req, res) {
             await wishesCollection.deleteOne({ _id: new ObjectId(id) });
             return res.status(200).json({ result: 'success' });
         }
+
+        // --- 4. SỬA / HIGHLIGHT LỜI CHÚC (PUT /api/wishes/:id) ---
+        else if (req.method === 'PUT' && req.url.startsWith('/api/wishes/')) {
+            // Xác thực Token
+            const clientToken = req.headers['authorization'];
+            if (!clientToken) return res.status(401).json({ error: "Missing Token" });
+            const config = await settingsCollection.findOne({ key: "main_config" });
+            if (clientToken !== config.access_token || Date.now() > config.token_expiry) {
+                return res.status(401).json({ error: "Unauthorized" });
+            }
+
+            const id = req.url.split('/').pop();
+            const body = req.body; // { name, message, is_highlight }
+
+            const updateData = {};
+            if (body.name) updateData.name = body.name;
+            if (body.message) updateData.message = body.message;
+            if (typeof body.is_highlight !== 'undefined') updateData.is_highlight = body.is_highlight;
+
+            await wishesCollection.updateOne(
+                { _id: new ObjectId(id) },
+                { $set: updateData }
+            );
+
+            return res.status(200).json({ result: 'success' });
+        }
         
         else {
              return res.status(404).json({ error: 'Not Found' }); 

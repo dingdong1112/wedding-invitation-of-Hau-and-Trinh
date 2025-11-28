@@ -309,6 +309,152 @@ export const admin = (() => {
             }
         };
 
+        // --- HÀM QUẢN LÝ SETTING (TAB 3) ---
+        window.updateConfig = async (key, value) => {
+            const body = {};
+            body[key] = value;
+
+            try {
+                const res = await request(HTTP_PATCH, SERVER_URL + '/api/admin/settings')
+                    .token(session.getToken())
+                    .body(body)
+                    .send();
+
+                if (res.code === 200) util.notify("Đã lưu cài đặt").success();
+                else util.notify("Lưu thất bại").error();
+            } catch (e) {
+                util.notify("Lỗi kết nối").error();
+            }
+        };
+
+        // --- HÀM QUẢN LÝ LỜI CHÚC (TAB 2) ---
+
+        // 1. Load danh sách (Gọi khi bấm vào Tab Wishes hoặc load trang)
+        const loadWishesManager = async () => {
+            const container = document.getElementById('wishes-manager-list');
+            if (!container) return;
+
+            container.innerHTML = '<p class="text-center">Đang tải...</p>';
+
+            const res = await request(HTTP_GET, SERVER_URL + '/api/wishes').token(session.getToken()).send();
+
+            if (res.code === 200) {
+                container.innerHTML = '';
+                res.data.forEach(item => {
+                    // Icon ngôi sao: Vàng nếu highlight, Xám nếu không
+                    const starClass = item.is_highlight ? 'text-warning' : 'text-secondary';
+
+                    const html = `
+                <div class="bg-white p-3 rounded-3 shadow-sm border d-flex justify-content-between align-items-start" id="wish-row-${item.id}">
+                    <div>
+                        <h6 class="fw-bold mb-1">${util.escapeHtml(item.name)}</h6>
+                        <p class="mb-1 text-muted small">${util.escapeHtml(item.message)}</p>
+                        <span class="badge bg-light text-dark">${new Date(item.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-light btn-sm rounded-circle ${starClass}" 
+                                onclick="undangan.admin.toggleHighlight('${item.id}', ${!item.is_highlight})" title="Nổi bật">
+                            <i class="fa-solid fa-star"></i>
+                        </button>
+                        <button class="btn btn-light btn-sm rounded-circle text-primary" 
+                                onclick="undangan.admin.openEditWish('${item.id}')" title="Sửa">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn btn-light btn-sm rounded-circle text-danger" 
+                                onclick="undangan.admin.deleteWish('${item.id}')" title="Xóa">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`;
+                    container.insertAdjacentHTML('beforeend', html);
+                });
+            }
+        };
+
+        // 2. Toggle Highlight (Ghim)
+        window.toggleHighlight = async (id, newState) => {
+            const res = await request(HTTP_PUT, SERVER_URL + `/api/wishes/${id}`)
+                .token(session.getToken())
+                .body({ is_highlight: newState })
+                .send();
+
+            if (res.code === 200) {
+                loadWishesManager(); // Reload lại list
+                util.notify(newState ? "Đã ghim lời chúc" : "Đã bỏ ghim").success();
+            }
+        };
+
+        // 3. Mở Modal Sửa
+        window.openEditWish = (id) => {
+            // Tìm dữ liệu từ giao diện hiện tại để điền vào modal (hoặc gọi API lấy detail)
+            const row = document.getElementById(`wish-row-${id}`);
+            const name = row.querySelector('h6').innerText;
+            const msg = row.querySelector('p').innerText;
+
+            document.getElementById('edit-wish-id').value = id;
+            document.getElementById('edit-wish-name').value = name;
+            document.getElementById('edit-wish-msg').value = msg;
+
+            bs.modal('editWishModal').show();
+        };
+
+        // 4. Lưu (Thêm mới hoặc Sửa)
+    window.saveWish = async () => {
+        const id = document.getElementById('edit-wish-id').value;
+        const name = document.getElementById('edit-wish-name').value;
+        const msg = document.getElementById('edit-wish-msg').value;
+
+        if (!name || !msg) {
+            util.notify("Vui lòng nhập tên và lời chúc").warning();
+            return;
+        }
+        
+        const btn = document.querySelector('#editWishModal .btn-primary');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+
+        let res;
+        
+        try {
+            if (id) {
+                // --- TRƯỜNG HỢP SỬA (CÓ ID) ---
+                res = await request(HTTP_PUT, SERVER_URL + `/api/wishes/${id}`)
+                    .token(session.getToken())
+                    .body({ name: name, message: msg })
+                    .send();
+            } else {
+                // --- TRƯỜNG HỢP THÊM MỚI (KHÔNG CÓ ID) ---
+                // Gọi API POST giống như khách gửi
+                res = await request(HTTP_POST, SERVER_URL + '/api/wishes')
+                    .body({ Ten: name, LoiChuc: msg, ThamDu: 'Admin thêm' }) // Dùng key giống form khách
+                    .send();
+            }
+
+            if (res.code === 200) {
+                bs.modal('editWishModal').hide();
+                loadWishesManager(); // Tải lại danh sách để thấy thay đổi
+                util.notify(id ? "Đã cập nhật thành công" : "Đã thêm lời chúc mới").success();
+            } else {
+                util.notify("Lỗi khi lưu").error();
+            }
+        } catch (e) {
+            util.notify("Lỗi kết nối").error();
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    };
+
+        // 5. Thêm thủ công (Add)
+        window.openAddWishModal = () => {
+            // Tái sử dụng modal edit nhưng xóa trắng ID
+            document.getElementById('edit-wish-id').value = ''; // Trống = Thêm mới
+            document.getElementById('edit-wish-name').value = '';
+            document.getElementById('edit-wish-msg').value = '';
+            bs.modal('editWishModal').show();
+        };
+
         window.addEventListener('load', () => pool.init(pageLoaded, ['gif']));
 
         return {

@@ -20,11 +20,15 @@ export default async function handler(req, res) {
         return res.status(200).json({
             result: 'success',
             data: {
-                can_delete: mainConfig.can_delete || false,
+                // Cấu hình cũ
                 confetti_enabled: mainConfig.confetti_enabled || false,
-                // Giả lập các trường cũ để Admin Panel không bị crash
-                can_edit: mainConfig.can_edit || false,
-                can_reply: mainConfig.can_reply || false,
+                form_locked: mainConfig.can_delete || false, // Đổi tên biến cho dễ hiểu ở Client (can_delete cũ)
+                
+                // Cấu hình mới
+                music_enabled: mainConfig.music_enabled !== false, // Mặc định true
+                vinyl_enabled: mainConfig.vinyl_enabled !== false,
+                wishes_popup_enabled: mainConfig.wishes_popup_enabled !== false,
+                particle_control_enabled: mainConfig.particle_control_enabled !== false,
             }
         });
     } catch (error) {

@@ -166,6 +166,7 @@ export const comment = (() => {
         try {
             const response = await fetch(SCRIPT_URL);
             const json = await response.json();
+            if (config.get('wishes_popup_enabled') === false) return;
             if (json.result === 'success' && json.data.length > 0) {
                 let rawData = json.data.filter(item => item.message && item.message.trim() !== "");
                 wishesData = shuffleArray(rawData);

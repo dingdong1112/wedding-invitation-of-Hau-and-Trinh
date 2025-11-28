@@ -88,42 +88,56 @@
         <!-- Body -->
         <div class="row m-0 p-0">
 
-            <!-- Menu -->
+            <!-- MENU CỘT TRÁI -->
             <div class="col-md-3 d-none d-md-block m-0 p-0">
-                <ul class="nav flex-column w-100 nav-pills pe-4" role="tablist">
-                    <li class="nav-item pe-2" role="presentation">
+                <ul class="nav flex-column w-100 nav-pills pe-4" id="admin-tabs" role="tablist">
+                    <!-- Tab 1: Home (Thống kê) -->
+                    <li class="nav-item pe-2">
                         <button
                             class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
-                            data-bs-toggle="pill" data-bs-target="#pills-home" id="button-home" type="button" role="tab"
-                            aria-controls="pills-home" aria-selected="true">
-                            <i class="fa-solid fa-house ms-3 me-2"></i>Home
+                            data-bs-toggle="pill" data-bs-target="#pills-home">
+                            <i class="fa-solid fa-chart-pie ms-3 me-2"></i>Thống Kê
                         </button>
                     </li>
-                    <li class="nav-item pe-2" role="presentation">
+                    <!-- Tab 2: Wishes (Quản lý lời chúc) -->
+                    <li class="nav-item pe-2">
                         <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
-                            data-bs-toggle="pill" data-bs-target="#pills-setting" id="button-setting" type="button"
-                            role="tab" aria-controls="pills-setting" aria-selected="false">
-                            <i class="fa-solid fa-gear ms-3 me-2"></i>Setting
+                            data-bs-toggle="pill" data-bs-target="#pills-wishes">
+                            <i class="fa-solid fa-comments ms-3 me-2"></i>Quản Lý Lời Chúc
                         </button>
                     </li>
-                    <li class="nav-item pe-2" role="presentation">
-                        <hr class="my-2" aria-hidden="true">
+                    <!-- Tab 3: Setting (Cài đặt Guest) -->
+                    <li class="nav-item pe-2">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-setting">
+                            <i class="fa-solid fa-sliders ms-3 me-2"></i>Cài Đặt Trang Khách
+                        </button>
                     </li>
-                    <li class="nav-item pe-2" role="presentation">
+                    <!-- Tab 4: Security (Admin) -->
+                    <li class="nav-item pe-2">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-security">
+                            <i class="fa-solid fa-user-shield ms-3 me-2"></i>Admin & Bảo Mật
+                        </button>
+                    </li>
+                    <li class="nav-item pe-2">
+                        <hr class="my-2">
+                    </li>
+                    <li class="nav-item pe-2">
                         <button
                             class="btn-theme-auto logout nav-link w-100 text-start fw-semibold mt-1 rounded-4 shadow-sm"
-                            onclick="undangan.admin.logout()" type="button" role="tab" aria-selected="false">
-                            <i class="fa-solid fa-right-from-bracket ms-3 me-2"></i>Logout
+                            onclick="undangan.admin.logout()">
+                            <i class="fa-solid fa-right-from-bracket ms-3 me-2"></i>Đăng Xuất
                         </button>
                     </li>
                 </ul>
             </div>
 
-            <!-- Content -->
+            <!-- CONTENT CỘT PHẢI -->
             <div class="col-md-9 m-0 p-0">
                 <div class="tab-content">
 
-                    <!-- Home -->
+                    <!-- 1. HOME: Thống kê (Giữ nguyên code cũ của bạn ở đây) -->
                     <section class="tab-pane fade show active" id="pills-home" role="tabpanel" tabindex="0">
 
                         <!-- Sub Header -->
@@ -281,45 +295,67 @@
                         </div>
                     </section>
 
-                    <!-- Setting -->
-                    <section class="tab-pane fade" id="pills-setting" role="tabpanel" tabindex="0">
-
-                        <!-- Sub Header -->
-                        <div class="rounded-4 p-2 mb-4 shadow" style="background-color: var(--bs-gray-200)">
-                            <h5 class="fw-bold my-1 ms-0 p-0" style="color: var(--bs-gray-900); font-size: 1rem;"><i
-                                    class="fa-solid fa-gear mx-2"></i>Setting</h5>
+                    <!-- 2. WISHES: Quản lý lời chúc -->
+                    <section class="tab-pane fade" id="pills-wishes">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold"><i class="fa-solid fa-comments me-2"></i>Danh sách lời chúc</h5>
+                            <button class="btn btn-success btn-sm rounded-pill"
+                                onclick="undangan.admin.openAddWishModal()">
+                                <i class="fa-solid fa-plus me-1"></i>Thêm thủ công
+                            </button>
                         </div>
-
-                        <!-- Email -->
-                        <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-envelope me-2"></i>Email</p>
-                            <p class="m-0 p-0" id="dashboard-email"></p>
+                        <div id="wishes-manager-list" class="d-flex flex-column gap-3">
+                            <!-- JS sẽ render danh sách vào đây -->
                         </div>
+                    </section>
 
-                        <!-- Name -->
-                        <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-person me-2"></i>Name</p>
-                            <form>
-                                <div class="mb-3">
-                                    <input dir="auto" type="text"
-                                        class="form-control form-control-sm rounded-4 shadow-sm" id="form-name"
-                                        minlength="2" maxlength="50" name="form-name"
-                                        oninput="undangan.admin.enableButtonName()" autocomplete="name"
-                                        data-offline-disabled="false">
-                                </div>
-                            </form>
+                    <!-- 3. SETTING: Cài đặt trang khách -->
+                    <section class="tab-pane fade" id="pills-setting">
+                        <div class="card p-4 shadow-sm rounded-4 border-0 bg-theme-auto">
+                            <h5 class="mb-3 fw-bold">Điều khiển giao diện Khách</h5>
 
-                            <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
-                                    id="button-change-name" onclick="undangan.admin.changeName(this)" disabled
-                                    data-offline-disabled="false">Change</button>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-confetti"
+                                    onchange="updateConfig('confetti_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-confetti">Hiệu ứng Pháo hoa
+                                    (Confetti)</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-particles"
+                                    onchange="updateConfig('particle_control_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-particles">Hiển thị nút chỉnh hiệu ứng (Đũa
+                                    thần)</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-vinyl"
+                                    onchange="updateConfig('vinyl_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-vinyl">Hiệu ứng Đĩa nhạc quay</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-music"
+                                    onchange="updateConfig('music_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-music">Tự động phát nhạc & Hiển thị trình
+                                    phát</label>
+                            </div>
+                            <hr>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-popup"
+                                    onchange="updateConfig('wishes_popup_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-popup">Popup chạy lời chúc ngẫu
+                                    nhiên</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-lock"
+                                    onchange="updateConfig('can_delete', this.checked)">
+                                <label class="form-check-label text-danger fw-bold" for="toggle-lock">KHÓA chức năng gửi
+                                    lời chúc (Maintenance)</label>
                             </div>
                         </div>
-
-                        <!-- Access Key Section -->
+                    </section>
+                    <section class="tab-pane fade" id="pills-security">
+                        <!-- Phần Access Key cũ -->
                         <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
                             <p class="fw-bold"><i class="fa-solid fa-key me-2"></i>Access Key (Token)</p>
-
                             <div class="input-group input-group-sm mb-3">
                                 <!-- Input để type="password" để hiện dấu sao -->
                                 <input type="password" class="form-control rounded-start-4 shadow-sm"
@@ -346,98 +382,9 @@
                             </div>
                         </div>
 
-                        <!-- Time Zone -->
+                        <!-- Phần Đổi Mật Khẩu cũ -->
                         <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-location-dot me-2"></i>Time Zone
-                            </p>
-                            <form>
-                                <div class="position-relative mb-3">
-                                    <input type="text" class="form-control form-control-sm rounded-4 shadow-sm"
-                                        id="form-timezone" oninput="undangan.admin.openLists(this, this.value)"
-                                        onclick="undangan.admin.openLists(this)" autocomplete="off"
-                                        data-offline-disabled="false">
-                                    <div id="dropdown-tz-list"
-                                        class="d-none list-group position-absolute w-100 shadow-sm rounded-4 overflow-y-scroll z-3"
-                                        style="max-height: 15rem;"></div>
-                                </div>
-                            </form>
-
-                            <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
-                                    id="button-timezone" onclick="undangan.admin.changeTz(this)" disabled
-                                    data-offline-disabled="false">Change</button>
-                            </div>
-                        </div>
-
-                        <!-- Tenor Key -->
-                        <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-photo-film me-2"></i>Tenor Key
-                            </p>
-
-                            <div class="input-group input-group-sm mb-3">
-                                <input type="text" class="form-control form-control-sm rounded-start-4 shadow-sm"
-                                    id="dashboard-tenorkey" placeholder="Api key tenor" autocomplete="off">
-                                <button class="btn btn-sm btn-outline-secondary rounded-end-4 shadow-sm" type="button"
-                                    onclick="document.getElementById('dashboard-tenorkey').value = null"><i
-                                        class="fa-solid fa-trash-can"></i></button>
-                            </div>
-
-                            <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
-                                    onclick="undangan.admin.tenor(this)" data-offline-disabled="false">Save</button>
-                            </div>
-                        </div>
-
-                        <!-- Toggle -->
-                        <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-sliders me-2"></i>Control</p>
-
-                            <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
-                                    role="switch" id="filterBadWord"
-                                    onchange="undangan.admin.changeCheckboxValue(this, 'filter')"
-                                    data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="filterBadWord">Filter bad
-                                    word</label>
-                            </div>
-                            <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
-                                    role="switch" id="confettiAnimation"
-                                    onchange="undangan.admin.changeCheckboxValue(this, 'confetti_animation')"
-                                    data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="confettiAnimation">Bật
-                                    chức năng bắn pháo hoa</label>
-                            </div>
-                            <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
-                                    role="switch" id="replyComment"
-                                    onchange="undangan.admin.changeCheckboxValue(this, 'can_reply')"
-                                    data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="replyComment">Can
-                                    reply</label>
-                            </div>
-                            <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
-                                    role="switch" id="editComment"
-                                    onchange="undangan.admin.changeCheckboxValue(this, 'can_edit')"
-                                    data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="editComment">Can
-                                    edit</label>
-                            </div>
-                            <div class="form-check form-switch mb-1">
-                                <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox"
-                                    role="switch" id="deleteComment"
-                                    onchange="undangan.admin.changeCheckboxValue(this, 'can_delete')"
-                                    data-offline-disabled="false">
-                                <label class="form-check-label" style="cursor:pointer;" for="deleteComment">Khóa
-                                    chức năng gửi lời chúc</label>
-                            </div>
-                        </div>
-
-                        <!-- Change Password -->
-                        <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-lock me-2"></i>Change Password
-                            </p>
+                            <p class="fw-bold"><i class="fa-solid fa-lock me-2"></i>Đổi Mật Khẩu</p>
                             <form>
                                 <input hidden type="text" name="username" autocomplete="username" value="...">
                                 <div class="my-2">
@@ -460,27 +407,139 @@
                                     data-offline-disabled="false">Change</button>
                             </div>
                         </div>
-
-                        <!-- Logout -->
-                        <div class="d-block d-md-none d-lg-none d-xl-none">
-                            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                                <button type="button"
-                                    class="btn btn-danger btn-sm w-100 text-center fw-semibold rounded-4 shadow-sm"
-                                    onclick="undangan.admin.logout()">
-                                    <i class="fa-solid fa-right-from-bracket me-2"></i>Logout
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="p-3 bg-theme-auto mb-4 rounded-4 shadow">
-                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-heart me-2"></i>Love Project</p>
-                            <p class="m-0 p-0">Discover and support this project on <i
-                                    class="fa-brands fa-github me-1"></i><a target="_blank"
-                                    href="https://github.com/dewanakl/undangan">GitHub</a></p>
-                        </div>
                     </section>
                 </div>
             </div>
+
+            <!-- MODAL SỬA LỜI CHÚC -->
+            <div class="modal fade" id="editWishModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Sửa Lời Chúc</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="edit-wish-id">
+                            <div class="mb-3">
+                                <label class="form-label">Tên khách:</label>
+                                <input type="text" class="form-control" id="edit-wish-name">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Lời chúc:</label>
+                                <textarea class="form-control" id="edit-wish-msg" rows="4"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary rounded-pill"
+                                data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-primary rounded-pill"
+                                onclick="undangan.admin.saveWish()">Lưu thay đổi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Zone -->
+            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
+                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-location-dot me-2"></i>Time Zone
+                </p>
+                <form>
+                    <div class="position-relative mb-3">
+                        <input type="text" class="form-control form-control-sm rounded-4 shadow-sm" id="form-timezone"
+                            oninput="undangan.admin.openLists(this, this.value)"
+                            onclick="undangan.admin.openLists(this)" autocomplete="off" data-offline-disabled="false">
+                        <div id="dropdown-tz-list"
+                            class="d-none list-group position-absolute w-100 shadow-sm rounded-4 overflow-y-scroll z-3"
+                            style="max-height: 15rem;"></div>
+                    </div>
+                </form>
+
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm" id="button-timezone"
+                        onclick="undangan.admin.changeTz(this)" disabled data-offline-disabled="false">Change</button>
+                </div>
+            </div>
+
+            <!-- Tenor Key -->
+            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
+                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-photo-film me-2"></i>Tenor Key
+                </p>
+
+                <div class="input-group input-group-sm mb-3">
+                    <input type="text" class="form-control form-control-sm rounded-start-4 shadow-sm"
+                        id="dashboard-tenorkey" placeholder="Api key tenor" autocomplete="off">
+                    <button class="btn btn-sm btn-outline-secondary rounded-end-4 shadow-sm" type="button"
+                        onclick="document.getElementById('dashboard-tenorkey').value = null"><i
+                            class="fa-solid fa-trash-can"></i></button>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-primary rounded-4 shadow-sm"
+                        onclick="undangan.admin.tenor(this)" data-offline-disabled="false">Save</button>
+                </div>
+            </div>
+
+            <!-- Toggle -->
+            <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
+                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-sliders me-2"></i>Control</p>
+
+                <div class="form-check form-switch mb-1">
+                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
+                        id="filterBadWord" onchange="undangan.admin.changeCheckboxValue(this, 'filter')"
+                        data-offline-disabled="false">
+                    <label class="form-check-label" style="cursor:pointer;" for="filterBadWord">Filter bad
+                        word</label>
+                </div>
+                <div class="form-check form-switch mb-1">
+                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
+                        id="confettiAnimation" onchange="undangan.admin.changeCheckboxValue(this, 'confetti_animation')"
+                        data-offline-disabled="false">
+                    <label class="form-check-label" style="cursor:pointer;" for="confettiAnimation">Bật
+                        chức năng bắn pháo hoa</label>
+                </div>
+                <div class="form-check form-switch mb-1">
+                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
+                        id="replyComment" onchange="undangan.admin.changeCheckboxValue(this, 'can_reply')"
+                        data-offline-disabled="false">
+                    <label class="form-check-label" style="cursor:pointer;" for="replyComment">Can
+                        reply</label>
+                </div>
+                <div class="form-check form-switch mb-1">
+                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
+                        id="editComment" onchange="undangan.admin.changeCheckboxValue(this, 'can_edit')"
+                        data-offline-disabled="false">
+                    <label class="form-check-label" style="cursor:pointer;" for="editComment">Can
+                        edit</label>
+                </div>
+                <div class="form-check form-switch mb-1">
+                    <input class="form-check-input shadow-sm" style="cursor:pointer;" type="checkbox" role="switch"
+                        id="deleteComment" onchange="undangan.admin.changeCheckboxValue(this, 'can_delete')"
+                        data-offline-disabled="false">
+                    <label class="form-check-label" style="cursor:pointer;" for="deleteComment">Khóa
+                        chức năng gửi lời chúc</label>
+                </div>
+            </div>
+
+            <!-- Logout -->
+            <div class="d-block d-md-none d-lg-none d-xl-none">
+                <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
+                    <button type="button"
+                        class="btn btn-danger btn-sm w-100 text-center fw-semibold rounded-4 shadow-sm"
+                        onclick="undangan.admin.logout()">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-3 bg-theme-auto mb-4 rounded-4 shadow">
+                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-heart me-2"></i>Love Project</p>
+                <p class="m-0 p-0">Discover and support this project on <i class="fa-brands fa-github me-1"></i><a
+                        target="_blank" href="https://github.com/dewanakl/undangan">GitHub</a></p>
+            </div>
+            </section>
+        </div>
+        </div>
         </div>
     </main>
 
