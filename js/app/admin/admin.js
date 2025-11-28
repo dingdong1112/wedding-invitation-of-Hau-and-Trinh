@@ -30,6 +30,8 @@ export const admin = (() => {
         const configStorage = storage('config');
         document.getElementById('form-name').value = 'Admin'; // Tên mặc định
 
+
+
         // Load config
         document.getElementById('confettiAnimation').checked = configStorage.get('confetti_enabled');
         document.getElementById('deleteComment').checked = configStorage.get('can_delete');
@@ -81,11 +83,138 @@ export const admin = (() => {
                 // comment.show(); // Tạm thời comment nếu chưa sửa comment.js Admin
             });
 
+        // Tải thống kê & Vẽ biểu đồ
+        request(HTTP_GET, SERVER_URL + '/api/wishes')
+            .token(session.getToken())
+            .withCache(1000 * 30)
+            .send()
+            .then((resp) => {
+                const allWishes = resp.data;
+
+                // 1. TÍNH TOÁN SỐ LIỆU CƠ BẢN
+                const comments = allWishes.length;
+                let present = allWishes.filter(i => i.presence === 'Có' || i.presence === '1' || i.presence === true).length;
+                let absent = allWishes.filter(i => i.presence === 'Không' || i.presence === '2' || i.presence === false).length;
+                let unknown = comments - present - absent; // Số người chưa xác định
+
+                document.getElementById('count-comment').textContent = comments;
+                document.getElementById('count-present').textContent = present;
+                document.getElementById('count-absent').textContent = absent;
+
+                // 2. VẼ BIỂU ĐỒ TRÒN (PIE CHART) - Tỷ lệ tham dự
+                renderPieChart(present, absent, unknown);
+
+                // 3. VẼ BIỂU ĐỒ CỘT (BAR CHART) - Xu hướng theo ngày
+                renderTrendChart(allWishes);
+
+                // 4. HIỂN THỊ BẢNG LỜI CHÚC MỚI NHẤT
+                renderLatestWishes(allWishes);
+            });
+
         // comment.show();
     }).catch(err => {
         // Nếu get user thất bại (token hết hạn), nó sẽ bị chuyển hướng login
         console.error("User stats failed, redirecting to login:", err);
     });
+
+    // --- CÁC HÀM HỖ TRỢ VẼ BIỂU ĐỒ (Thêm vào bên dưới getUserStats) ---
+
+    let pieChartInstance = null;
+    let barChartInstance = null;
+
+    const renderPieChart = (present, absent, unknown) => {
+        const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+        // Hủy biểu đồ cũ nếu có (để tránh vẽ chồng lên nhau khi reload)
+        if (pieChartInstance) pieChartInstance.destroy();
+
+        pieChartInstance = new Chart(ctx, {
+            type: 'doughnut', // Biểu đồ bánh rán (đẹp hơn pie thường)
+            data: {
+                labels: ['Tham gia', 'Vắng mặt', 'Chưa rõ'],
+                datasets: [{
+                    data: [present, absent, unknown],
+                    backgroundColor: ['#8573F1', '#6546B1', '#e9ecef'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    };
+
+    const renderTrendChart = (wishes) => {
+        const ctx = document.getElementById('wishesTrendChart').getContext('2d');
+
+        // Xử lý dữ liệu: Gom nhóm theo ngày
+        const last7Days = {};
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+            last7Days[dateStr] = 0; // Khởi tạo bằng 0
+        }
+
+        wishes.forEach(w => {
+            const wDate = new Date(w.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+            if (last7Days[wDate] !== undefined) {
+                last7Days[wDate]++;
+            }
+        });
+
+        if (barChartInstance) barChartInstance.destroy();
+
+        barChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(last7Days),
+                datasets: [{
+                    label: 'Số lời chúc',
+                    data: Object.values(last7Days),
+                    backgroundColor: '#7A5CD9',
+                    borderRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } } // Trục Y chỉ hiện số nguyên
+                }
+            }
+        });
+    };
+
+    const renderLatestWishes = (wishes) => {
+        const tbody = document.getElementById('latest-wishes-table');
+        tbody.innerHTML = '';
+        // Lấy 5 tin mới nhất
+        const latest = wishes.slice(0, 5);
+
+        latest.forEach(w => {
+            let badgeClass = 'bg-secondary';
+            let badgeText = 'Chưa rõ';
+
+            if (w.presence === 'Có' || w.presence === true) { badgeClass = 'bg-success'; badgeText = 'Tham gia'; }
+            else if (w.presence === 'Không' || w.presence === false) { badgeClass = 'bg-danger'; badgeText = 'Vắng mặt'; }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="fw-bold text-truncate" style="max-width: 150px;">${util.escapeHtml(w.name)}</td>
+                <td><span class="badge ${badgeClass} rounded-pill">${badgeText}</span></td>
+                <td class="text-truncate" style="max-width: 200px;">${util.escapeHtml(w.message)}</td>
+                <td class="text-muted small">${new Date(w.created_at).toLocaleDateString('vi-VN')}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    };
+
 
     /**
      * @param {HTMLElement} checkbox
@@ -1108,6 +1237,9 @@ export const admin = (() => {
                 applyFilters,
                 resetFilters,
                 toggleTimeFilter,
+                renderPieChart,
+                renderTrendChart,
+                renderLatestWishes,
             },
         };
     };
