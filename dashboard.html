@@ -130,6 +130,12 @@
                             <i class="fa-solid fa-right-from-bracket ms-3 me-2"></i>Đăng Xuất
                         </button>
                     </li>
+                    <li class="nav-item pe-2">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-security">
+                            <i class="fa-solid fa-user-shield ms-3 me-2"></i>Thông tin dự án
+                        </button>
+                    </li>
                 </ul>
             </div>
 
@@ -452,6 +458,14 @@
                             </div>
                         </div>
                     </section>
+                    <section class="tab-pane fade" id="pills-security">
+                        <div class="p-3 bg-theme-auto mb-4 rounded-4 shadow">
+                            <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-heart me-2"></i>Love Project</p>
+                            <p class="m-0 p-0">Discover and support this project on <i
+                                    class="fa-brands fa-github me-1"></i><a target="_blank"
+                                    href="https://github.com/dewanakl/undangan">GitHub</a></p>
+                        </div>
+                    </section>
                 </div>
             </div>
 
@@ -483,29 +497,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Logout -->
-            <div class="d-block d-md-none d-lg-none d-xl-none">
-                <div class="p-3 bg-theme-auto mb-3 rounded-4 shadow">
-                    <button type="button"
-                        class="btn btn-danger btn-sm w-100 text-center fw-semibold rounded-4 shadow-sm"
-                        onclick="undangan.admin.logout()">
-                        <i class="fa-solid fa-right-from-bracket me-2"></i>Logout
-                    </button>
-                </div>
-            </div>
-
-            <div class="p-3 bg-theme-auto mb-4 rounded-4 shadow">
-                <p class="mx-0 mt-0 mb-1 p-0 fw-bold"><i class="fa-solid fa-heart me-2"></i>Love Project</p>
-                <p class="m-0 p-0">Discover and support this project on <i class="fa-brands fa-github me-1"></i><a
-                        target="_blank" href="https://github.com/dewanakl/undangan">GitHub</a></p>
-            </div>
-            </section>
-        </div>
-        </div>
-        </div>
-    </main>
-
+            
     <!-- Modal login -->
     <div class="modal fade" id="mainModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-label="modal login"
         tabindex="-1" aria-hidden="true">
