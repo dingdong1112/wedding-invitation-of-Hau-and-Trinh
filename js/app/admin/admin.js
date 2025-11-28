@@ -111,10 +111,30 @@ export const admin = (() => {
     const regenerate = () => util.notify("Tính năng không được hỗ trợ.").warning();
     const changeName = () => util.notify("Đổi tên trong Cấu hình Server.").warning();
     const download = () => util.notify("Vui lòng tải thủ công từ MongoDB Atlas.").warning();
-    const enableButtonName = () => { };
-    const enableButtonPassword = () => { };
     const openLists = () => { };
     const changeTz = () => util.notify("Tính năng không được hỗ trợ.").warning();
+
+    /**
+     * @returns {void}
+     */
+    const enableButtonName = () => {
+        const btn = document.getElementById('button-change-name');
+        if (btn.disabled) {
+            btn.disabled = false;
+        }
+    };
+
+    /**
+     * @returns {void}
+     */
+    const enableButtonPassword = () => {
+        const btn = document.getElementById('button-change-password');
+        const old = document.getElementById('old_password');
+
+        if (btn.disabled && old.value.length !== 0) {
+            btn.disabled = false;
+        }
+    };
 
     const logout = () => {
         if (util.ask("Bạn muốn đăng xuất?")) {
