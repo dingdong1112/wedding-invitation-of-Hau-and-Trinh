@@ -343,6 +343,13 @@ export const guest = (() => {
         config = storage('config');
         information = storage('information');
 
+        if (!config.get('vinyl_enabled')) {
+        document.getElementById('vinyl-container').style.display = 'none';
+    }
+    if (!config.get('particle_control_enabled')) {
+        document.getElementById('particle-controller').style.display = 'none';
+    }
+
         // 2. Lấy Cấu Hình từ Server (MongoDB)
         let serverConfig = {
             confetti_enabled: true,
@@ -357,6 +364,7 @@ export const guest = (() => {
             if (res.status === 200) {
                 const json = await res.json();
                 // Gộp config server vào config mặc định
+                isConfettiOn = json.data.confetti_enabled;
                 serverConfig = { ...serverConfig, ...json.data };
 
                 // Lưu vào storage để dùng cho các module khác
