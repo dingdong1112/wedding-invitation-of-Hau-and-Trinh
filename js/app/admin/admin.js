@@ -241,12 +241,12 @@ export const admin = (() => {
         // ... (logic clear storage) ...
 
         // --- THÊM CÁC HÀM GLOBAL CHO DASHBOARD HTML GỌI ---
-        
+
         // 1. Hàm Ẩn/Hiện Token
         window.toggleTokenVisibility = () => {
             const input = document.getElementById('dashboard-accesskey');
             const icon = document.getElementById('eye-icon');
-            
+
             if (input.type === "password") {
                 input.type = "text";
                 icon.className = "fa-solid fa-eye-slash";
@@ -259,33 +259,45 @@ export const admin = (() => {
         // 2. Hàm Copy Token
         window.copyToken = () => {
             const token = document.getElementById('dashboard-accesskey').value;
-            if(!token) return;
+            if (!token) return;
             navigator.clipboard.writeText(token);
             util.notify("Đã copy Token!").success();
         };
 
         // 3. Hàm Regenerate Token
         window.regenerateToken = async () => {
-            if(!util.ask("Tạo token mới sẽ làm phiên đăng nhập cũ hết hạn. Tiếp tục?")) return;
-            
+            if (!util.ask("Tạo token mới sẽ làm phiên đăng nhập cũ hết hạn. Tiếp tục?")) return;
+
             // Gọi API regenerate (Bạn cần tạo file api/admin/regenerate.js trước nhé)
             try {
                 const res = await request(HTTP_POST, SERVER_URL + '/api/admin/regenerate')
-                                    .token(session.getToken())
-                                    .send();
+                    .token(session.getToken())
+                    .send();
+
+                console.log("Regenerate Response:", res); // Debug xem nó trả về gì
+
+                 let newToken = res.data ? res.data.token : null;
+
+                // Trường hợp 2: request trả về trực tiếp { token: ... } (hoặc res.token)
+                if (!newToken && res.token) {
+                    newToken = res.token;
+                }
                 
-                if(res.code === 200) {
-                    const newToken = res.data.token;
-                    session.setToken(newToken); // Cập nhật localStorage
-                    document.getElementById('dashboard-accesskey').value = newToken; // Cập nhật giao diện
+                // Trường hợp 3: res.result === 'success'
+                if (newToken) {
+                    session.setToken(newToken);
+                    document.getElementById('dashboard-accesskey').value = newToken;
                     util.notify("Token mới đã được tạo!").success();
                 } else {
-                    util.notify("Phiên hết hạn, vui lòng đăng nhập lại.").error();
-                    setTimeout(() => auth.clearSession(), 1000);
+                    util.notify("Lỗi: Không nhận được token mới.").error();
+                    // Chỉ logout nếu mã lỗi là 401
+                    if (res.code === 401 || res.status === 401) {
+                         setTimeout(() => auth.clearSession(), 1000);
+                    }
                 }
             } catch (e) {
-                console.error(e); // Log lỗi ra console để debug
-                util.notify("Lỗi kết nối (Xem console)").error();
+                console.error(e);
+                util.notify("Lỗi kết nối").error();
             }
         };
 
