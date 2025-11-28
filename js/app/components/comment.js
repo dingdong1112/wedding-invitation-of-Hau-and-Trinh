@@ -28,7 +28,6 @@ export const comment = (() => {
             const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
             const json = await res.json();
             // Tận dụng trường can_delete làm cờ "Khóa"
-            isLocked = json.data.can_delete;
         } catch (e) { }
 
         const form = document.getElementById('wishes-form');
