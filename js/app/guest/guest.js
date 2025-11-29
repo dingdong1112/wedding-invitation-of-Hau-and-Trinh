@@ -432,6 +432,7 @@ export const guest = (() => {
         // 5. Tải thư viện phụ trợ
         lib.load({
             aos: true,
+            
             confetti: serverConfig.confetti_enabled // Chỉ tải thư viện nếu được bật
         });
 
