@@ -159,6 +159,7 @@ export const guest = (() => {
      * @returns {void}
      */
     const open = (button) => {
+        const particleController = document.getElementById('particle-toggle-button');
         button.disabled = true;
         document.body.scrollIntoView({ behavior: 'instant' });
         document.getElementById('root').classList.remove('opacity-0');
@@ -169,6 +170,15 @@ export const guest = (() => {
 
         slide();
         theme.spyTop();
+
+        if (particleController) {
+            if (serverConfig.confetti_enabled) { // Dùng confetti_enabled để kiểm tra bật/tắt nút
+                particleController.style.display = 'flex'; // Hiện nút
+                setupParticleControls();
+            } else {
+                particleController.style.display = 'none'; // Ẩn nút nếu config tắt
+            }
+        }
 
         const config = storage('config');
         if (typeof window.confetti === 'function' && config.get('confetti_enabled')) {
@@ -356,7 +366,7 @@ export const guest = (() => {
 
         // Cần đảm bảo các element có sẵn để tránh lỗi JS
         const vinylContainer = document.getElementById('vinyl-container');
-        const particleController = document.getElementById('particle-toggle-button');
+        //const particleController = document.getElementById('particle-toggle-button');
         const wishesToggleButton = document.getElementById('wishes-toggle-button');
         const controlsPanel = document.getElementById('particle-controls');
 
@@ -391,14 +401,7 @@ export const guest = (() => {
         }
 
         // B. NÚT ĐIỀU KHIỂN PHÁO HOA (particle_control_enabled)
-        if (particleController) {
-            if (serverConfig.confetti_enabled) { // Dùng confetti_enabled để kiểm tra bật/tắt nút
-                particleController.style.display = 'flex'; // Hiện nút
-                setupParticleControls();
-            } else {
-                particleController.style.display = 'none'; // Ẩn nút nếu config tắt
-            }
-        }
+
 
         // C. KHÓA FORM GỬI LỜI CHÚC (comment_lock_enabled)
         const sendForm = document.getElementById('wishes-form');
