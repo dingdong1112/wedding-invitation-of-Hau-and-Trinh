@@ -27,7 +27,7 @@ export const guest = (() => {
      */
     let config = null;
 
-    const VERCEL_BASE_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app'; 
+    const VERCEL_BASE_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app';
 
     /**
      * @returns {void}
@@ -289,13 +289,14 @@ export const guest = (() => {
     };
 
     /**
-     * Mở modal và hiển thị Album lật trang
-     * @returns {void}
-     */
+ * Mở modal và hiển thị Album lật trang
+ * @returns {void}
+ */
     const openAlbum = async () => {
-        const albumModal = bs.modal('albumModal');
+        const modalElement = document.getElementById('albumModal');
+        if (!modalElement) return;
 
-        // 1. Tải danh sách ảnh (ví dụ: quét ảnh .webp)
+        // Tải danh sách ảnh (giữ nguyên)
         const images = await fetchGalleryImages('webp');
 
         if (images.length === 0) {
@@ -303,40 +304,77 @@ export const guest = (() => {
             return;
         }
 
-        albumModal.show();
-        flipbookEl = document.getElementById('flipbook');
-        flipbookEl.innerHTML = ''; // Xóa nội dung cũ
-        flipbookEl.style.display = 'block';
+        const flipbookEl = document.getElementById('flipbook');
 
-        // 2. Chuẩn bị HTML cho Turn.js
+        // 1. Chuẩn bị HTML (Làm sạch và thêm ảnh)
+        flipbookEl.innerHTML = '';
         images.forEach((url, index) => {
-            // Tạo mỗi trang (div) trong album
             const page = document.createElement('div');
-            page.style.backgroundImage = `url(${url})`;
-            page.style.backgroundSize = 'cover';
-            page.style.backgroundPosition = 'center';
-            page.style.backgroundColor = '#f8f8f8'; // Màu nền khi lật
+            // Thêm class chuẩn của Turn.js (Page)
+            page.className = 'page';
+            // Thay vì dùng background-image, ta dùng thẻ <img> để trình duyệt tải tốt hơn
+            page.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
             flipbookEl.appendChild(page);
         });
 
-        // 3. Khởi tạo Turn.js
-        $(flipbookEl).turn({ // Dùng jQuery ($) là yêu cầu của Turn.js cũ
-            width: 800, // Chiều rộng tổng album
-            height: 500, // Chiều cao album
-            autoCenter: true,
-            gradients: true, // Hiệu ứng đổ bóng 3D
-            elevation: 50, // Độ sâu của hiệu ứng lật
-            pages: images.length,
+        flipbookEl.style.display = 'none'; // Ẩn đi trong khi chờ Modal mở
+
+        // 2. HIỂN THỊ MODAL
+        const bsModalInstance = window.bootstrap.Modal.getOrCreateInstance(modalElement);
+        bsModalInstance.show();
+
+        // 3. Khởi tạo Turn.js (TRONG CALLBACK CỦA MODAL)
+
+        // Xóa sự kiện cũ
+        $(modalElement).off('shown.bs.modal');
+        $(modalElement).off('hidden.bs.modal');
+
+        $(modalElement).on('shown.bs.modal', function () {
+
+            // --- CHỜ 100ms ĐỂ CÁC KÍCH THƯỚC TRỞ NÊN ỔN ĐỊNH ---
+            setTimeout(() => {
+
+                flipbookEl.style.display = 'block';
+
+                // TÍNH TOÁN KÍCH THƯỚC TƯƠNG ĐỐI
+                // Lấy kích thước khả dụng của cửa sổ Modal (ViewPort)
+                const modalViewPortWidth = $(this).find('.modal-content').width();
+                const modalViewPortHeight = $(this).find('.modal-content').height();
+
+                // Kích thước Album (Ví dụ tỷ lệ 1.6:1)
+                const ratio = 1.6;
+                let finalWidth = Math.min(800, modalViewPortWidth * 0.9);
+                let finalHeight = finalWidth / ratio;
+
+                // Nếu chiều cao vượt quá màn hình, ta phải dùng chiều cao làm chuẩn
+                if (finalHeight > modalViewPortHeight * 0.9) {
+                    finalHeight = modalViewPortHeight * 0.9;
+                    finalWidth = finalHeight * ratio;
+                }
+
+                // Khởi tạo Turn.js
+                $(flipbookEl).turn({
+                    width: finalWidth,
+                    height: finalHeight,
+                    // KHÔNG DÙNG autoCenter: true
+                    gradients: true,
+                    elevation: 50,
+                    pages: images.length,
+                });
+
+                // --- CĂN GIỮA THỦ CÔNG ---
+                // Gọi hàm center của Turn.js (vì nó đã được sửa trong version 4)
+                $(flipbookEl).turn('center');
+                $(flipbookEl).turn('resize');
+
+            }, 100); // Tăng độ trễ lên 100ms
         });
 
-        // Đảm bảo album căn giữa trong Modal
-        $(modalEl).on('shown.bs.modal', function () {
-            $(flipbookEl).turn('center');
-        });
-
-        // Đóng Turn.js khi Modal bị đóng
-        $(modalEl).on('hidden.bs.modal', function () {
-            $(flipbookEl).turn('destroy'); // Dọn dẹp Turn.js
+        // Gắn sự kiện đóng
+        $(modalElement).on('hidden.bs.modal', function () {
+            if ($(flipbookEl).data('turn-page')) {
+                $(flipbookEl).turn('destroy').html('');
+            }
             flipbookEl.style.display = 'none';
         });
     };
