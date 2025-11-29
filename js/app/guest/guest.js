@@ -18,7 +18,7 @@ import { pool } from '../../connection/request.js';
 const VERCEL_BASE_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app';
 const BOOK_RATIO = 1.6;
 let allImagesUrls = [];
-//let pageFlipInstance = null; // Instance của PageFlip
+let pageFlipInstance = null; // Instance của PageFlip
 let currentDetailIndex = 0;
 
 export const guest = (() => {
@@ -832,7 +832,7 @@ export const guest = (() => {
         const singlePageWidth = finalWidth / 2;
 
         // 3. Chuẩn bị HTML (Pages)
-        bookEl.innerHTML = '';
+        //bookEl.innerHTML = '';
         const pageElements = images.map((url, index) => {
             const page = document.createElement('div');
             page.className = 'my-page';
@@ -842,14 +842,10 @@ export const guest = (() => {
             }
 
             page.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            bookEl.appendChild(page);
+            //bookEl.appendChild(page);
             return page;
         });
 
-        // Xóa instance cũ nếu tồn tại
-        //if (pageFlipInstance) {
-            //pageFlipInstance.destroy();
-        //}
 
         // 4. Khởi tạo PageFlip
         if (typeof St === 'undefined' || typeof St.PageFlip === 'undefined') {
@@ -857,7 +853,7 @@ export const guest = (() => {
             util.notify("Lỗi: Thư viện PageFlip (St) chưa được tải.").error();
             return;
         }
-        const pageFlipInstance = new St.PageFlip(bookEl, {
+        pageFlipInstance = new St.PageFlip(bookEl, {
             width: singlePageWidth,
             height: finalHeight,
             size: 'stretch', // Sách sẽ tự co giãn theo Modal
@@ -868,26 +864,33 @@ export const guest = (() => {
             usePortrait: true,
             startPage: 0,
         });
+        //const childrenClones = Array.from(bookEl.children).map(child => child.cloneNode(true));
 
-        pageFlipInstance.on('init', (e) => {
-            // 1. Load Pages sau khi thư viện sẵn sàng
-            pageFlipInstance.loadFromHtml(pageElements);
+        pageFlipInstance.loadFromHTML(pageElements);
+        bookEl.style.display = 'block';
 
-            // 2. Gắn sự kiện Click sau khi Album đã load Pages
-            bookEl.addEventListener('click', (e) => {
-                if (e.target.tagName === 'IMG') {
-                    const pageEl = e.target.closest('.my-page');
-                    const pageIndex = parseInt(pageEl.getAttribute('data-page-index'));
+        // 5. Gắn sự kiện Mở Detail khi click vào trang
+        bookEl.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                const pageEl = e.target.closest('.my-page');
+                const pageIndex = parseInt(pageEl.getAttribute('data-page-index'));
 
-                    const imageUrl = allImagesUrls[pageIndex];
+                // Lấy URL ảnh chính xác
+                const imageUrl = allImagesUrls[pageIndex];
 
-                    window.openDetailModal(imageUrl);
-                }
-            });
-
-            // 3. Hiển thị khối Album
-            bookEl.style.display = 'block';
+                // Mở Modal Chi tiết
+                openDetailModal(imageUrl, `Ảnh ${pageIndex + 1}`);
+            }
         });
+
+        // 6. Gắn sự kiện Đóng Modal và Dọn dẹp
+        $(modalElement).on('hidden.bs.modal', function () {
+            pageFlipInstance.destroy();
+            bookEl.style.display = 'none';
+        });
+
+        // 7. Hiển thị Modal
+        bs.modal('albumModal').show();
     };
     //KẾT THÚC CODE PHẦN PAGE-TURNING ANIMATION CHO ẢNH THƯ VIỆN ---
 
