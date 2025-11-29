@@ -394,6 +394,7 @@ export const guest = (() => {
         if (particleController) {
             if (serverConfig.confetti_enabled) { // Dùng confetti_enabled để kiểm tra bật/tắt nút
                 particleController.style.display = 'flex'; // Hiện nút
+                setupParticleControls();
             } else {
                 particleController.style.display = 'none'; // Ẩn nút nếu config tắt
             }
