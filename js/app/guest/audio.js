@@ -91,17 +91,7 @@ export const audio = (() => {
 
         // Lấy Widget ngay đầu để xử lý ẩn
         els.widget = document.getElementById('music-player-container');
-        
-        // --- TRƯỜNG HỢP TẮT NHẠC ---
-        if (!isMusicEnabled) {
-            //console.log("Music is disabled by Admin.");
-            //if (els.widget) els.widget.classList.add('d-none'); // Ẩn giao diện
-            progress.complete('audio'); // Báo load xong để không kẹt Loading
-            return { load: () => {} }; // THOÁT NGAY LẬP TỨC
-        }
 
-        // --- TRƯỜNG HỢP BẬT NHẠC (Chạy tiếp xuống dưới) ---
-        
         // Map các element còn lại (Bỏ dòng els.widget đi vì đã lấy ở trên rồi)
         els.toggleBtn = document.getElementById('music-toggle-btn');
         els.panel = document.getElementById('music-panel');
@@ -112,6 +102,16 @@ export const audio = (() => {
         els.vinyl = document.getElementById('vinyl-container');
         els.shuffleBtn = document.getElementById('btn-shuffle');
         els.loopBtn = document.getElementById('btn-loop');
+        
+        // --- TRƯỜNG HỢP TẮT NHẠC ---
+        /*if (!isMusicEnabled) {
+            //console.log("Music is disabled by Admin.");
+            //if (els.widget) els.widget.classList.add('d-none'); // Ẩn giao diện
+            //progress.complete('audio'); // Báo load xong để không kẹt Loading
+            return { load: () => {} }; // THOÁT NGAY LẬP TỨC
+        }*/
+
+        // --- TRƯỜNG HỢP BẬT NHẠC (Chạy tiếp xuống dưới) ---               
 
         // Sự kiện click nút Toggle
         if (els.toggleBtn) {
