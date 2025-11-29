@@ -223,7 +223,7 @@ export const guest = (() => {
                 vinylNeedle?.style.setProperty('display', 'block');
                 vinylDisk?.style.setProperty('display', 'block');
                 musicToggle?.style.setProperty('display', 'flex'); // Hiện nút QL nhạc
-                aud.load(musicEnabled); // Load và tự phát nếu config cho phép
+                aud.load(serverConfig.music_enabled); // Load và tự phát nếu config cho phép
             }
         }
 
@@ -419,8 +419,8 @@ export const guest = (() => {
         const img = image.init();
         //const aud = audio.init();
         const lib = loaderLibs();
-        const aud = audio.init();
-        const cmt = comment.init();
+        //const aud = audio.init();
+        //const cmt = comment.init();
 
         information = storage('information');
 
