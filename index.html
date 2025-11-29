@@ -1585,15 +1585,17 @@
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content bg-black">
                 <!-- Nút đóng -->
-                <button type="button" class="btn btn-light rounded-circle shadow-lg position-absolute z-1"
-                    style="top: 10px; left: 10px; z-index: 10;" data-bs-dismiss="modal">
-                    <i class="fa-solid fa-angle-left"></i>
-                </button>
+                <button type="button" class="btn btn-light rounded-circle shadow-lg position-absolute" 
+        style="top: 10px; right: 10px; z-index: 10;" data-bs-dismiss="modal">
+    <i class="fa-solid fa-xmark"></i>
+</button>
 
                 <div class="modal-body p-0 d-flex flex-column" id="detail-modal-body">
 
-                    <!-- 1. SWIPER CHÍNH (ẢNH LỚN) -->
-                    <div class="swiper mySwiper2 flex-grow-1" id="main-swiper">
+                    <!-- SWIPER CHÍNH (Cần max-width để ảnh có không gian thở) -->
+                    <div class="swiper mySwiper2 flex-grow-1" id="main-swiper"
+                        style="max-width: 100%; height: calc(100vh - 100px);">
+                        <!-- Thêm style inline chiều cao để fix lỗi không hiển thị -->
                         <div class="swiper-wrapper" id="main-swiper-wrapper">
                             <!-- Ảnh sẽ được JS thêm vào đây -->
                         </div>

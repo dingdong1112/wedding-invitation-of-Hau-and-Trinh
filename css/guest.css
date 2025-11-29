@@ -854,6 +854,12 @@ svg {
     margin: 0 5px;
 }
 
+#detailModal button {
+    z-index: 1070; /* Cao hơn các lớp phủ Bootstrap */
+    border: none;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
 @keyframes pulseArrow {
     from { transform: scale(1); opacity: 0.8; }
     to { transform: scale(1.2); opacity: 1; }
@@ -898,4 +904,45 @@ svg {
     align-items: center;
     width: 100%;
     height: 95vh;
+}
+
+/* File css/guest.css (hoặc nơi CSS tùy chỉnh) */
+
+/* Đảm bảo MODAL BODY là Flexbox để chia không gian */
+#detailModal .modal-body {
+    height: 100%;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* Đảm bảo SWIPER MAIN chiếm hết phần còn lại */
+#main-swiper {
+    width: 100%;
+    height: 100%;
+}
+
+/* Fix lỗi tràn ảnh trong Swiper (Swiper tạo các lớp 3D) */
+#main-swiper .swiper-slide {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Fix lỗi thumbnails cách xa nhau */
+#thumb-swiper .swiper-wrapper {
+    align-items: center;
+}
+
+#thumb-swiper .swiper-slide {
+    width: 80px; /* Cố định chiều rộng slide thumbnail */
+    height: 80px; /* Cố định chiều cao slide thumbnail */
+}
+
+#detailModal .swiper-button-next,
+#detailModal .swiper-button-prev {
+    color: white !important;
+    transform: scale(0.7); /* Thu nhỏ nút điều hướng Swiper */
+    opacity: 0.7;
 }
