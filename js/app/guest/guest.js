@@ -158,8 +158,17 @@ export const guest = (() => {
      * @param {HTMLButtonElement} button
      * @returns {void}
      */
-    const open = (button) => {
+    const open = async (button) => {
         const particleController = document.getElementById('particle-toggle-button');
+        const vinylContainer = document.getElementById('vinyl-container');
+        const vinylNeedle = document.getElementById('vinyl-needle');
+        const vinylDisk = document.getElementById('vinyl-disk');
+        const vinylHole = document.getElementById('vinyl-hole');
+        const vinylGrooves = document.getElementById('vinyl-grooves');
+        const musicToggle = document.getElementById('music-toggle-button');
+        const wishesToggleButton = document.getElementById('wishes-toggle-button');
+        const aud = audio.init();
+
         button.disabled = true;
         document.body.scrollIntoView({ behavior: 'instant' });
         document.getElementById('root').classList.remove('opacity-0');
@@ -171,6 +180,24 @@ export const guest = (() => {
         slide();
         theme.spyTop();
 
+        let serverConfig = {
+            confetti_enabled: document.body.getAttribute('data-confetti') === 'true'
+        };
+
+        try {
+            // Serverless Function sẽ tự thêm hostname
+            const res = await fetch('/api/config');
+            if (res.status === 200) {
+                const json = await res.json();
+                serverConfig = json.data;
+                // Lưu cấu hình vào storage để các module khác sử dụng
+                Object.entries(serverConfig).forEach(([k, v]) => config.set(k, v));
+            }
+        } catch (e) {
+            console.warn("Lỗi tải config, dùng mặc định.");
+        }
+
+        // A. HIỆU ỨNG ĐŨA THẦN VÀ PHÁO HOA (confetti_enabled)
         if (particleController) {
             if (serverConfig.confetti_enabled) { // Dùng confetti_enabled để kiểm tra bật/tắt nút
                 particleController.style.display = 'flex'; // Hiện nút
@@ -188,6 +215,48 @@ export const guest = (() => {
             // Nếu có animation rơi (ve), cũng phải kiểm tra config
             // Ve là animation rơi liên tục.
             //util.timeOut(ve, 1500);
+        }
+
+        //B. HIỆU ỨNG ĐĨA THAN + PHÁT NHẠC + ICON QL NHẠC (vinyl_enabled)
+        if (vinylContainer) {
+            if (!serverConfig.vinyl_enabled) {
+                vinylGrooves.style.display = 'none';
+                vinylHole.style.display = 'none';
+                vinylNeedle.style.display = 'none';
+                vinylDisk.style.display = 'block';
+                musicToggle.style.display = 'none';
+                aud.load(false);
+            } else {
+                vinylGrooves.style.display = 'block';
+                vinylHole.style.display = 'block';
+                vinylNeedle.style.display = 'block';
+                vinylDisk.style.display = 'block';
+                musicToggle.style.display = 'flex';
+                aud.load(serverConfig.music_enabled);
+            }
+        }
+
+        // C. KHÓA FORM GỬI LỜI CHÚC (comment_lock_enabled)
+        const sendForm = document.getElementById('wishes-form');
+        const sendBtn = document.getElementById('btn-send-wish');
+        if (serverConfig.can_delete && sendForm) {
+            sendForm.remove(); // Xóa form hoàn toàn (hoặc ẩn đi)
+            if (sendBtn) sendBtn.disabled = true; // Khóa nút nếu vẫn giữ form
+
+            // Thêm thông báo bảo trì nếu cần
+            const container = document.getElementById('comment')?.querySelector('.container');
+            if (container) {
+                container.insertAdjacentHTML('afterbegin',
+                    '<div class="alert alert-danger rounded-4 shadow-sm text-center">Chức năng Gửi Lời Chúc đang bảo trì.</div>');
+            }
+        }
+
+        // D. POP-UP LỜI CHUC (wishes_popup_enabled)
+        if (serverConfig.wishes_popup_enabled) {
+            wishesToggleButton.style.display = 'flex';
+            comment.init();
+        } else {
+            wishesToggleButton.style.display = 'none';
         }
 
         document.dispatchEvent(new Event('undangan.open'));
@@ -354,11 +423,11 @@ export const guest = (() => {
         lang.init();
         offline.init();
         // Comment.init phải chạy trước khi tải config vì nó cần progress.add
-        comment.init();
+        //comment.init();
         progress.init();
         const vid = video.init();
         const img = image.init();
-        const aud = audio.init();
+        //const aud = audio.init();
         const lib = loaderLibs();
 
         config = storage('config');
@@ -370,7 +439,7 @@ export const guest = (() => {
         const wishesToggleButton = document.getElementById('wishes-toggle-button');
         const controlsPanel = document.getElementById('particle-controls');
 
-        // 2. Lấy Cấu Hình từ Server (MongoDB)
+        /* 2. Lấy Cấu Hình từ Server (MongoDB)
         let serverConfig = {
             confetti_enabled: document.body.getAttribute('data-confetti') === 'true'
         };
@@ -386,61 +455,14 @@ export const guest = (() => {
             }
         } catch (e) {
             console.warn("Lỗi tải config, dùng mặc định.");
-        }
+        }*/
 
-
-        // ----------------------------------------------------
-        // 3. ĐỒNG BỘ HÓA GIAO DIỆN (DỰA TRÊN serverConfig)
-        // ----------------------------------------------------
-
-        // A. HIỆU ỨNG ĐĨA THAN (vinyl_enabled)
-        if (vinylContainer) {
-            if (!serverConfig.vinyl_enabled) {
-                vinylContainer.style.display = 'none';
-            }
-        }
-
-        // B. NÚT ĐIỀU KHIỂN PHÁO HOA (particle_control_enabled)
-
-
-        // C. KHÓA FORM GỬI LỜI CHÚC (comment_lock_enabled)
-        const sendForm = document.getElementById('wishes-form');
-        const sendBtn = document.getElementById('btn-send-wish');
-        if (serverConfig.can_delete && sendForm) {
-            sendForm.remove(); // Xóa form hoàn toàn (hoặc ẩn đi)
-            if (sendBtn) sendBtn.disabled = true; // Khóa nút nếu vẫn giữ form
-
-            // Thêm thông báo bảo trì nếu cần
-            const container = document.getElementById('comment')?.querySelector('.container');
-            if (container) {
-                container.insertAdjacentHTML('afterbegin',
-                    '<div class="alert alert-danger rounded-4 shadow-sm text-center">Chức năng Gửi Lời Chúc đang bảo trì.</div>');
-            }
-        }
-
-        // D. POPUP LỜI CHÚC NGẪU NHIÊN (popup_wishes_enabled)
-        // Logic này cần được xử lý trong hàm fetchWishes của comment.js.
-
-
-        // 4. Tải tài nguyên (Chạy song song cho nhanh)
+        // 3. Tải tài nguyên (Chạy song song cho nhanh)
         vid.load();
         img.load();
 
-        // QUAN TRỌNG: Truyền cờ autoplay vào audio.load()
-        aud.load(serverConfig.music_enabled);
 
-        // 5. Tải thư viện phụ trợ
-        lib.load({
-            aos: true,
-            confetti: serverConfig.confetti_enabled // Chỉ tải thư viện nếu được bật
-        });
-
-        // 6. Kích hoạt Popup Lời Chúc và hoàn tất loading
-
-
-
-
-        // 7. Xử lý sự kiện giao diện (Giữ nguyên)
+        // 4. Xử lý sự kiện giao diện (Giữ nguyên)
         window.addEventListener('resize', util.debounce(slide));
         document.addEventListener('undangan.progress.done', () => booting());
         document.addEventListener('hide.bs.modal', () => document.activeElement?.blur());

@@ -103,7 +103,7 @@ const adminModule = () => {
 
         const fieldMap = {
             'toggle-confetti': 'confetti_enabled',
-            'toggle-particles': 'particle_control_enabled',
+            //'toggle-particles': 'particle_control_enabled',
             'toggle-popup': 'wishes_popup_enabled',
             'toggle-lock': 'can_delete',
             'replyComment': 'can_reply',
@@ -808,7 +808,7 @@ const adminModule = () => {
 
             const configStorage = storage('config');
             setCheck('toggle-confetti', configStorage.get('confetti_enabled'));
-            setCheck('toggle-particles', configStorage.get('particle_control_enabled'));
+            //setCheck('toggle-particles', configStorage.get('particle_control_enabled'));
             setCheck('toggle-vinyl', configStorage.get('vinyl_enabled'));
             setCheck('toggle-music', configStorage.get('music_enabled'));
             setCheck('toggle-popup', configStorage.get('wishes_popup_enabled'));
