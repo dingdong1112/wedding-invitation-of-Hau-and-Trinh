@@ -1357,80 +1357,80 @@
                 <ul id="playlist-ul" class="list-group list-group-flush small"></ul>
             </div>
         </div>
+    </div>
 
-        <!-- Nút Đổi Giao Diện (giữ lại ở vị trí cũ và ẩn đi) -->
-        <div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
-            <button type="button" id="button-theme"
-                class="btn bg-light-dark border btn-sm rounded-circle d-none btn-transparent shadow-sm mt-3"
-                aria-label="Đổi giao diện" onclick="undangan.theme.change()">
-                <i class="fa-solid fa-circle-half-stroke"></i>
+    <!-- Nút Đổi Giao Diện (giữ lại ở vị trí cũ và ẩn đi) -->
+    <div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
+        <button type="button" id="button-theme"
+            class="btn bg-light-dark border btn-sm rounded-circle d-none btn-transparent shadow-sm mt-3"
+            aria-label="Đổi giao diện" onclick="undangan.theme.change()">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+        </button>
+    </div>
+
+    <!-- BẮT ĐẦU BẢNG ĐIỀU KHIỂN HIỆU ỨNG RƠI -->
+    <!-- THANH CÔNG CỤ BÊN PHẢI -->
+    <div id="right-toolbar" class="d-flex flex-column align-items-end position-fixed"
+        style="top: 70px; right: 20px; z-index: 1030; gap: 15px; pointer-events: none;">
+
+        <!-- 1. CỤM PHÁO HOA (Nút + Bảng điều khiển) -->
+        <div id="confetti-wrapper" class="position-relative">
+            <!-- Nút Mở/Đóng Bảng Chỉnh Hiệu Ứng -->
+            <button type="button" id="particle-toggle-button"
+                class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm"
+                style="pointer-events: auto;" title="Chỉnh hiệu ứng">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
             </button>
-        </div>
 
-        <!-- BẮT ĐẦU BẢNG ĐIỀU KHIỂN HIỆU ỨNG RƠI -->
-        <!-- THANH CÔNG CỤ BÊN PHẢI -->
-        <div id="right-toolbar" class="d-flex flex-column align-items-end position-fixed"
-            style="top: 70px; right: 20px; z-index: 1030; gap: 15px; pointer-events: none;">
+            <!-- Bảng điều khiển (Ẩn mặc định) -->
+            <div id="particle-controls" class="shadow-lg rounded-4 border position-absolute bg-body p-3"
+                style="top: 0; right: 50px; width: 240px; pointer-events: auto;">
 
-            <!-- 1. CỤM PHÁO HOA (Nút + Bảng điều khiển) -->
-            <div id="confetti-wrapper" class="position-relative">
-                <!-- Nút Mở/Đóng Bảng Chỉnh Hiệu Ứng -->
-                <button type="button" id="particle-toggle-button"
-                    class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm"
-                    style="pointer-events: auto;" title="Chỉnh hiệu ứng">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                </button>
+                <div class="control-group mb-2">
+                    <label for="particle-shape" class="form-label small fw-bold">Biểu tượng:</label>
+                    <select id="particle-shape" class="form-select form-select-sm">
+                        <option value="confetti">Kim tuyến</option>
+                        <option value="svg-heart" selected>Trái tim ❤️</option>
+                        <option value="snow">Tuyết ❄️</option>
+                        <option value="stars">Ngôi sao ✨</option>
+                    </select>
+                </div>
 
-                <!-- Bảng điều khiển (Ẩn mặc định) -->
-                <div id="particle-controls" class="shadow-lg rounded-4 border position-absolute bg-body p-3"
-                    style="top: 0; right: 50px; width: 240px; pointer-events: auto;">
+                <div class="control-group mb-2">
+                    <label for="particle-duration" class="form-label small fw-bold">Thời gian rơi:</label>
+                    <select id="particle-duration" class="form-select form-select-sm">
+                        <option value="0">Dừng lại</option>
+                        <option value="60">1 phút</option>
+                        <option value="300">5 phút</option>
+                        <option value="600">10 phút</option>
+                        <option value="-1" selected>Rơi mãi</option>
+                    </select>
+                </div>
 
-                    <div class="control-group mb-2">
-                        <label for="particle-shape" class="form-label small fw-bold">Biểu tượng:</label>
-                        <select id="particle-shape" class="form-select form-select-sm">
-                            <option value="confetti">Kim tuyến</option>
-                            <option value="svg-heart" selected>Trái tim ❤️</option>
-                            <option value="snow">Tuyết ❄️</option>
-                            <option value="stars">Ngôi sao ✨</option>
-                        </select>
-                    </div>
+                <div class="control-group mb-2">
+                    <label for="particle-size" class="form-label small fw-bold">Kích thước:</label>
+                    <input type="range" id="particle-size" class="form-range" min="0.5" max="2.5" step="0.1" value="1">
+                </div>
 
-                    <div class="control-group mb-2">
-                        <label for="particle-duration" class="form-label small fw-bold">Thời gian rơi:</label>
-                        <select id="particle-duration" class="form-select form-select-sm">
-                            <option value="0">Dừng lại</option>
-                            <option value="60">1 phút</option>
-                            <option value="300">5 phút</option>
-                            <option value="600">10 phút</option>
-                            <option value="-1" selected>Rơi mãi</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group mb-2">
-                        <label for="particle-size" class="form-label small fw-bold">Kích thước:</label>
-                        <input type="range" id="particle-size" class="form-range" min="0.5" max="2.5" step="0.1"
-                            value="1">
-                    </div>
-
-                    <div class="control-group">
-                        <label for="particle-density" class="form-label small fw-bold">Mật độ rơi:</label>
-                        <input type="range" id="particle-density" class="form-range" min="10" max="200" step="10"
-                            value="50">
-                    </div>
+                <div class="control-group">
+                    <label for="particle-density" class="form-label small fw-bold">Mật độ rơi:</label>
+                    <input type="range" id="particle-density" class="form-range" min="10" max="200" step="10"
+                        value="50">
                 </div>
             </div>
-
-            <!-- 2. NÚT BẬT/TẮT LỜI CHÚC (Độc lập) -->
-            <button type="button" id="wishes-toggle-button"
-                class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm active"
-                style="pointer-events: auto;" title="Bật/Tắt lời chúc">
-                <i class="fa-solid fa-comment-dots"></i>
-            </button>
-
         </div>
-        <!-- KẾT THÚC BẢNG ĐIỀU KHIỂN -->
 
-        <!--
+        <!-- 2. NÚT BẬT/TẮT LỜI CHÚC (Độc lập) -->
+        <button type="button" id="wishes-toggle-button"
+            class="btn bg-light-dark border btn-sm rounded-circle btn-transparent shadow-sm active"
+            style="pointer-events: auto;" title="Bật/Tắt lời chúc">
+            <i class="fa-solid fa-comment-dots"></i>
+        </button>
+
+    </div>
+    <!-- KẾT THÚC BẢNG ĐIỀU KHIỂN -->
+
+    <!--
 <div class="d-flex position-fixed flex-column" style="bottom: 10vh; right: 2vh; z-index: 1030;">
     --Theme Button
     <button type="button" id="button-theme"
@@ -1447,70 +1447,70 @@
     </button>
 </div>
 -->
-        <!-- Loading Page -->
-        <div class="loading-page bg-white-black" id="loading" style="opacity: 1;">
-            <div class="d-flex justify-content-center align-items-center vh-100 overflow-y-auto">
-                <div class="d-flex flex-column width-loading text-center">
-                    <img src="./assets/images/placeholder.webp" data-src="./assets/images/icon-95x95.png"
-                        fetchpriority="high" class="img-fluid mb-3 mx-auto object-fit-cover opacity-0" alt="icon"
-                        style="width: 3.5rem; height: 3.5rem;">
-                    <div class="progress" role="progressbar" style="height: 0.5rem;" aria-label="progress bar">
-                        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
-                    </div>
-                    <small class="d-none mt-1 text-theme-auto" id="progress-info" style="font-size: 0.8rem;">Booting
-                        application...</small>
-                    <noscript>
-                        <small class="mt-1 text-danger">Sorry, this invitation requires javascript to work</small>
-                    </noscript>
+    <!-- Loading Page -->
+    <div class="loading-page bg-white-black" id="loading" style="opacity: 1;">
+        <div class="d-flex justify-content-center align-items-center vh-100 overflow-y-auto">
+            <div class="d-flex flex-column width-loading text-center">
+                <img src="./assets/images/placeholder.webp" data-src="./assets/images/icon-95x95.png"
+                    fetchpriority="high" class="img-fluid mb-3 mx-auto object-fit-cover opacity-0" alt="icon"
+                    style="width: 3.5rem; height: 3.5rem;">
+                <div class="progress" role="progressbar" style="height: 0.5rem;" aria-label="progress bar">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
                 </div>
-            </div>
-            <div class="text-center position-fixed w-100" style="bottom: 8%; left: 0;">
-                <div class="d-flex flex-column">
-                    <small class="text-secondary">from</small>
-                    <small class="text-theme-auto"><i class="fa-brands fa-github me-1"></i>duyhau1998</small>
-                </div>
+                <small class="d-none mt-1 text-theme-auto" id="progress-info" style="font-size: 0.8rem;">Booting
+                    application...</small>
+                <noscript>
+                    <small class="mt-1 text-danger">Sorry, this invitation requires javascript to work</small>
+                </noscript>
             </div>
         </div>
+        <div class="text-center position-fixed w-100" style="bottom: 8%; left: 0;">
+            <div class="d-flex flex-column">
+                <small class="text-secondary">from</small>
+                <small class="text-theme-auto"><i class="fa-brands fa-github me-1"></i>duyhau1998</small>
+            </div>
+        </div>
+    </div>
 
-        <!-- Modal Image -->
-        <div class="modal fade" id="modal-image" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-4 border border-0">
-                    <div class="modal-body p-0">
-                        <div class="d-flex position-absolute top-0 end-0">
-                            <a class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
-                                role="button" target="_blank" href="./assets/images/placeholder.webp"
-                                id="button-modal-click">
-                                <i class="fa-solid fa-arrow-up-right-from-square" style="width: 1em !important;"></i>
-                            </a>
-                            <button
-                                class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
-                                id="button-modal-download">
-                                <i class="fa-solid fa-download" style="width: 1em !important;"></i>
-                            </button>
-                            <button
-                                class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
-                                data-bs-dismiss="modal">
-                                <i class="fa-solid fa-circle-xmark" style="width: 1em !important;"></i>
-                            </button>
-                        </div>
-
-                        <img src="./assets/images/placeholder.webp" class="img-fluid w-100 rounded-4 cursor-pointer"
-                            alt="image" id="show-modal-image">
+    <!-- Modal Image -->
+    <div class="modal fade" id="modal-image" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border border-0">
+                <div class="modal-body p-0">
+                    <div class="d-flex position-absolute top-0 end-0">
+                        <a class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
+                            role="button" target="_blank" href="./assets/images/placeholder.webp"
+                            id="button-modal-click">
+                            <i class="fa-solid fa-arrow-up-right-from-square" style="width: 1em !important;"></i>
+                        </a>
+                        <button
+                            class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
+                            id="button-modal-download">
+                            <i class="fa-solid fa-download" style="width: 1em !important;"></i>
+                        </button>
+                        <button
+                            class="btn d-flex justify-content-center align-items-center bg-overlay-auto p-2 m-1 rounded-circle border shadow-sm z-1"
+                            data-bs-dismiss="modal">
+                            <i class="fa-solid fa-circle-xmark" style="width: 1em !important;"></i>
+                        </button>
                     </div>
+
+                    <img src="./assets/images/placeholder.webp" class="img-fluid w-100 rounded-4 cursor-pointer"
+                        alt="image" id="show-modal-image">
                 </div>
             </div>
         </div>
-        <!-- Popup Lời Chúc Góc Phải -->
-        <div id="wish-notification" class="wish-box">
-            <div class="wish-avatar">
-                <i class="fa-solid fa-heart text-danger"></i>
-            </div>
-            <div class="wish-content">
-                <h5 id="wish-name">Tên Khách</h5>
-                <p id="wish-message">Nội dung lời chúc sẽ hiện ở đây...</p>
-            </div>
+    </div>
+    <!-- Popup Lời Chúc Góc Phải -->
+    <div id="wish-notification" class="wish-box">
+        <div class="wish-avatar">
+            <i class="fa-solid fa-heart text-danger"></i>
         </div>
+        <div class="wish-content">
+            <h5 id="wish-name">Tên Khách</h5>
+            <p id="wish-message">Nội dung lời chúc sẽ hiện ở đây...</p>
+        </div>
+    </div>
     </div>
 </body>
 
