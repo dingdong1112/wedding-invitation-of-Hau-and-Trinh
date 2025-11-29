@@ -423,6 +423,7 @@ export const guest = (() => {
         //const cmt = comment.init();
 
         information = storage('information');
+        config = storage('config');
 
         // 2. Lấy Cấu Hình từ Server (Chặn và chờ kết quả)
         let serverConfig = {
