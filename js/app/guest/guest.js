@@ -403,7 +403,6 @@ export const guest = (() => {
                         });
                     },
                 }
-            });
         });
 
         // --- 4. Khởi tạo Swiper Chính (Main) ---
