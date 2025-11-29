@@ -26,9 +26,7 @@ export const guest = (() => {
      * @type {ReturnType<typeof storage>|null}
      */
     let config = null;
-
-    let currentAlbumImages = []; // Lưu danh sách ảnh sau khi fetch
-    let currentImageIndex = 0;
+    let allImagesUrls = []; // Danh sách ảnh cuối cùng (Được lấy từ API)
 
     const VERCEL_BASE_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app';
 
@@ -263,10 +261,10 @@ export const guest = (() => {
     // Định nghĩa thư viện Turn.js (chỉ hoạt động sau khi turn.js được tải)
     let flipbookEl = null;
 
-    /**
+    /*
      * @param {string} ext - Đuôi file (jpg/webp)
      * @returns {Promise<string[]>}
-     */
+     *
     const fetchGalleryImages = async (ext = 'webp') => {
         try {
             // GỌI URL ĐẦY ĐỦ
@@ -289,257 +287,468 @@ export const guest = (() => {
             // util.notify("Lỗi tải danh sách ảnh.").warning(); 
             return [];
         }
-    };
+    };*/
 
     /**
- * Mở modal và hiển thị Album lật trang
- * @returns {void}
+ * Tải danh sách ảnh từ API (Đã có sẵn ở các bước trước)
+ * @param {string} ext - Đuôi file (jpg/webp)
+ * @returns {Promise<string[]>}
  */
-    const openAlbum = async () => {
-        const modalElement = document.getElementById('albumModal');
-        if (!modalElement) return;
-
-        // Tải danh sách ảnh (giữ nguyên)
-        const images = await fetchGalleryImages('webp');
-
-        if (images.length === 0) {
-            util.notify("Không tìm thấy ảnh nào trong thư mục.").warning();
-            return;
+    const fetchGalleryImages = async (ext = 'webp') => {
+        try {
+            const apiUrl = `${VERCEL_BASE_URL}/api/gallery?ext=${ext}`;
+            const res = await fetch(apiUrl);
+            if (res.status !== 200) {
+                throw new Error(`API returned status ${res.status}`);
+            }
+            const json = await res.json();
+            if (json.success && json.files.length > 0) {
+                return json.files;
+            }
+            return [];
+        } catch (e) {
+            console.error("Lỗi tải danh sách ảnh:", e);
+            return [];
         }
+    };
 
-        const flipbookEl = document.getElementById('flipbook');
 
-        // 1. Chuẩn bị HTML (Làm sạch và thêm ảnh)
-        flipbookEl.innerHTML = '';
-        images.forEach((url, index) => {
-            const page = document.createElement('div');
-            // Thêm class chuẩn của Turn.js (Page)
-            page.className = 'page';
-            // Thay vì dùng background-image, ta dùng thẻ <img> để trình duyệt tải tốt hơn
-            page.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            flipbookEl.appendChild(page);
-        });
+    /**
+     * Hàm Khởi tạo Gallery Thumbnail và mở Modal Swiper
+     */
+    const initGalleryAndSetupSwiper = async (ext = 'webp') => {
+        const images = await fetchGalleryImages(ext);
+        allImagesUrls = images; // Lưu vào biến toàn cục
 
-        flipbookEl.style.display = 'none'; // Ẩn đi trong khi chờ Modal mở
+        if (images.length === 0) return;
 
-        // 2. HIỂN THỊ MODAL
-        const bsModalInstance = window.bootstrap.Modal.getOrCreateInstance(modalElement);
-        bsModalInstance.show();
+        // 1. Cập nhật Thumbnail Tĩnh (Ảnh đại diện)
+        const staticThumb = document.querySelector('#album-thumbnail img');
+        if (staticThumb) staticThumb.src = images[0];
 
-        // 3. Khởi tạo Turn.js (TRONG CALLBACK CỦA MODAL)
+        // 2. Tạo Thumbnail Grid (d-md-flex)
+        const container = document.getElementById('gallery-container');
+        if (container) {
+            container.innerHTML = '';
+            images.forEach((url, index) => {
+                const a = document.createElement('a');
+                a.href = 'javascript:void(0);'; // Vô hiệu hóa link tải
+                a.className = 'col';
+                a.onclick = () => window.openAlbumModal(index);
 
-        // Xóa sự kiện cũ
-        $(modalElement).off('shown.bs.modal');
-        $(modalElement).off('hidden.bs.modal');
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'img-fluid rounded-3 shadow-sm cursor-pointer';
+                img.style.aspectRatio = '16 / 10';
+                img.style.objectFit = 'cover';
+                img.style.pointerEvents = 'none'; // Ngăn chặn sự kiện trên ảnh
 
-        $(modalElement).on('shown.bs.modal', function () {
-            // HIỆN CHỈ DẪN SAU KHI ALBUM SẴN SÀNG
-            const instructions = document.getElementById('flip-instructions');
-            if (instructions) {
-                instructions.style.display = 'flex';
-            }
-            // --- CHỜ 100ms ĐỂ CÁC KÍCH THƯỚC TRỞ NÊN ỔN ĐỊNH ---
-            setTimeout(() => {
-
-                flipbookEl.style.display = 'block';
-
-                // TÍNH TOÁN KÍCH THƯỚC TƯƠNG ĐỐI
-                // Lấy kích thước khả dụng của cửa sổ Modal (ViewPort)
-                const modalViewPortWidth = $(this).find('.modal-content').width();
-                const modalViewPortHeight = $(this).find('.modal-content').height();
-
-                // Kích thước Album (Ví dụ tỷ lệ 1.6:1)
-                const ratio = 1.6;
-                let finalWidth = Math.min(800, modalViewPortWidth * 0.9);
-                let finalHeight = finalWidth / ratio;
-
-                // Nếu chiều cao vượt quá màn hình, ta phải dùng chiều cao làm chuẩn
-                if (finalHeight > modalViewPortHeight * 0.9) {
-                    finalHeight = modalViewPortHeight * 0.9;
-                    finalWidth = finalHeight * ratio;
-                }
-
-                // Khởi tạo Turn.js
-                $(flipbookEl).turn({
-                    width: finalWidth,
-                    height: finalHeight,
-                    // KHÔNG DÙNG autoCenter: true
-                    gradients: true,
-                    elevation: 50,
-                    pages: images.length,
-                });
-
-                // --- CĂN GIỮA THỦ CÔNG ---
-                // Gọi hàm center của Turn.js (vì nó đã được sửa trong version 4)
-                $(flipbookEl).turn('center');
-                $(flipbookEl).turn('resize');
-
-                setTimeout(() => {
-                    $(flipbookEl).on('click', '.page', function (e) {
-                        // Log để debug
-                        console.log('--- Page Clicked ---');
-
-                        // Lấy số trang
-                        const pageNumber = $(this).attr('page');
-                        if (!pageNumber) return; // Nếu không phải trang lật (ví dụ: gáy sách) thì dừng
-
-                        // Chuyển từ số trang sang index mảng
-                        const imageIndex = parseInt(pageNumber) - 1;
-
-                        // Kiểm tra xem trang có đang lật không (Quan trọng!)
-                        if ($(flipbookEl).turn('isTurning') || $(flipbookEl).turn('isZoomed')) {
-                            return; // Không làm gì nếu đang lật hoặc zoom
-                        }
-
-                        // Mở Modal Chi tiết
-                        openDetailView(imageIndex);
-
-                        // Buộc return false để chặn các sự kiện click/tap khác của Turn.js
-                        return false;
-                    });
-                }, 500);
-
-                $(flipbookEl).on('touchstart', '.page', function (e) {
-                    // Chặn hành vi mặc định (lật trang)
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    // Lấy index (Turn.js sử dụng thuộc tính 'page' hoặc index DOM)
-                    const pageNumber = $(this).attr('page') || $(this).index() + 1;
-                    const imageIndex = parseInt(pageNumber) - 1;
-
-                    // Kiểm tra xem đây có phải là thao tác lật (drag) hay chỉ là tap (click)
-                    // Nếu là thao tác lật, ta không mở Detail View. 
-                    // Nếu là tap, ta mở Detail View.
-
-                    // Đây là logic đơn giản nhất: Mở Detail View
-                    if (imageIndex >= 0) {
-                        console.log('Clicked page index:', imageIndex);
-                        openDetailView(imageIndex);
-                    }
-                });
-
-            }, 100); // Tăng độ trễ lên 100ms
-        });
-
-        // Gắn sự kiện đóng
-        $(modalElement).on('hidden.bs.modal', function () {
-            if ($(flipbookEl).data('turn-page')) {
-                $(flipbookEl).turn('destroy').html('');
-            }
-            flipbookEl.style.display = 'none';
-            // ẨN CHỈ DẪN
-            const instructions = document.getElementById('flip-instructions');
-            if (instructions) {
-                instructions.style.display = 'none';
-            }
-        });
+                a.appendChild(img);
+                container.appendChild(a);
+            });
+        }
     };
 
     /**
-     * @param {HTMLImageElement} img
+     * Mở Modal Swiper (Thay thế openAlbum cũ)
+     * @param {number} initialIndex
      * @returns {void}
      */
-    const modal = (img) => {
-        document.getElementById('button-modal-click').setAttribute('href', img.src);
-        document.getElementById('button-modal-download').setAttribute('data-src', img.src);
+    window.openAlbumModal = (initialIndex = 0) => {
+        const modalElement = document.getElementById('detailModal');
+        if (!modalElement || allImagesUrls.length === 0) return;
 
-        const i = document.getElementById('show-modal-image');
-        i.src = img.src;
-        i.width = img.width;
-        i.height = img.height;
-        bs.modal('modal-image').show();
-    };
+        const mainWrapper = document.getElementById('main-swiper-wrapper');
+        const thumbWrapper = document.getElementById('thumb-swiper-wrapper');
 
-    /**
-     * @returns {void}
-     */
-    const modalImageClick = () => {
-        document.getElementById('show-modal-image').addEventListener('click', (e) => {
-            const abs = e.currentTarget.parentNode.querySelector('.position-absolute');
+        // Dọn dẹp nội dung cũ
+        mainWrapper.innerHTML = '';
+        thumbWrapper.innerHTML = '';
 
-            abs.classList.contains('d-none')
-                ? abs.classList.replace('d-none', 'd-flex')
-                : abs.classList.replace('d-flex', 'd-none');
+        // Đổ ảnh vào Swiper
+        allImagesUrls.forEach((url) => {
+            // Main Swiper Slide
+            mainWrapper.innerHTML += `
+            <div class="swiper-slide d-flex justify-content-center align-items-center">
+                <img src="${url}" class="img-fluid" style="max-height: 90vh; object-fit: contain;">
+            </div>`;
+
+            // Thumbnail Swiper Slide
+            thumbWrapper.innerHTML += `
+            <div class="swiper-slide p-1">
+                <img src="${url}" class="rounded-3" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;">
+            </div>`;
         });
+
+        // 1. Khởi tạo Swiper Thumbnail
+        const swiperThumbs = new Swiper("#thumb-swiper", {
+            spaceBetween: 10,
+            slidesPerView: 'auto',
+            freeMode: true,
+            watchSlidesProgress: true,
+            centeredSlides: true,
+            observer: true, // Quan trọng khi dùng trong Modal
+        });
+
+        // 2. Khởi tạo Swiper Chính (Chọn hiệu ứng nghệ thuật)
+        const swiperMain = new Swiper("#main-swiper", {
+            spaceBetween: 0,
+            initialSlide: initialIndex,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            thumbs: {
+                swiper: swiperThumbs,
+            },
+            // --- HIỆU ỨNG NGHỆ THUẬT: CUBE (Rất tốt cho album) ---
+            effect: "cube",
+            cubeEffect: {
+                shadow: true,
+                slideShadows: true,
+                shadowOffset: 20,
+                shadowScale: 0.94,
+            },
+            // -----------------------------------------------------
+            observer: true,
+            observeParents: true, // Quan trọng khi dùng trong Modal
+        });
+
+        // Mở Modal
+        bs.modal('detailModal').show();
     };
 
     /**
- * Mở View chi tiết ảnh (Full Screen)
- * @param {number} startIndex
- * @returns {void}
+ * Hàm Khởi tạo và Hiển thị Gallery Swiper
+ * @param {string} ext
  */
-    const openDetailView = (startIndex) => {
-        // Lấy dữ liệu ảnh đã có
-        currentAlbumImages = Array.from(document.querySelectorAll('#flipbook .page img')).map(img => img.src);
-        currentImageIndex = startIndex;
+    const initSwiperGallery = async (ext = 'webp') => {
+        const container = document.getElementById('gallery-container');
+        if (!container) return;
 
-        // Khởi tạo Modal chi tiết
-        const detailModal = bs.modal('detailModal');
-        const thumbContainer = document.getElementById('detail-thumbnails');
+        // Tải danh sách ảnh từ API
+        const images = await fetchGalleryImages(ext);
+        if (images.length === 0) return;
 
-        thumbContainer.innerHTML = ''; // Dọn dẹp
+        // Lấy link ảnh đầu tiên làm thumbnail tĩnh
+        const staticThumb = document.querySelector('#album-thumbnail img');
+        if (staticThumb) staticThumb.src = images[0];
 
-        // 1. Dựng thanh Thumbnail
-        currentAlbumImages.forEach((src, index) => {
-            const thumb = document.createElement('img');
-            thumb.src = src;
-            thumb.className = 'rounded-3 shadow-sm cursor-pointer mx-1';
-            thumb.style.width = '60px';
-            thumb.style.height = '60px';
-            thumb.style.objectFit = 'cover';
-            thumb.onclick = () => showImageDetail(index);
-            thumbContainer.appendChild(thumb);
-        });
+        // 1. Tạo Thumbnail Tĩnh (GridView)
+        // ... (logic tạo gridview như hướng dẫn PhotoSwipe ở các bước trước) ...
 
-        // 2. Thiết lập các nút điều hướng
-        const btnPrev = document.getElementById('btn-prev-detail');
-        const btnNext = document.getElementById('btn-next-detail');
-        btnPrev.onclick = () => navigateDetail(-1);
-        btnNext.onclick = () => navigateDetail(1);
+        // 2. Định nghĩa hàm mở Modal (sẽ gọi Swiper)
 
-        // 3. Mở Modal và hiển thị ảnh đầu tiên
-        bs.modal('albumModal').hide(); // Đóng Modal Lật
-        detailModal.show();             // Mở Modal Chi tiết
+        const modalElement = document.getElementById('detailModal');
 
-        // Đảm bảo Modal Lật hiển thị lại khi Modal Chi tiết đóng
-        $(detailModal.element).on('hidden.bs.modal', function () {
-            bs.modal('albumModal').show();
-        });
+        window.openAlbumModal = (initialIndex = 0) => {
+            const mainWrapper = document.getElementById('main-swiper-wrapper');
+            const thumbWrapper = document.getElementById('thumb-swiper-wrapper');
 
-        showImageDetail(startIndex);
+            mainWrapper.innerHTML = '';
+            thumbWrapper.innerHTML = '';
+
+            // Đổ ảnh vào Swiper
+            images.forEach((url, index) => {
+                // Main Swiper Slide
+                mainWrapper.innerHTML += `
+                <div class="swiper-slide d-flex justify-content-center align-items-center">
+                    <img src="${url}" class="img-fluid" style="max-height: 90vh; object-fit: contain;">
+                </div>`;
+
+                // Thumbnail Swiper Slide
+                thumbWrapper.innerHTML += `
+                <div class="swiper-slide">
+                    <img src="${url}" class="rounded-3" style="width: 100px; height: 60px; object-fit: cover; cursor: pointer;">
+                </div>`;
+            });
+
+            // Khởi tạo Swiper Thumbnail
+            const swiperThumbs = new Swiper("#thumb-swiper", {
+                spaceBetween: 10,
+                slidesPerView: 'auto',
+                freeMode: true,
+                watchSlidesProgress: true,
+                centeredSlides: true,
+            });
+
+            // Khởi tạo Swiper Chính (Hiệu ứng nghệ thuật cao)
+            const swiperMain = new Swiper("#main-swiper", {
+                spaceBetween: 0,
+                initialSlide: initialIndex,
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                thumbs: {
+                    swiper: swiperThumbs,
+                },
+                // --- CHỌN HIỆU ỨNG TẠI ĐÂY ---
+                effect: "coverflow", // Ví dụ: coverflow, flip, cube
+                coverflowEffect: {
+                    rotate: 50,
+                    stretch: 0,
+                    depth: 100,
+                    modifier: 1,
+                    slideShadows: true,
+                },
+                // -----------------------------
+            });
+
+            // Mở Modal
+            bs.modal('detailModal').show();
+        };
     };
 
-    // Hàm hiển thị ảnh chi tiết và update Thumbnail
-    const showImageDetail = (index) => {
-        if (index < 0 || index >= currentAlbumImages.length) return;
 
-        currentImageIndex = index;
-        const detailImage = document.getElementById('detail-image');
-        if (detailImage) {
-            detailImage.src = currentAlbumImages[index];
-        }
-
-        // Update highlight thumbnail
-        document.querySelectorAll('#detail-thumbnails img').forEach((img, i) => {
-            img.style.border = (i === index) ? '2px solid white' : 'none';
-            img.style.opacity = (i === index) ? 1 : 0.6;
-        });
-
-        // Cuộn ngang đến thumbnail đang chọn
-        const selectedThumb = document.querySelectorAll('#detail-thumbnails img')[index];
-        if (selectedThumb) {
-            selectedThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
-    };
-
-    // Hàm chuyển ảnh chi tiết
-    const navigateDetail = (direction) => {
-        let newIndex = currentImageIndex + direction;
-        if (newIndex >= currentAlbumImages.length) newIndex = 0;
-        if (newIndex < 0) newIndex = currentAlbumImages.length - 1;
-        showImageDetail(newIndex);
-    };
+    /* Mở modal và hiển thị Album lật trang
+    * @returns {void}
+    *
+       const openAlbum = async () => {
+           const modalElement = document.getElementById('albumModal');
+           if (!modalElement) return;
+   
+           // Tải danh sách ảnh (giữ nguyên)
+           const images = await fetchGalleryImages('webp');
+   
+           if (images.length === 0) {
+               util.notify("Không tìm thấy ảnh nào trong thư mục.").warning();
+               return;
+           }
+   
+           const flipbookEl = document.getElementById('flipbook');
+   
+           // 1. Chuẩn bị HTML (Làm sạch và thêm ảnh)
+           flipbookEl.innerHTML = '';
+           images.forEach((url, index) => {
+               const page = document.createElement('div');
+               // Thêm class chuẩn của Turn.js (Page)
+               page.className = 'page';
+               // Thay vì dùng background-image, ta dùng thẻ <img> để trình duyệt tải tốt hơn
+               page.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+               flipbookEl.appendChild(page);
+           });
+   
+           flipbookEl.style.display = 'none'; // Ẩn đi trong khi chờ Modal mở
+   
+           // 2. HIỂN THỊ MODAL
+           const bsModalInstance = window.bootstrap.Modal.getOrCreateInstance(modalElement);
+           bsModalInstance.show();
+   
+           // 3. Khởi tạo Turn.js (TRONG CALLBACK CỦA MODAL)
+   
+           // Xóa sự kiện cũ
+           $(modalElement).off('shown.bs.modal');
+           $(modalElement).off('hidden.bs.modal');
+   
+           $(modalElement).on('shown.bs.modal', function () {
+               // HIỆN CHỈ DẪN SAU KHI ALBUM SẴN SÀNG
+               const instructions = document.getElementById('flip-instructions');
+               if (instructions) {
+                   instructions.style.display = 'flex';
+               }
+               // --- CHỜ 100ms ĐỂ CÁC KÍCH THƯỚC TRỞ NÊN ỔN ĐỊNH ---
+               setTimeout(() => {
+   
+                   flipbookEl.style.display = 'block';
+   
+                   // TÍNH TOÁN KÍCH THƯỚC TƯƠNG ĐỐI
+                   // Lấy kích thước khả dụng của cửa sổ Modal (ViewPort)
+                   const modalViewPortWidth = $(this).find('.modal-content').width();
+                   const modalViewPortHeight = $(this).find('.modal-content').height();
+   
+                   // Kích thước Album (Ví dụ tỷ lệ 1.6:1)
+                   const ratio = 1.6;
+                   let finalWidth = Math.min(800, modalViewPortWidth * 0.9);
+                   let finalHeight = finalWidth / ratio;
+   
+                   // Nếu chiều cao vượt quá màn hình, ta phải dùng chiều cao làm chuẩn
+                   if (finalHeight > modalViewPortHeight * 0.9) {
+                       finalHeight = modalViewPortHeight * 0.9;
+                       finalWidth = finalHeight * ratio;
+                   }
+   
+                   // Khởi tạo Turn.js
+                   $(flipbookEl).turn({
+                       width: finalWidth,
+                       height: finalHeight,
+                       // KHÔNG DÙNG autoCenter: true
+                       gradients: true,
+                       elevation: 50,
+                       pages: images.length,
+                   });
+   
+                   // --- CĂN GIỮA THỦ CÔNG ---
+                   // Gọi hàm center của Turn.js (vì nó đã được sửa trong version 4)
+                   $(flipbookEl).turn('center');
+                   $(flipbookEl).turn('resize');
+   
+                   setTimeout(() => {
+                       $(flipbookEl).on('click', '.page', function (e) {
+                           // Log để debug
+                           console.log('--- Page Clicked ---');
+   
+                           // Lấy số trang
+                           const pageNumber = $(this).attr('page');
+                           if (!pageNumber) return; // Nếu không phải trang lật (ví dụ: gáy sách) thì dừng
+   
+                           // Chuyển từ số trang sang index mảng
+                           const imageIndex = parseInt(pageNumber) - 1;
+   
+                           // Kiểm tra xem trang có đang lật không (Quan trọng!)
+                           if ($(flipbookEl).turn('isTurning') || $(flipbookEl).turn('isZoomed')) {
+                               return; // Không làm gì nếu đang lật hoặc zoom
+                           }
+   
+                           // Mở Modal Chi tiết
+                           openDetailView(imageIndex);
+   
+                           // Buộc return false để chặn các sự kiện click/tap khác của Turn.js
+                           return false;
+                       });
+                   }, 500);
+   
+                   $(flipbookEl).on('touchstart', '.page', function (e) {
+                       // Chặn hành vi mặc định (lật trang)
+                       e.preventDefault();
+                       e.stopPropagation();
+   
+                       // Lấy index (Turn.js sử dụng thuộc tính 'page' hoặc index DOM)
+                       const pageNumber = $(this).attr('page') || $(this).index() + 1;
+                       const imageIndex = parseInt(pageNumber) - 1;
+   
+                       // Kiểm tra xem đây có phải là thao tác lật (drag) hay chỉ là tap (click)
+                       // Nếu là thao tác lật, ta không mở Detail View. 
+                       // Nếu là tap, ta mở Detail View.
+   
+                       // Đây là logic đơn giản nhất: Mở Detail View
+                       if (imageIndex >= 0) {
+                           console.log('Clicked page index:', imageIndex);
+                           openDetailView(imageIndex);
+                       }
+                   });
+   
+               }, 100); // Tăng độ trễ lên 100ms
+           });
+   
+           // Gắn sự kiện đóng
+           $(modalElement).on('hidden.bs.modal', function () {
+               if ($(flipbookEl).data('turn-page')) {
+                   $(flipbookEl).turn('destroy').html('');
+               }
+               flipbookEl.style.display = 'none';
+               // ẨN CHỈ DẪN
+               const instructions = document.getElementById('flip-instructions');
+               if (instructions) {
+                   instructions.style.display = 'none';
+               }
+           });
+       };
+   
+       /**
+        * @param {HTMLImageElement} img
+        * @returns {void}
+        *
+       const modal = (img) => {
+           document.getElementById('button-modal-click').setAttribute('href', img.src);
+           document.getElementById('button-modal-download').setAttribute('data-src', img.src);
+   
+           const i = document.getElementById('show-modal-image');
+           i.src = img.src;
+           i.width = img.width;
+           i.height = img.height;
+           bs.modal('modal-image').show();
+       };
+   
+       /**
+        * @returns {void}
+        *
+       const modalImageClick = () => {
+           document.getElementById('show-modal-image').addEventListener('click', (e) => {
+               const abs = e.currentTarget.parentNode.querySelector('.position-absolute');
+   
+               abs.classList.contains('d-none')
+                   ? abs.classList.replace('d-none', 'd-flex')
+                   : abs.classList.replace('d-flex', 'd-none');
+           });
+       };
+   
+       /**
+    * Mở View chi tiết ảnh (Full Screen)
+    * @param {number} startIndex
+    * @returns {void}
+    *
+       const openDetailView = (startIndex) => {
+           // Lấy dữ liệu ảnh đã có
+           currentAlbumImages = Array.from(document.querySelectorAll('#flipbook .page img')).map(img => img.src);
+           currentImageIndex = startIndex;
+   
+           // Khởi tạo Modal chi tiết
+           const detailModal = bs.modal('detailModal');
+           const thumbContainer = document.getElementById('detail-thumbnails');
+   
+           thumbContainer.innerHTML = ''; // Dọn dẹp
+   
+           // 1. Dựng thanh Thumbnail
+           currentAlbumImages.forEach((src, index) => {
+               const thumb = document.createElement('img');
+               thumb.src = src;
+               thumb.className = 'rounded-3 shadow-sm cursor-pointer mx-1';
+               thumb.style.width = '60px';
+               thumb.style.height = '60px';
+               thumb.style.objectFit = 'cover';
+               thumb.onclick = () => showImageDetail(index);
+               thumbContainer.appendChild(thumb);
+           });
+   
+           // 2. Thiết lập các nút điều hướng
+           const btnPrev = document.getElementById('btn-prev-detail');
+           const btnNext = document.getElementById('btn-next-detail');
+           btnPrev.onclick = () => navigateDetail(-1);
+           btnNext.onclick = () => navigateDetail(1);
+   
+           // 3. Mở Modal và hiển thị ảnh đầu tiên
+           bs.modal('albumModal').hide(); // Đóng Modal Lật
+           detailModal.show();             // Mở Modal Chi tiết
+   
+           // Đảm bảo Modal Lật hiển thị lại khi Modal Chi tiết đóng
+           $(detailModal.element).on('hidden.bs.modal', function () {
+               bs.modal('albumModal').show();
+           });
+   
+           showImageDetail(startIndex);
+       };
+   
+       // Hàm hiển thị ảnh chi tiết và update Thumbnail
+       const showImageDetail = (index) => {
+           if (index < 0 || index >= currentAlbumImages.length) return;
+   
+           currentImageIndex = index;
+           const detailImage = document.getElementById('detail-image');
+           if (detailImage) {
+               detailImage.src = currentAlbumImages[index];
+           }
+   
+           // Update highlight thumbnail
+           document.querySelectorAll('#detail-thumbnails img').forEach((img, i) => {
+               img.style.border = (i === index) ? '2px solid white' : 'none';
+               img.style.opacity = (i === index) ? 1 : 0.6;
+           });
+   
+           // Cuộn ngang đến thumbnail đang chọn
+           const selectedThumb = document.querySelectorAll('#detail-thumbnails img')[index];
+           if (selectedThumb) {
+               selectedThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+           }
+       };
+   
+       // Hàm chuyển ảnh chi tiết
+       const navigateDetail = (direction) => {
+           let newIndex = currentImageIndex + direction;
+           if (newIndex >= currentAlbumImages.length) newIndex = 0;
+           if (newIndex < 0) newIndex = currentAlbumImages.length - 1;
+           showImageDetail(newIndex);
+       };*/
 
     /**
      * @param {HTMLDivElement} div 
@@ -646,8 +855,9 @@ export const guest = (() => {
 
         countDownDate();
         showGuestName();
-        modalImageClick();
+        //modalImageClick();
         normalizeArabicFont();
+        initSwiperGallery('webp');
         //buildGoogleCalendar();
 
         if (information.has('presence')) {
@@ -730,6 +940,9 @@ export const guest = (() => {
         img.load();
         lib.load(true, false);
         //aud.load(serverConfig.music_enabled);
+
+        // KHỞI TẠO SWIPER GALLERY
+        initSwiperGallery('webp');
 
 
         // 4. Xử lý sự kiện giao diện (Giữ nguyên)
@@ -992,6 +1205,7 @@ export const guest = (() => {
                 showStory,
                 closeInformation,
                 openAlbum,
+                initGallery: initSwiperGallery,
             },
         };
     };

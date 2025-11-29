@@ -70,12 +70,27 @@
         integrity="sha256-4rTIfo5GQTi/7UJqoyUJQKzxW8VN/YBH31+Cy+vTZj4=" crossorigin="anonymous">
     <link rel="stylesheet" href="./css/guest.css">
 
+    <!-- ... (các link CSS và JS preload khác) ... -->
+
+    <!-- THÊM SWIPER.JS CSS (Nên đặt trong HEAD) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- THÊM JQUERY (Nếu code gốc chưa có, đặt trước các script cần $) -->
+    <!-- Nếu đã có jQuery, bỏ qua dòng này -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- THÊM SWIPER.JS JS (Cùng vị trí với file guest.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
     <!-- Dependencies JS -->
     <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc=" crossorigin="anonymous"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!------------------------------>
     <script type="module" src="./js/guest.js"></script>
     <script src="./dist/guest.js"></script>
@@ -588,20 +603,26 @@
                     </div>
                 </section>
 
-                <!-- Gallery Section (Thumbnail Tĩnh) -->
+                <!-- Gallery Section (Sử dụng Swiper cho hiển thị lớn) -->
                 <section class="bg-white-black pb-5 pt-3" id="gallery">
                     <div class="container text-center">
-                        <h2 class="font-esthetic py-2 m-0" style="font-size: 2.25rem;">Album Cưới</h2>
+                        <h2 class="font-esthetic py-2 m-0" style="font-size: 2.25rem;">Album Ảnh Cưới</h2>
 
-                        <!-- THUMBNAIL ĐẠI DIỆN -->
+                        <!-- THUMBNAIL TĨNH VÀ KHU VỰC THUMBNAIL GRID -->
                         <div id="album-thumbnail"
                             class="mt-4 shadow-lg rounded-4 overflow-hidden mx-auto cursor-pointer"
-                            onclick="undangan.guest.openAlbum()">
-                            <!-- Ảnh đại diện tĩnh (Cần thêm ID để JS thao tác) -->
+                            onclick="window.openAlbumModal(0)">
+                            <!-- Ảnh đại diện tĩnh -->
                             <img src="./assets/images/placeholder.webp" data-src="./assets/images/_HIP0017.webp"
                                 alt="Album Preview" class="img-fluid" style="object-fit: cover;">
                         </div>
                         <p class="small mt-2 text-theme-auto">Nhấp vào để xem Album Ảnh Nghệ Thuật</p>
+
+                        <!-- Container cho các ảnh nhỏ dạng Grid (chỉ hiển thị trên Desktop/Tablet) -->
+                        <div id="gallery-container" class="pswp-gallery row row-cols-3 g-2 mt-4 d-none d-md-flex">
+                            <!-- Ảnh thumbnail sẽ được JS thêm vào đây -->
+                        </div>
+
                     </div>
                 </section>
 
@@ -1559,39 +1580,40 @@
             <p id="wish-message">Nội dung lời chúc sẽ hiện ở đây...</p>
         </div>
     </div>
-    <!-- MODAL XEM CHI TIẾT ẢNH VÀ THUMBNAIL -->
+    <!-- MODAL XEM CHI TIẾT ẢNH VÀ THUMBNAIL (SỬ DỤNG CẤU TRÚC MODAL ĐÃ CÓ) -->
     <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content bg-black">
-                <!-- Nút đóng (Về lại Album Lật) -->
+                <!-- Nút đóng -->
                 <button type="button" class="btn btn-light rounded-circle shadow-lg position-absolute z-1"
-                    style="top: 10px; left: 10px;" data-bs-dismiss="modal" id="btn-close-detail-modal">
+                    style="top: 10px; left: 10px; z-index: 10;" data-bs-dismiss="modal">
                     <i class="fa-solid fa-angle-left"></i>
                 </button>
 
                 <div class="modal-body p-0 d-flex flex-column" id="detail-modal-body">
 
-                    <!-- 1. KHU VỰC ẢNH LỚN -->
-                    <div class="flex-grow-1 d-flex justify-content-center align-items-center p-3 position-relative">
-                        <img id="detail-image" src="" class="img-fluid" style="max-height: 90vh; object-fit: contain;">
-                        <!-- Nút chuyển ảnh -->
-                        <button id="btn-prev-detail" class="btn btn-light rounded-circle position-absolute"
-                            style="left: 10px;"><i class="fa-solid fa-chevron-left"></i></button>
-                        <button id="btn-next-detail" class="btn btn-light rounded-circle position-absolute"
-                            style="right: 10px;"><i class="fa-solid fa-chevron-right"></i></button>
+                    <!-- 1. SWIPER CHÍNH (ẢNH LỚN) -->
+                    <div class="swiper mySwiper2 flex-grow-1" id="main-swiper">
+                        <div class="swiper-wrapper" id="main-swiper-wrapper">
+                            <!-- Ảnh sẽ được JS thêm vào đây -->
+                        </div>
+                        <!-- Nút điều hướng -->
+                        <div class="swiper-button-next text-white"></div>
+                        <div class="swiper-button-prev text-white"></div>
                     </div>
 
-                    <!-- 2. KHU VỰC THUMBNAIL LƯỚT NGANG -->
+                    <!-- 2. SWIPER THUMBNAIL (LƯỚT NGANG) -->
                     <div class="bg-dark p-2" style="height: 100px; flex-shrink: 0;">
-                        <div id="detail-thumbnails" class="d-flex overflow-x-scroll h-100 align-items-center">
-                            <!-- Thẻ ảnh nhỏ sẽ được JS thêm vào đây -->
+                        <div class="swiper mySwiper" id="thumb-swiper">
+                            <div class="swiper-wrapper" id="thumb-swiper-wrapper">
+                                <!-- Thumbnails sẽ được JS thêm vào đây -->
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="./js/libs/turn.js"></script>
 </body>
 
 </html>
