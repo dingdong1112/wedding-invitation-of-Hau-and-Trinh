@@ -27,6 +27,8 @@ export const guest = (() => {
      */
     let config = null;
 
+    const VERCEL_BASE_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app'; 
+
     /**
      * @returns {void}
      */
@@ -253,6 +255,90 @@ export const guest = (() => {
 
         document.dispatchEvent(new Event('undangan.open'));
         util.changeOpacity(document.getElementById('welcome'), false).then((el) => el.remove());
+    };
+
+    // Định nghĩa thư viện Turn.js (chỉ hoạt động sau khi turn.js được tải)
+    let flipbookEl = null;
+
+    /**
+     * @param {string} ext - Đuôi file (jpg/webp)
+     * @returns {Promise<string[]>}
+     */
+    const fetchGalleryImages = async (ext = 'webp') => {
+        try {
+            // GỌI URL ĐẦY ĐỦ
+            const apiUrl = `${VERCEL_BASE_URL}/api/gallery?ext=${ext}`;
+            const res = await fetch(apiUrl);
+            // KIỂM TRA MÃ TRẠNG THÁI TRƯỚC KHI ĐỌC JSON
+            if (res.status !== 200) {
+                throw new Error(`API returned status ${res.status}`);
+            }
+
+            const json = await res.json();
+
+            if (json.success && json.files.length > 0) {
+                return json.files;
+            }
+            return [];
+        } catch (e) {
+            console.error("Lỗi tải danh sách ảnh:", e);
+            // THAY THẾ ALERT CŨ BẰNG CONSOLE.ERROR (Hoặc giữ alert nếu muốn)
+            // util.notify("Lỗi tải danh sách ảnh.").warning(); 
+            return [];
+        }
+    };
+
+    /**
+     * Mở modal và hiển thị Album lật trang
+     * @returns {void}
+     */
+    const openAlbum = async () => {
+        const albumModal = bs.modal('albumModal');
+
+        // 1. Tải danh sách ảnh (ví dụ: quét ảnh .webp)
+        const images = await fetchGalleryImages('webp');
+
+        if (images.length === 0) {
+            util.notify("Không tìm thấy ảnh nào trong thư mục.").warning();
+            return;
+        }
+
+        albumModal.show();
+        flipbookEl = document.getElementById('flipbook');
+        flipbookEl.innerHTML = ''; // Xóa nội dung cũ
+        flipbookEl.style.display = 'block';
+
+        // 2. Chuẩn bị HTML cho Turn.js
+        images.forEach((url, index) => {
+            // Tạo mỗi trang (div) trong album
+            const page = document.createElement('div');
+            page.style.backgroundImage = `url(${url})`;
+            page.style.backgroundSize = 'cover';
+            page.style.backgroundPosition = 'center';
+            page.style.backgroundColor = '#f8f8f8'; // Màu nền khi lật
+            flipbookEl.appendChild(page);
+        });
+
+        // 3. Khởi tạo Turn.js
+        $(flipbookEl).turn({ // Dùng jQuery ($) là yêu cầu của Turn.js cũ
+            width: 800, // Chiều rộng tổng album
+            height: 500, // Chiều cao album
+            autoCenter: true,
+            gradients: true, // Hiệu ứng đổ bóng 3D
+            elevation: 50, // Độ sâu của hiệu ứng lật
+            pages: images.length,
+        });
+
+        // Đảm bảo album căn giữa trong Modal
+        $(modalEl).on('shown.bs.modal', function () {
+            $(flipbookEl).turn('center');
+        });
+
+        // Đóng Turn.js khi Modal bị đóng
+        $(modalEl).on('hidden.bs.modal', function () {
+            $(flipbookEl).turn('destroy'); // Dọn dẹp Turn.js
+            flipbookEl.style.display = 'none';
+        });
     };
 
     /**
@@ -733,6 +819,7 @@ export const guest = (() => {
                 modal,
                 showStory,
                 closeInformation,
+                openAlbum,
             },
         };
     };

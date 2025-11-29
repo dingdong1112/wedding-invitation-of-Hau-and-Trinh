@@ -237,7 +237,7 @@
     x: 0.5,
     y: 0.5,
     shapes: ['square', 'circle'],
-    zIndex: 100,
+    zIndex: 9999,
     colors: [
       '#26ccff',
       '#a25afd',

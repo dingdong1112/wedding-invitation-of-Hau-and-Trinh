@@ -76,6 +76,7 @@
     <script type="module" src="./js/guest.js"></script>
     <script src="./js/libs/ics.js"></script>
     <script src="./js/libs/confetti.js"></script>
+    <script src="./js/libs/turn.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/ics.js@0.3.1/ics.min.js"></script>-->
 </head>
 <!-- Jika tidak menggunakan komentar, hapus atribut data-key dan data-url, serta abaikan file dashboard.html. -->
@@ -583,8 +584,43 @@
                     </div>
                 </section>
 
-                <!-- Gallery -->
+                <!-- Gallery Section (Thumbnail Tĩnh) -->
                 <section class="bg-white-black pb-5 pt-3" id="gallery">
+                    <div class="container text-center">
+                        <h2 class="font-esthetic py-2 m-0" style="font-size: 2.25rem;">Album Cưới</h2>
+
+                        <!-- THUMBNAIL ĐẠI DIỆN -->
+                        <div id="album-thumbnail"
+                            class="mt-4 shadow-lg rounded-4 overflow-hidden mx-auto cursor-pointer"
+                            onclick="undangan.guest.openAlbum()">
+                            <!-- Ảnh đại diện tĩnh (Cần thêm ID để JS thao tác) -->
+                            <img src="./assets/images/placeholder.webp" data-src="./assets/images/_HIP0017.webp"
+                                alt="Album Preview" class="img-fluid" style="object-fit: cover;">
+                        </div>
+                        <p class="small mt-2 text-theme-auto">Nhấp vào để xem Album Ảnh Nghệ Thuật</p>
+                    </div>
+                </section>
+
+                <!-- MODAL ALBUM LẬT TRANG -->
+                <div class="modal fade" id="albumModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                        <div class="modal-content" style="background: none; border: none;">
+                            <div class="modal-body p-0">
+
+                                <!-- Vùng chứa Album (Turn.js sẽ render vào đây) -->
+                                <div id="flipbook" class="mx-auto" style="display: none;"></div>
+
+                                <!-- Nút đóng -->
+                                <button type="button"
+                                    class="btn btn-light rounded-circle shadow-lg position-absolute z-1"
+                                    style="top: 10px; right: 10px;" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--section class="bg-white-black pb-5 pt-3" id="gallery">
                     <div class="container">
                         <div class="border rounded-5 shadow p-3">
 
@@ -1033,7 +1069,7 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </section-->
 
                 <!-- Wave Separator -->
                 <div class="svg-wrapper">
