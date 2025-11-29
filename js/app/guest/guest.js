@@ -158,17 +158,24 @@ export const guest = (() => {
      * @param {HTMLButtonElement} button
      * @returns {void}
      */
-    const open = async (button) => {
+    const open = (button) => {
         const serverConfig = window.SERVER_CONFIG; // Lấy config đã tải ở pageLoaded
 
+        // TÌM KIẾM TẤT CẢ ELEMENT CẦN THAO TÁC (SAFE ACCESS)
         const particleController = document.getElementById('particle-toggle-button');
-        const vinylContainer = document.getElementById('vinyl-container');
-        const vinylNeedle = document.getElementById('vinyl-needle');
-        const vinylDisk = document.getElementById('vinyl-disk');
-        const vinylHole = document.getElementById('vinyl-hole');
-        const vinylGrooves = document.getElementById('vinyl-grooves');
-        const musicToggle = document.getElementById('music-toggle-button');
         const wishesToggleButton = document.getElementById('wishes-toggle-button');
+        const sendForm = document.getElementById('wishes-form');
+        const sendBtn = document.getElementById('btn-send-wish');
+
+        // Element Đĩa than (Vinyl)
+        const vinylContainer = document.getElementById('vinyl-container');
+        const vinylGrooves = document.querySelector('.vinyl-grooves'); // Dùng class vì nó nằm trong container
+        const vinylHole = document.querySelector('.vinyl-hole');
+        const vinylNeedle = document.querySelector('.vinyl-needle');
+        const vinylDisk = document.querySelector('.vinyl-disk');
+
+        // Nút điều khiển nhạc tổng (của bạn là Music Toggle Button)
+        const musicToggle = document.getElementById('music-toggle-btn'); // Sử dụng ID chính xác
         const aud = audio.init();
 
         button.disabled = true;
@@ -178,9 +185,6 @@ export const guest = (() => {
         if (theme.isAutoMode()) {
             document.getElementById('button-theme').classList.remove('d-none');
         }
-
-        slide();
-        theme.spyTop();
 
         // A. HIỆU ỨNG ĐŨA THẦN VÀ PHÁO HOA (confetti_enabled)
         if (particleController) {
@@ -205,25 +209,25 @@ export const guest = (() => {
         //B. HIỆU ỨNG ĐĨA THAN + PHÁT NHẠC + ICON QL NHẠC (vinyl_enabled)
         if (vinylContainer) {
             if (!serverConfig.vinyl_enabled) {
-                vinylGrooves.style.display = 'none';
-                vinylHole.style.display = 'none';
-                vinylNeedle.style.display = 'none';
-                vinylDisk.style.display = 'block';
-                musicToggle.style.display = 'none';
-                aud.load(false);
+                vinylGrooves?.style.setProperty('display', 'none');
+                vinylHole?.style.setProperty('display', 'none');
+                vinylNeedle?.style.setProperty('display', 'none');
+                // Element chính (disk) vẫn hiện nhưng không xoay
+                vinylDisk?.style.setProperty('display', 'block');
+                musicToggle?.style.setProperty('display', 'none'); // Ẩn nút QL nhạc
+                aud.load(false); // Load nhạc nhưng không tự phát
             } else {
-                vinylGrooves.style.display = 'block';
-                vinylHole.style.display = 'block';
-                vinylNeedle.style.display = 'block';
-                vinylDisk.style.display = 'block';
-                musicToggle.style.display = 'flex';
-                aud.load(serverConfig.music_enabled);
+                // BẬT HIỆU ỨNG ĐĨA THAN
+                vinylGrooves?.style.setProperty('display', 'block');
+                vinylHole?.style.setProperty('display', 'block');
+                vinylNeedle?.style.setProperty('display', 'block');
+                vinylDisk?.style.setProperty('display', 'block');
+                musicToggle?.style.setProperty('display', 'flex'); // Hiện nút QL nhạc
+                aud.load(musicEnabled); // Load và tự phát nếu config cho phép
             }
         }
 
         // C. KHÓA FORM GỬI LỜI CHÚC (comment_lock_enabled)
-        const sendForm = document.getElementById('wishes-form');
-        const sendBtn = document.getElementById('btn-send-wish');
         if (serverConfig.can_delete && sendForm) {
             sendForm.remove(); // Xóa form hoàn toàn (hoặc ẩn đi)
             if (sendBtn) sendBtn.disabled = true; // Khóa nút nếu vẫn giữ form
@@ -242,7 +246,10 @@ export const guest = (() => {
             comment.init();
         } else {
             wishesToggleButton.style.display = 'none';
-        }
+        }        
+
+        slide();
+        theme.spyTop();
 
         document.dispatchEvent(new Event('undangan.open'));
         util.changeOpacity(document.getElementById('welcome'), false).then((el) => el.remove());
@@ -415,8 +422,12 @@ export const guest = (() => {
         const aud = audio.init();
         const cmt = comment.init();
 
+        information = storage('information');
+
         // 2. Lấy Cấu Hình từ Server (Chặn và chờ kết quả)
-        let serverConfig = { /* ... */ };
+        let serverConfig = {
+            confetti_enabled: document.body.getAttribute('data-confetti') === 'true'
+        };
         try {
             const res = await fetch('/api/config');
             if (res.status === 200) {
@@ -458,8 +469,8 @@ export const guest = (() => {
         // 4. Tải tài nguyên (Chạy song song cho nhanh)
         vid.load();
         img.load();
-        lib.load({ confetti: serverConfig.confetti_enabled });
-        aud.load(serverConfig.music_enabled);
+        lib.load(true, false);
+        //aud.load(serverConfig.music_enabled);
 
 
         // 4. Xử lý sự kiện giao diện (Giữ nguyên)
