@@ -159,6 +159,8 @@ export const guest = (() => {
      * @returns {void}
      */
     const open = async (button) => {
+        const serverConfig = window.SERVER_CONFIG; // Lấy config đã tải ở pageLoaded
+
         const particleController = document.getElementById('particle-toggle-button');
         const vinylContainer = document.getElementById('vinyl-container');
         const vinylNeedle = document.getElementById('vinyl-needle');
@@ -179,23 +181,6 @@ export const guest = (() => {
 
         slide();
         theme.spyTop();
-
-        let serverConfig = {
-            confetti_enabled: document.body.getAttribute('data-confetti') === 'true'
-        };
-
-        try {
-            // Serverless Function sẽ tự thêm hostname
-            const res = await fetch('/api/config');
-            if (res.status === 200) {
-                const json = await res.json();
-                serverConfig = json.data;
-                // Lưu cấu hình vào storage để các module khác sử dụng
-                Object.entries(serverConfig).forEach(([k, v]) => config.set(k, v));
-            }
-        } catch (e) {
-            console.warn("Lỗi tải config, dùng mặc định.");
-        }
 
         // A. HIỆU ỨNG ĐŨA THẦN VÀ PHÁO HOA (confetti_enabled)
         if (particleController) {
@@ -422,22 +407,32 @@ export const guest = (() => {
         // 1. Khởi tạo các module cơ bản
         lang.init();
         offline.init();
-        // Comment.init phải chạy trước khi tải config vì nó cần progress.add
-        //comment.init();
         progress.init();
         const vid = video.init();
         const img = image.init();
         //const aud = audio.init();
         const lib = loaderLibs();
+        const aud = audio.init();
+        const cmt = comment.init();
 
-        config = storage('config');
-        information = storage('information');
+        // 2. Lấy Cấu Hình từ Server (Chặn và chờ kết quả)
+        let serverConfig = { /* ... */ };
+        try {
+            const res = await fetch('/api/config');
+            if (res.status === 200) {
+                const json = await res.json();
+                serverConfig = json.data;
+                Object.entries(serverConfig).forEach(([k, v]) => config.set(k, v));
+            }
+        } catch (e) {
+            console.warn("Lỗi tải config, dùng mặc định.");
+        }
 
         // Cần đảm bảo các element có sẵn để tránh lỗi JS
-        const vinylContainer = document.getElementById('vinyl-container');
+        //const vinylContainer = document.getElementById('vinyl-container');
         //const particleController = document.getElementById('particle-toggle-button');
-        const wishesToggleButton = document.getElementById('wishes-toggle-button');
-        const controlsPanel = document.getElementById('particle-controls');
+        //const wishesToggleButton = document.getElementById('wishes-toggle-button');
+        //const controlsPanel = document.getElementById('particle-controls');
 
         /* 2. Lấy Cấu Hình từ Server (MongoDB)
         let serverConfig = {
@@ -457,9 +452,14 @@ export const guest = (() => {
             console.warn("Lỗi tải config, dùng mặc định.");
         }*/
 
-        // 3. Tải tài nguyên (Chạy song song cho nhanh)
+        // 3. Quyết định trạng thái Khởi động (Lưu vào scope chung)
+        window.SERVER_CONFIG = serverConfig;
+
+        // 4. Tải tài nguyên (Chạy song song cho nhanh)
         vid.load();
         img.load();
+        lib.load({ confetti: serverConfig.confetti_enabled });
+        aud.load(serverConfig.music_enabled);
 
 
         // 4. Xử lý sự kiện giao diện (Giữ nguyên)
