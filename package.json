@@ -14,13 +14,14 @@
         "lint:css": "stylelint css",
         "lint:html": "htmlhint **/*.html",
         "dev": "npx esbuild js/*.js --bundle --outdir=dist --servedir=. --serve=8081",
-        "build": "npx esbuild js/*.js --bundle --minify --outdir=dist",
+        "build": "npx esbuild js/*.js --bundle --minify --outdir=dist --external:page-flip",
         "build:public": "npm run build && mkdir public && cp -r dist public/ && cp -r assets public/ && cp -r css public/ && cp -r js public/ && cp index.html public/ && cp dashboard.html public/"
     },
     "dependencies": {
         "esbuild": "^0.25.10",
         "gulp": "^5.0.1",
         "mongodb": "^7.0.0",
+        "page-flip": "^2.0.7",
         "path": "^0.12.7"
     }
 }
