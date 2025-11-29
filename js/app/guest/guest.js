@@ -606,7 +606,7 @@ export const guest = (() => {
                 gravity: 0.5,
                 drift: Math.random() * 0.5 - 0.25,
                 disableForReducedMotion: true,
-                zIndex: 2000
+                zIndex: 9999
             };
 
             // --- XỬ LÝ TỪNG LOẠI ---

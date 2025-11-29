@@ -94,8 +94,8 @@ export const audio = (() => {
         
         // --- TRƯỜNG HỢP TẮT NHẠC ---
         if (!isMusicEnabled) {
-            console.log("Music is disabled by Admin.");
-            if (els.widget) els.widget.classList.add('d-none'); // Ẩn giao diện
+            //console.log("Music is disabled by Admin.");
+            //if (els.widget) els.widget.classList.add('d-none'); // Ẩn giao diện
             progress.complete('audio'); // Báo load xong để không kẹt Loading
             return { load: () => {} }; // THOÁT NGAY LẬP TỨC
         }

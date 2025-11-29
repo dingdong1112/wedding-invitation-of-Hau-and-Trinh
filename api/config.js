@@ -29,7 +29,7 @@ export default async function handler(req, res) {
                 music_enabled: mainConfig.music_enabled !== false, // Mặc định true
                 vinyl_enabled: mainConfig.vinyl_enabled !== false,
                 wishes_popup_enabled: mainConfig.wishes_popup_enabled !== false,
-                particle_control_enabled: mainConfig.particle_control_enabled !== false,
+                //particle_control_enabled: mainConfig.particle_control_enabled !== false,
             }
         });
     } catch (error) {
