@@ -25,7 +25,7 @@ export const audio = (() => {
 
     let audioEl = new Audio();
     // Cấu hình CORS để Web Audio API hoạt động không bị lỗi bảo mật
-    audioEl.crossOrigin = "anonymous"; 
+    audioEl.crossOrigin = "anonymous";
 
     let audioCtx = null;
     let gainNode = null;
@@ -34,9 +34,9 @@ export const audio = (() => {
     let currentIndex = 0;
     let isPlaying = false;
     let isPanelOpen = false;
-    
-    let isShuffle = false; 
-    let loopMode = 1; 
+
+    let isShuffle = false;
+    let loopMode = 1;
 
     // Các Element giao diện
     const els = {
@@ -51,7 +51,7 @@ export const audio = (() => {
         if (isPanelOpen && els.panel && els.toggleBtn) {
             isPanelOpen = false;
             els.panel.classList.add('d-none');
-            if(isPlaying) els.toggleBtn.classList.add('spin-slow');
+            if (isPlaying) els.toggleBtn.classList.add('spin-slow');
             els.toggleBtn.innerHTML = '<i class="fa-solid fa-compact-disc"></i>';
         }
     };
@@ -68,11 +68,11 @@ export const audio = (() => {
             source = audioCtx.createMediaElementSource(audioEl);
             source.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
+
             // Set âm lượng mặc định (0.8)
             gainNode.gain.value = 0.8;
         }
-        
+
         // Resume nếu bị trình duyệt treo
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
@@ -85,9 +85,9 @@ export const audio = (() => {
         // 1. KIỂM TRA CONFIG TRƯỚC
         // Lưu ý: Phải đảm bảo file này đã import { storage } from '../../common/storage.js';
         const config = storage('config');
-        
+
         // Mặc định là TRUE (nếu chưa có config thì vẫn hiện nhạc)
-        const isMusicEnabled = config.get('music_enabled') !== false; 
+        const isMusicEnabled = config.get('music_enabled') !== false;
 
         // Lấy Widget ngay đầu để xử lý ẩn
         els.widget = document.getElementById('music-player-container');
@@ -102,26 +102,44 @@ export const audio = (() => {
         els.vinyl = document.getElementById('vinyl-container');
         els.shuffleBtn = document.getElementById('btn-shuffle');
         els.loopBtn = document.getElementById('btn-loop');
-        
+
         // --- TRƯỜNG HỢP TẮT NHẠC ---
-        /*if (!isMusicEnabled) {
+        if (!isMusicEnabled) {
             //console.log("Music is disabled by Admin.");
             //if (els.widget) els.widget.classList.add('d-none'); // Ẩn giao diện
             //progress.complete('audio'); // Báo load xong để không kẹt Loading
-            return { load: () => {} }; // THOÁT NGAY LẬP TỨC
-        }*/
+            if (els.toggleBtn) {
+                els.toggleBtn.addEventListener('click', () => {
+                    if (!isPanelOpen) {
+                        isPanelOpen = true;
+                        els.panel.classList.remove('d-none');
+                        els.toggleBtn.classList.remove('spin-slow');
+                        els.toggleBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+
+                        // Đóng bảng pháo hoa nếu đang mở (Tương tác chéo)
+                        const particlePanel = document.getElementById('particle-controls');
+                        if (particlePanel) particlePanel.classList.remove('show');
+                    } else {
+                        closePanel();
+                    }
+                });
+            }
+            return { load: () => { } }; // THOÁT NGAY LẬP TỨC
+        }
 
         // --- TRƯỜNG HỢP BẬT NHẠC (Chạy tiếp xuống dưới) ---               
 
         // Sự kiện click nút Toggle
+
+
         if (els.toggleBtn) {
             els.toggleBtn.addEventListener('click', () => {
                 if (!isPanelOpen) {
                     isPanelOpen = true;
                     els.panel.classList.remove('d-none');
-                    els.toggleBtn.classList.remove('spin-slow'); 
+                    els.toggleBtn.classList.remove('spin-slow');
                     els.toggleBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-                    
+
                     // Đóng bảng pháo hoa nếu đang mở (Tương tác chéo)
                     const particlePanel = document.getElementById('particle-controls');
                     if (particlePanel) particlePanel.classList.remove('show');
@@ -133,7 +151,7 @@ export const audio = (() => {
 
         // Xử lý Playlist mặc định
         const defaultUrl = document.body.getAttribute('data-audio');
-        if(defaultUrl && playlist.length === 0) {
+        if (defaultUrl && playlist.length === 0) {
             playlist.push({ title: "Nhạc nền", src: defaultUrl });
         }
 
@@ -143,7 +161,7 @@ export const audio = (() => {
                 audioEl.currentTime = 0;
                 play();
             } else {
-                next(true); 
+                next(true);
             }
         });
 
@@ -160,17 +178,17 @@ export const audio = (() => {
             try {
                 initAudioContext(); // Kích hoạt Web Audio API
                 play();
-            } catch(e) { console.log("Autoplay blocked", e); }
+            } catch (e) { console.log("Autoplay blocked", e); }
         });
 
-        return { load: () => {} };
+        return { load: () => { } };
     };
 
     const loadTrack = (index) => {
         currentIndex = index;
         audioEl.src = playlist[currentIndex].src;
         audioEl.load();
-        if(els.title) els.title.innerText = playlist[currentIndex].title;
+        if (els.title) els.title.innerText = playlist[currentIndex].title;
         updatePlaylistUI();
     };
 
@@ -209,7 +227,7 @@ export const audio = (() => {
             loadTrack(randomIndex);
         } else {
             let nextIndex = currentIndex + 1;
-            if (nextIndex >= playlist.length) nextIndex = 0; 
+            if (nextIndex >= playlist.length) nextIndex = 0;
             loadTrack(nextIndex);
         }
         play();
@@ -233,7 +251,7 @@ export const audio = (() => {
         } else {
             // Fallback cho trường hợp chưa init (hiếm gặp)
             // Audio Tag thường chỉ max là 1
-            audioEl.volume = Math.min(volume, 1); 
+            audioEl.volume = Math.min(volume, 1);
         }
     };
 
@@ -250,21 +268,21 @@ export const audio = (() => {
     };
 
     const updateModeButtons = () => {
-        if(!els.shuffleBtn || !els.loopBtn) return;
+        if (!els.shuffleBtn || !els.loopBtn) return;
         if (isShuffle) els.shuffleBtn.classList.add('active');
         else els.shuffleBtn.classList.remove('active');
-        els.loopBtn.className = 'btn-control small'; 
-        if (loopMode === 1) els.loopBtn.classList.add('active'); 
-        else if (loopMode === 2) els.loopBtn.classList.add('active', 'loop-one'); 
+        els.loopBtn.className = 'btn-control small';
+        if (loopMode === 1) els.loopBtn.classList.add('active');
+        else if (loopMode === 2) els.loopBtn.classList.add('active', 'loop-one');
     };
 
     const togglePlaylist = () => els.playlistContainer.classList.toggle('d-none');
 
     const updatePlayButton = () => {
-        if(!els.playBtn) return;
+        if (!els.playBtn) return;
         if (isPlaying) {
             els.playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-            if(!isPanelOpen) els.toggleBtn?.classList.add('spin-slow');
+            if (!isPanelOpen) els.toggleBtn?.classList.add('spin-slow');
         } else {
             els.playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
             els.toggleBtn?.classList.remove('spin-slow');
@@ -277,7 +295,7 @@ export const audio = (() => {
     };
 
     const renderPlaylist = () => {
-        if(!els.playlistUl) return;
+        if (!els.playlistUl) return;
         els.playlistUl.innerHTML = '';
         playlist.forEach((track, i) => {
             const li = document.createElement('li');
@@ -291,7 +309,7 @@ export const audio = (() => {
     const updatePlaylistUI = () => {
         const items = document.querySelectorAll('.playlist-item');
         items.forEach((item, i) => {
-            if(i === currentIndex) item.classList.add('active');
+            if (i === currentIndex) item.classList.add('active');
             else item.classList.remove('active');
         });
     };
@@ -303,5 +321,5 @@ export const audio = (() => {
         closePanel
     };
 
-    return { init, load: () => {} };
+    return { init, load: () => { } };
 })();
