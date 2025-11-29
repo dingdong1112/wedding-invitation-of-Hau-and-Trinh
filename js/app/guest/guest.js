@@ -27,6 +27,9 @@ export const guest = (() => {
      */
     let config = null;
 
+    let currentAlbumImages = []; // Lưu danh sách ảnh sau khi fetch
+    let currentImageIndex = 0;
+
     const VERCEL_BASE_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app';
 
     /**
@@ -367,6 +370,17 @@ export const guest = (() => {
                 $(flipbookEl).turn('center');
                 $(flipbookEl).turn('resize');
 
+                $(flipbookEl).on('click', '.page', function () {
+                    // Lấy index của trang vừa click
+                    const pageIndex = $(this).attr('page');
+
+                    // Chuyển từ số trang sang index mảng (trang 1 là index 0)
+                    const imageIndex = parseInt(pageIndex) - 1;
+
+                    // Mở Modal Chi tiết
+                    openDetailView(imageIndex);
+                });
+
             }, 100); // Tăng độ trễ lên 100ms
         });
 
@@ -405,6 +419,83 @@ export const guest = (() => {
                 ? abs.classList.replace('d-none', 'd-flex')
                 : abs.classList.replace('d-flex', 'd-none');
         });
+    };
+
+    /**
+ * Mở View chi tiết ảnh (Full Screen)
+ * @param {number} startIndex
+ * @returns {void}
+ */
+    const openDetailView = (startIndex) => {
+        // Lấy dữ liệu ảnh đã có
+        currentAlbumImages = Array.from(document.querySelectorAll('#flipbook .page img')).map(img => img.src);
+        currentImageIndex = startIndex;
+
+        // Khởi tạo Modal chi tiết
+        const detailModal = bs.modal('detailModal');
+        const thumbContainer = document.getElementById('detail-thumbnails');
+
+        thumbContainer.innerHTML = ''; // Dọn dẹp
+
+        // 1. Dựng thanh Thumbnail
+        currentAlbumImages.forEach((src, index) => {
+            const thumb = document.createElement('img');
+            thumb.src = src;
+            thumb.className = 'rounded-3 shadow-sm cursor-pointer mx-1';
+            thumb.style.width = '60px';
+            thumb.style.height = '60px';
+            thumb.style.objectFit = 'cover';
+            thumb.onclick = () => showImageDetail(index);
+            thumbContainer.appendChild(thumb);
+        });
+
+        // 2. Thiết lập các nút điều hướng
+        const btnPrev = document.getElementById('btn-prev-detail');
+        const btnNext = document.getElementById('btn-next-detail');
+        btnPrev.onclick = () => navigateDetail(-1);
+        btnNext.onclick = () => navigateDetail(1);
+
+        // 3. Mở Modal và hiển thị ảnh đầu tiên
+        bs.modal('albumModal').hide(); // Đóng Modal Lật
+        detailModal.show();             // Mở Modal Chi tiết
+
+        // Đảm bảo Modal Lật hiển thị lại khi Modal Chi tiết đóng
+        $(detailModal.element).on('hidden.bs.modal', function () {
+            bs.modal('albumModal').show();
+        });
+
+        showImageDetail(startIndex);
+    };
+
+    // Hàm hiển thị ảnh chi tiết và update Thumbnail
+    const showImageDetail = (index) => {
+        if (index < 0 || index >= currentAlbumImages.length) return;
+
+        currentImageIndex = index;
+        const detailImage = document.getElementById('detail-image');
+        if (detailImage) {
+            detailImage.src = currentAlbumImages[index];
+        }
+
+        // Update highlight thumbnail
+        document.querySelectorAll('#detail-thumbnails img').forEach((img, i) => {
+            img.style.border = (i === index) ? '2px solid white' : 'none';
+            img.style.opacity = (i === index) ? 1 : 0.6;
+        });
+
+        // Cuộn ngang đến thumbnail đang chọn
+        const selectedThumb = document.querySelectorAll('#detail-thumbnails img')[index];
+        if (selectedThumb) {
+            selectedThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    };
+
+    // Hàm chuyển ảnh chi tiết
+    const navigateDetail = (direction) => {
+        let newIndex = currentImageIndex + direction;
+        if (newIndex >= currentAlbumImages.length) newIndex = 0;
+        if (newIndex < 0) newIndex = currentAlbumImages.length - 1;
+        showImageDetail(newIndex);
     };
 
     /**

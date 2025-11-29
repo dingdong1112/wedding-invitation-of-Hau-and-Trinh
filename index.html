@@ -615,6 +615,13 @@
                                 <div id="flipbook" class="mx-auto" style="display: none; width: 800px; height: 500px;">
                                 </div>
 
+                                <!-- HƯỚNG DẪN ĐỘNG -->
+                                <div id="flip-instructions" class="d-flex align-items-center">
+                                    <span class="instruction-arrow"><i class="fa-solid fa-angle-left"></i></span>
+                                    <span>Lướt hoặc nhấp để lật trang</span>
+                                    <span class="instruction-arrow"><i class="fa-solid fa-angle-right"></i></span>
+                                </div>
+
                                 <!-- Nút đóng -->
                                 <button type="button"
                                     class="btn btn-light rounded-circle shadow-lg position-absolute z-1"
@@ -1552,6 +1559,37 @@
             <p id="wish-message">Nội dung lời chúc sẽ hiện ở đây...</p>
         </div>
     </div>
+    <!-- MODAL XEM CHI TIẾT ẢNH VÀ THUMBNAIL -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-black">
+                <!-- Nút đóng (Về lại Album Lật) -->
+                <button type="button" class="btn btn-light rounded-circle shadow-lg position-absolute z-1"
+                    style="top: 10px; left: 10px;" data-bs-dismiss="modal" id="btn-close-detail-modal">
+                    <i class="fa-solid fa-angle-left"></i>
+                </button>
+
+                <div class="modal-body p-0 d-flex flex-column" id="detail-modal-body">
+
+                    <!-- 1. KHU VỰC ẢNH LỚN -->
+                    <div class="flex-grow-1 d-flex justify-content-center align-items-center p-3 position-relative">
+                        <img id="detail-image" src="" class="img-fluid" style="max-height: 90vh; object-fit: contain;">
+                        <!-- Nút chuyển ảnh -->
+                        <button id="btn-prev-detail" class="btn btn-light rounded-circle position-absolute"
+                            style="left: 10px;"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button id="btn-next-detail" class="btn btn-light rounded-circle position-absolute"
+                            style="right: 10px;"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+
+                    <!-- 2. KHU VỰC THUMBNAIL LƯỚT NGANG -->
+                    <div class="bg-dark p-2" style="height: 100px; flex-shrink: 0;">
+                        <div id="detail-thumbnails" class="d-flex overflow-x-scroll h-100 align-items-center">
+                            <!-- Thẻ ảnh nhỏ sẽ được JS thêm vào đây -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="./js/libs/turn.js"></script>
 </body>
