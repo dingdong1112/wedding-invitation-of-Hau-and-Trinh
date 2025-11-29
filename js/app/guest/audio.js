@@ -103,35 +103,7 @@ export const audio = (() => {
         els.shuffleBtn = document.getElementById('btn-shuffle');
         els.loopBtn = document.getElementById('btn-loop');
 
-        // --- TRƯỜNG HỢP TẮT NHẠC ---
-        if (!isMusicEnabled) {
-            //console.log("Music is disabled by Admin.");
-            //if (els.widget) els.widget.classList.add('d-none'); // Ẩn giao diện
-            //progress.complete('audio'); // Báo load xong để không kẹt Loading
-            if (els.toggleBtn) {
-                els.toggleBtn.addEventListener('click', () => {
-                    if (!isPanelOpen) {
-                        isPanelOpen = true;
-                        els.panel.classList.remove('d-none');
-                        els.toggleBtn.classList.remove('spin-slow');
-                        els.toggleBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-
-                        // Đóng bảng pháo hoa nếu đang mở (Tương tác chéo)
-                        const particlePanel = document.getElementById('particle-controls');
-                        if (particlePanel) particlePanel.classList.remove('show');
-                    } else {
-                        closePanel();
-                    }
-                });
-            }
-            return { load: () => { } }; // THOÁT NGAY LẬP TỨC
-        }
-
-        // --- TRƯỜNG HỢP BẬT NHẠC (Chạy tiếp xuống dưới) ---               
-
         // Sự kiện click nút Toggle
-
-
         if (els.toggleBtn) {
             els.toggleBtn.addEventListener('click', () => {
                 if (!isPanelOpen) {
@@ -167,6 +139,16 @@ export const audio = (() => {
 
         // Render giao diện lần đầu
         renderPlaylist();
+        // --- TRƯỜNG HỢP TẮT NHẠC ---
+        if (!isMusicEnabled) {
+            //console.log("Music is disabled by Admin.");
+            //if (els.widget) els.widget.classList.add('d-none'); // Ẩn giao diện
+            //progress.complete('audio'); // Báo load xong để không kẹt Loading
+
+            return { load: () => { } }; // THOÁT NGAY LẬP TỨC
+        }
+
+        // --- TRƯỜNG HỢP BẬT NHẠC (Chạy tiếp xuống dưới) ---               
         loadTrack(0);
         updateModeButtons();
 
