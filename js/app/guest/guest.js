@@ -333,7 +333,11 @@ export const guest = (() => {
         $(modalElement).off('hidden.bs.modal');
 
         $(modalElement).on('shown.bs.modal', function () {
-
+            // HIỆN CHỈ DẪN SAU KHI ALBUM SẴN SÀNG
+            const instructions = document.getElementById('flip-instructions');
+            if (instructions) {
+                instructions.style.display = 'flex';
+            }
             // --- CHỜ 100ms ĐỂ CÁC KÍCH THƯỚC TRỞ NÊN ỔN ĐỊNH ---
             setTimeout(() => {
 
@@ -370,15 +374,49 @@ export const guest = (() => {
                 $(flipbookEl).turn('center');
                 $(flipbookEl).turn('resize');
 
-                $(flipbookEl).on('click', '.page', function () {
-                    // Lấy index của trang vừa click
-                    const pageIndex = $(this).attr('page');
+                setTimeout(() => {
+                    $(flipbookEl).on('click', '.page', function (e) {
+                        // Log để debug
+                        console.log('--- Page Clicked ---');
 
-                    // Chuyển từ số trang sang index mảng (trang 1 là index 0)
-                    const imageIndex = parseInt(pageIndex) - 1;
+                        // Lấy số trang
+                        const pageNumber = $(this).attr('page');
+                        if (!pageNumber) return; // Nếu không phải trang lật (ví dụ: gáy sách) thì dừng
 
-                    // Mở Modal Chi tiết
-                    openDetailView(imageIndex);
+                        // Chuyển từ số trang sang index mảng
+                        const imageIndex = parseInt(pageNumber) - 1;
+
+                        // Kiểm tra xem trang có đang lật không (Quan trọng!)
+                        if ($(flipbookEl).turn('isTurning') || $(flipbookEl).turn('isZoomed')) {
+                            return; // Không làm gì nếu đang lật hoặc zoom
+                        }
+
+                        // Mở Modal Chi tiết
+                        openDetailView(imageIndex);
+
+                        // Buộc return false để chặn các sự kiện click/tap khác của Turn.js
+                        return false;
+                    });
+                }, 500);
+
+                $(flipbookEl).on('touchstart', '.page', function (e) {
+                    // Chặn hành vi mặc định (lật trang)
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Lấy index (Turn.js sử dụng thuộc tính 'page' hoặc index DOM)
+                    const pageNumber = $(this).attr('page') || $(this).index() + 1;
+                    const imageIndex = parseInt(pageNumber) - 1;
+
+                    // Kiểm tra xem đây có phải là thao tác lật (drag) hay chỉ là tap (click)
+                    // Nếu là thao tác lật, ta không mở Detail View. 
+                    // Nếu là tap, ta mở Detail View.
+
+                    // Đây là logic đơn giản nhất: Mở Detail View
+                    if (imageIndex >= 0) {
+                        console.log('Clicked page index:', imageIndex);
+                        openDetailView(imageIndex);
+                    }
                 });
 
             }, 100); // Tăng độ trễ lên 100ms
@@ -390,6 +428,11 @@ export const guest = (() => {
                 $(flipbookEl).turn('destroy').html('');
             }
             flipbookEl.style.display = 'none';
+            // ẨN CHỈ DẪN
+            const instructions = document.getElementById('flip-instructions');
+            if (instructions) {
+                instructions.style.display = 'none';
+            }
         });
     };
 
@@ -665,7 +708,7 @@ export const guest = (() => {
         let serverConfig = {
             confetti_enabled: document.body.getAttribute('data-confetti') === 'true'
         };
-
+ 
         try {
             // Serverless Function sẽ tự thêm hostname
             const res = await fetch('/api/config');

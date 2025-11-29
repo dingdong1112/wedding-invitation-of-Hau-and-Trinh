@@ -842,9 +842,10 @@ svg {
     transform: translateX(-50%);
     color: white;
     font-size: 0.8rem;
-    z-index: 1060;
+    z-index: 5000;
     pointer-events: none;
     opacity: 0.8;
+    display: flex;
 }
 
 .instruction-arrow {
