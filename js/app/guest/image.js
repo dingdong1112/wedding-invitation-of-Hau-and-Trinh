@@ -116,7 +116,7 @@ export const image = (() => {
      */
     const init = () => {
         c = cache('image').withForceCache();
-        images = document.querySelectorAll('img');
+         images = document.querySelectorAll('img:not(.modal-body img)');
         images.forEach(progress.add);
 
         return {
