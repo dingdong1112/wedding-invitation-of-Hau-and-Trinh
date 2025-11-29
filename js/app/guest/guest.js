@@ -1201,10 +1201,10 @@ export const guest = (() => {
             comment,
             guest: {
                 open,
-                modal,
+                //modal,
                 showStory,
                 closeInformation,
-                openAlbum,
+                //openAlbum,
                 initGallery: initSwiperGallery,
             },
         };
