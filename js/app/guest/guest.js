@@ -246,7 +246,7 @@ export const guest = (() => {
             comment.init();
         } else {
             wishesToggleButton.style.display = 'none';
-        }        
+        }
 
         slide();
         theme.spyTop();
@@ -436,7 +436,7 @@ export const guest = (() => {
                 Object.entries(serverConfig).forEach(([k, v]) => config.set(k, v));
             }
         } catch (e) {
-            console.warn("Lỗi tải config, dùng mặc định.");
+            console.warn("Lỗi tải config, dùng mặc định:", e);
         }
 
         // Cần đảm bảo các element có sẵn để tránh lỗi JS

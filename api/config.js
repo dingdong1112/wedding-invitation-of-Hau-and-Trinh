@@ -5,8 +5,18 @@ const uri = process.env.MONGO_URI || "mongodb+srv://admin:admin0123@weddingdb.p6
 const client = new MongoClient(uri);
 
 export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    // --- CẤU HÌNH CORS (CHUẨN HÓA) ---
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Cho phép mọi domain (cả localhost)
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS'); // Chỉ cho GET và OPTIONS
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Xử lý request OPTIONS (preflight)
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+    // ------------------------------------
 
     try {
         await client.connect();
