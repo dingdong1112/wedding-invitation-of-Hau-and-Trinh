@@ -898,7 +898,7 @@ export const guest = (() => {
                 startPage: 0,
                 clickEventForward: false,
                 useMouseEvents: true
-            });
+            });            
 
             pageFlipInstance.loadFromHTML(pageElements);
 
@@ -939,7 +939,9 @@ export const guest = (() => {
                 }
                 isTouching = false;
             });
-        });
+        });        
+
+            pageFlipInstance.loadFromHTML(pageElements);
 
         // 7. Khi modal đóng → destroy PageFlip và reset #book
         $(modalElement).on('hidden.bs.modal', function () {
