@@ -16,7 +16,7 @@ import { pool } from '../../connection/request.js';
 
 // --- CẤU HÌNH VÀ BIẾN GLOBAL ---
 const VERCEL_BASE_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app';
-const BOOK_RATIO = 1.6;
+const BOOK_RATIO = 6 / 4; // Width / Height chuẩn, chỉnh theo ảnh thực tế
 let allImagesUrls = [];
 let pageFlipInstance = null; // Instance của PageFlip
 let currentDetailIndex = 0;
@@ -760,7 +760,7 @@ export const guest = (() => {
 
         // 3. Mở Modal và hiển thị ảnh đầu tiên
         bs.modal('albumModal').hide();
-        detailModal.show();
+        detailModal.show(1);
 
         // Gán sự kiện cho các nút điều hướng (đã nằm trong HTML)
 
@@ -814,85 +814,277 @@ export const guest = (() => {
         showImageDetail(newIndex);
     };
 
+
     // --- HÀM 3: KHỞI TẠO ALBUM LẬT (CHÍNH) ---
     /** @returns {void} */
     const initPageFlipAlbum = async (ext = 'webp') => {
-        const bookEl = document.getElementById('book');
+        // 1. Lấy container và modal
+        let bookEl = document.getElementById('book');
         const modalElement = document.getElementById('albumModal');
 
-        // 1. Tải ảnh và kiểm tra
+        // Kiểm tra tồn tại container        
+        if (!bookEl) {
+            //errorLog("Lỗi: Không tìm thấy #book trong DOM, tạo lại phần tử này.");
+            const modalBody = document.querySelector('#albumModal .modal-body');
+            if (!modalBody) {
+                console.error('Lỗi: modal-body không tồn tại, không thể tạo lại #book!');
+                return null;
+            }
+
+            // Chèn lại #book vào modal-body
+            modalBody.insertAdjacentHTML('afterbegin', `
+            <div id="book" style="display: none;">
+                <!-- Trang ảnh sẽ được JS thêm vào đây -->
+            </div>
+        `);
+        }
+
+        if (!modalElement) {
+            console.error("Lỗi: Không tìm thấy modal #albumModal trong DOM!");
+            return;
+        }
+
+        // 2. Tải ảnh
         const images = await fetchGalleryImages(ext);
         allImagesUrls = images; // Lưu vào biến global
         if (images.length === 0) return;
 
-        // 2. Tính toán kích thước (Co giãn theo màn hình)
+        // 3. Tính toán kích thước sách
         const screenWidth = window.innerWidth;
-        const finalWidth = Math.min(800, screenWidth * 0.95);
+        const finalWidth = Math.min(800, screenWidth * 0.95); // tổng width sách
         const finalHeight = finalWidth / BOOK_RATIO;
         const singlePageWidth = finalWidth / 2;
 
-        // 3. Chuẩn bị HTML (Pages)
-        //bookEl.innerHTML = '';
-        const pageElements = images.map((url, index) => {
-            const page = document.createElement('div');
-            page.className = 'my-page';
-            page.setAttribute('data-page-index', index); // Dùng attribute để dễ truy xuất
-            if (index === 0 || index === images.length - 1) {
-                page.setAttribute('data-density', 'hard'); // Bìa sách
-            }
-
-            page.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            //bookEl.appendChild(page);
-            return page;
-        });
-
-
-        // 4. Khởi tạo PageFlip
-        if (typeof St === 'undefined' || typeof St.PageFlip === 'undefined') {
-            // Thông báo lỗi cụ thể để dễ debug
-            util.notify("Lỗi: Thư viện PageFlip (St) chưa được tải.").error();
-            return;
+        // 4. Destroy instance cũ nếu tồn tại
+        if (pageFlipInstance) {
+            pageFlipInstance.destroy();
+            pageFlipInstance = null;
         }
-        pageFlipInstance = new St.PageFlip(bookEl, {
-            width: singlePageWidth,
-            height: finalHeight,
-            size: 'stretch', // Sách sẽ tự co giãn theo Modal
-            drawShadow: true,
-            flippingTime: 700, // Hiệu ứng lật nhanh hơn 
-            showCover: true,
-            disableFlipByClick: false,
-            usePortrait: true,
-            startPage: 0,
-        });
-        //const childrenClones = Array.from(bookEl.children).map(child => child.cloneNode(true));
 
-        pageFlipInstance.loadFromHTML(pageElements);
+        // 5. Clear container
+        bookEl.innerHTML = '';
         bookEl.style.display = 'block';
 
-        // 5. Gắn sự kiện Mở Detail khi click vào trang
-        bookEl.addEventListener('click', (e) => {
-            if (e.target.tagName === 'IMG') {
-                const pageEl = e.target.closest('.my-page');
-                const pageIndex = parseInt(pageEl.getAttribute('data-page-index'));
+        // 5. Show modal
+        const bsModal = new bootstrap.Modal(modalElement);
+        bsModal.show();
 
-                // Lấy URL ảnh chính xác
+        // 6. Delay 1 frame để modal render xong
+        requestAnimationFrame(() => {
+            const screenWidth = window.innerWidth;
+            const finalWidth = Math.min(800, screenWidth * 0.95);
+            const finalHeight = finalWidth / BOOK_RATIO;
+            const singlePageWidth = finalWidth / 2;
+
+            // 6a. Tạo page elements
+            const pageElements = allImagesUrls.map((url, index) => {
+                const page = document.createElement('div');
+                page.className = 'my-page';
+                page.dataset.pageIndex = index;
+                if (index === 0 || index === allImagesUrls.length - 1) page.dataset.density = 'hard';
+                page.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+                return page;
+            });
+
+            // 6b. Khởi tạo PageFlip
+            pageFlipInstance = new St.PageFlip(bookEl, {
+                width: singlePageWidth,
+                height: finalHeight,
+                size: 'stretch',
+                drawShadow: true,
+                flippingTime: 600,
+                showCover: true,
+                disableFlipByClick: true,   // <<--- TẮT click lật
+                startPage: 0,
+                clickEventForward: false,
+                useMouseEvents: true
+            });
+
+            pageFlipInstance.loadFromHTML(pageElements);
+
+            // 6c. Chặn dblclick PageFlip, dùng riêng mở modal detail
+            bookEl.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                const img = e.target.closest("img");
+                if (!img) return;
+
+                const pageEl = img.closest(".my-page");
+                if (!pageEl) return;
+
+                const pageIndex = parseInt(pageEl.dataset.pageIndex);
                 const imageUrl = allImagesUrls[pageIndex];
 
-                // Mở Modal Chi tiết
                 openDetailModal(imageUrl, `Ảnh ${pageIndex + 1}`);
+            }, true); // capture = true
+
+            // 6d. Touch swipe nâng cao
+            let startX = 0, startY = 0, isTouching = false;
+            bookEl.addEventListener('touchstart', e => {
+                if (e.touches.length === 1) {
+                    isTouching = true;
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                }
+            });
+            bookEl.addEventListener('touchend', e => {
+                if (!isTouching) return;
+                const dx = e.changedTouches[0].clientX - startX;
+                const dy = e.changedTouches[0].clientY - startY;
+                if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) {
+                    if (dx > 0) pageFlipInstance.flipPrev('top');
+                    else pageFlipInstance.flipNext('top');
+                }
+                isTouching = false;
+            });
+        });
+
+        // 7. Khi modal đóng → destroy PageFlip và reset #book
+        $(modalElement).on('hidden.bs.modal', function () {
+            if (pageFlipInstance) {
+                pageFlipInstance.destroy();
+                pageFlipInstance = null;
+            }
+            const bookEl = document.getElementById('book');
+            if (bookEl) {
+                bookEl.outerHTML = `
+            <div id="book" style="display:none;">
+                <!-- Trang ảnh sẽ được JS thêm vào đây -->
+            </div>`;
             }
         });
 
-        // 6. Gắn sự kiện Đóng Modal và Dọn dẹp
+        // 9. Gắn sự kiện khi đóng modal để destroy PageFlip và clear container
         $(modalElement).on('hidden.bs.modal', function () {
-            pageFlipInstance.destroy();
-            bookEl.style.display = 'none';
+            if (pageFlipInstance) {
+                pageFlipInstance.destroy();
+                pageFlipInstance = null;
+            }
+            bookEl.innerHTML = '';
+            bookEl.id = '';
+            //bookEl.style.display = 'none';
         });
-
-        // 7. Hiển thị Modal
-        bs.modal('albumModal').show();
     };
+
+    // ĐÓNG ALBUM
+    function closeDetailModal2() {
+        const albumModalEl = document.getElementById("albumModal");
+        let bookEl = document.getElementById("book");
+
+        // === 1. Xóa toàn bộ phần tử con của #book & reset về HTML nguyên bản ===
+        if (bookEl) {
+            bookEl.outerHTML = `
+            <div id="book" style="display: none;">
+                <!-- Trang ảnh sẽ được JS thêm vào đây -->
+            </div>
+        `;
+        }
+
+        // Sau khi outerHTML, phải query lại #book (vì nó đã là phần tử mới)
+        bookEl = document.getElementById("book");
+
+        // === 2. Tắt modal thủ công (KHÔNG để Bootstrap xóa DOM) ===
+        if (albumModalEl) {
+            albumModalEl.classList.remove("show");
+            albumModalEl.style.display = "none";
+        }
+
+        // === 3. Xóa backdrop nếu còn ===
+        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+
+        // === 4. Gỡ toàn bộ khóa scroll của Bootstrap ===
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
+        document.body.removeAttribute("style");
+
+        console.log("Album đã đóng và thẻ #book đã reset về trạng thái ban đầu.");
+    }
+
+    // --- Detail modal với swipe + pinch zoom ---
+    function openDetailModalSwipeZoom(index) {
+        const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+        const imgEl = document.getElementById('detail-fullscreen-image');
+        imgEl.src = allImagesUrls[index];
+
+        let currentIndex = index;
+        let scale = 1, moveX = 0, moveY = 0;
+        let startDist = null, startX = 0, startY = 0;
+
+        imgEl.style.transform = 'scale(1) translate(0,0)';
+        imgEl.style.transition = 'transform 0.2s ease-out';
+
+        detailModal.show();
+
+        // Pinch & drag
+        imgEl.ontouchstart = (e) => {
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].pageX - e.touches[1].pageX;
+                const dy = e.touches[0].pageY - e.touches[1].pageY;
+                startDist = Math.hypot(dx, dy);
+            } else if (e.touches.length === 1 && scale > 1) {
+                startX = e.touches[0].pageX - moveX;
+                startY = e.touches[0].pageY - moveY;
+            }
+        };
+
+        imgEl.ontouchmove = (e) => {
+            e.preventDefault();
+            if (e.touches.length === 2 && startDist) {
+                const dx = e.touches[0].pageX - e.touches[1].pageX;
+                const dy = e.touches[0].pageY - e.touches[1].pageY;
+                const dist = Math.hypot(dx, dy);
+                scale *= dist / startDist;
+                scale = Math.max(1, Math.min(scale, 4));
+                imgEl.style.transform = `scale(${scale}) translate(${moveX}px,${moveY}px)`;
+                startDist = dist;
+            } else if (e.touches.length === 1 && scale > 1) {
+                moveX = e.touches[0].pageX - startX;
+                moveY = e.touches[0].pageY - startY;
+                imgEl.style.transform = `scale(${scale}) translate(${moveX}px,${moveY}px)`;
+            }
+        };
+
+        imgEl.ontouchend = () => { startDist = null; };
+
+        // Swipe next/prev ảnh
+        let touchStartX = 0;
+        imgEl.addEventListener('touchstart', e => { if (e.touches.length === 1) touchStartX = e.touches[0].clientX; });
+        imgEl.addEventListener('touchend', e => {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(dx) > 50) {
+                if (dx < 0) currentIndex = Math.min(currentIndex + 1, allImagesUrls.length - 1);
+                else currentIndex = Math.max(currentIndex - 1, 0);
+                imgEl.src = allImagesUrls[currentIndex];
+                scale = 1; moveX = 0; moveY = 0;
+                imgEl.style.transform = 'scale(1) translate(0,0)';
+            }
+        });
+    }
+
     //KẾT THÚC CODE PHẦN PAGE-TURNING ANIMATION CHO ẢNH THƯ VIỆN ---
+
+    function closeDetailModal() {
+        const detailModalEl = document.getElementById("detailModal");
+        const imgEl = document.getElementById("detail-fullscreen-image");
+
+        // 1. Reset zoom & vị trí
+        imgEl.style.transform = "scale(1) translate(0,0)";
+        imgEl.src = "";
+
+        // 2. Đóng modal detail
+        const modalInstance = bootstrap.Modal.getInstance(detailModalEl)
+            || new bootstrap.Modal(detailModalEl);
+
+        modalInstance.hide();
+
+        // 3. (OPTIONAL) mở lại album
+        const albumModalEl = document.getElementById("albumModal");
+        const albumModal = new bootstrap.Modal(albumModalEl);
+        albumModal.show();
+    }
 
     /**
      * @returns {object}
@@ -933,6 +1125,8 @@ export const guest = (() => {
                 closeInformation,
                 openAlbum: initPageFlipAlbum, // Gán hàm khởi tạo Album vào API công khai
                 openDetail: openDetailModal, // Export hàm mở chi tiết
+                closeDetailModal2,
+                closeDetailModal,
             },
         };
     };

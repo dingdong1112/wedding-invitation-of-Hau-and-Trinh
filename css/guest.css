@@ -796,3 +796,12 @@ svg {
 #detail-thumbnails img {
     transition: all 0.3s ease;
 }
+
+#book { width:100%; height:100%; }
+.my-page img { user-select:none; pointer-events:none; }
+#album-thumbnail img { transition: transform 0.3s ease; }
+#album-thumbnail:hover img { transform: scale(1.05); }
+#detail-fullscreen-image { touch-action: none; }
+#book-container { max-width: 95vw; max-height: 80vh; }
+#page-indicator { font-size: 0.85rem; }
+
