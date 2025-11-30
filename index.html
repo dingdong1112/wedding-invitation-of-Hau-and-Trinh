@@ -611,49 +611,29 @@
                         <div class="modal-content" style="background: none; border: none;">
                             <div class="modal-body p-0 d-flex justify-content-center align-items-center">
 
-                                <!-- THAY ĐỔI LỚN Ở ĐÂY: Thêm min-width và min-height để force kích thước hiển thị -->
-                                <div id="album-controls-wrapper"
-                                    class="d-flex flex-column align-items-center position-relative"
-                                    style="min-width: 80vw;  max-width: 85vh; min-height: 80vh; max-height: 85vh;">
-                                    <!-- 80vw/80vh đảm bảo vùng này chiếm 80% màn hình, giúp các nút nằm xa nhau -->
-
-                                    <!-- Vùng chứa NÚT ĐIỀU KHIỂN (Danh sách ảnh và Đóng) -->
-                                    <!-- top: -60px và right: 0. Các giá trị này sẽ được tính toán so với kích thước lớn của wrapper -->
-                                    <div class="position-absolute z-3 d-flex gap-2" style="top: -60px; right: 0;">
-
-                                        <!-- Nút Danh sách ảnh -->
-                                        <button type="button" class="btn btn-info shadow-lg text-white"
-                                            id="btn-list-photos" onclick="undangan.guest.openDetail()">
-                                            <i class="fa-solid fa-list-ul me-1"></i> Danh sách ảnh
-                                        </button>
-
-                                        <!-- Nút Đóng -->
-                                        <button type="button" class="btn btn-light rounded-circle shadow-lg"
-                                            id="btn-close-album-top" onclick="undangan.guest.closeDetailModal2()">
-                                            <i class="fa-solid fa-xmark"></i>
-                                        </button>
-                                    </div>
-
-                                    <!-- Vùng chứa SÁCH (ID: book) -->
-                                    <!-- Lưu ý: Nếu #book được khởi tạo bằng JS, bạn phải đảm bảo JS cũng thiết lập kích thước lớn cho nó. -->
-                                    <div id="book" style="display: none;">
-                                        <!-- Trang ảnh sẽ được JS thêm vào đây -->
-                                    </div>
-
-                                    <!-- HƯỚNG DẪN ĐỘNG -->
-                                    <!-- Vị trí: Căn giữa, nằm dưới album. -->
-                                    <div id="flip-instructions" class="d-flex align-items-center mt-4 text-white">
-                                        <span class="instruction-arrow"><i class="fa-solid fa-angle-left"></i></span>
-                                        <span>Lướt hoặc nhấp để lật trang</span>
-                                        <span class="instruction-arrow"><i class="fa-solid fa-angle-right"></i></span>
-                                    </div>
-
+                                <!-- Vùng chứa SÁCH (ID: book) -->
+                                <div id="book" style="display: none;">
+                                    <!-- Trang ảnh sẽ được JS thêm vào đây -->
                                 </div>
 
+                                <!-- HƯỚNG DẪN ĐỘNG -->
+                                <div id="flip-instructions" class="d-flex align-items-center">
+                                    <span class="instruction-arrow"><i class="fa-solid fa-angle-left"></i></span>
+                                    <span>Lướt hoặc nhấp để lật trang</span>
+                                    <span class="instruction-arrow"><i class="fa-solid fa-angle-right"></i></span>
+                                </div>
+
+                                <!-- Nút đóng -->
+                                <button type="button"
+                                    class="btn btn-light rounded-circle shadow-lg position-absolute z-1"
+                                    style="top: 10px; right: 10px;" id="btn-close-detail2">
+                                    <i class="fa-solid fa-xmark" onclick="undangan.guest.closeDetailModal2()"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <!-- MODAL XEM CHI TIẾT ẢNH (SINGLE IMAGE VIEWER) -->
                 <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
                     <div class="modal-dialog modal-fullscreen">
@@ -1178,8 +1158,7 @@
                             <div class="collapse" id="collapseTf">
                                 <hr class="my-2 py-1">
                                 <p class="m-0" style="font-size: 0.9rem;"><i
-                                        class="fa-solid fa-building-columns me-1"></i>Bank
-                                    Central Asia</p>
+                                        class="fa-solid fa-building-columns me-1"></i>Bank Central Asia</p>
                                 <div class="d-flex justify-content-between align-items-center mt-2">
                                     <p class="m-0 p-0" style="font-size: 0.85rem;"><i
                                             class="fa-solid fa-credit-card me-1"></i>1234567891234</p>
@@ -1273,8 +1252,7 @@
                                 <!-- Chọn tham dự -->
                                 <div class="mb-3">
                                     <label class="form-label my-1"><i
-                                            class="fa-solid fa-person-circle-question me-2"></i>Xác
-                                        nhận tham dự</label>
+                                            class="fa-solid fa-person-circle-question me-2"></i>Xác nhận tham dự</label>
                                     <select class="form-select shadow-sm rounded-4" name="ThamDu">
                                         <option value="Có">🙋🏻‍♂️ Chắc chắn sẽ đến</option>
                                         <option value="Không">🙅🏻‍♂️ Rất tiếc không thể tham dự</option>

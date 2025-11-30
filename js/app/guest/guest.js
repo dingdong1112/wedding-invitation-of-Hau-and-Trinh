@@ -941,7 +941,6 @@ export const guest = (() => {
             });
         });        
 
-            pageFlipInstance.loadFromHTML(pageElements);
 
         // 7. Khi modal đóng → destroy PageFlip và reset #book
         $(modalElement).on('hidden.bs.modal', function () {
