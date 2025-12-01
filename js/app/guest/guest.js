@@ -869,6 +869,8 @@ export const guest = (() => {
         const bsModal = new bootstrap.Modal(modalElement);
         bsModal.show();
 
+
+
         // 6. Delay 1 frame để modal render xong
         requestAnimationFrame(() => {
             const screenWidth = window.innerWidth;
@@ -876,31 +878,8 @@ export const guest = (() => {
             const finalHeight = finalWidth / BOOK_RATIO;
             const singlePageWidth = finalWidth / 2;
 
-            // 6a. Tạo page elements
-            const pageElements = allImagesUrls.map((url, index) => {
-                const page = document.createElement('div');
-                page.className = 'my-page';
-                page.dataset.pageIndex = index;
-                if (index === 0 || index === allImagesUrls.length - 1) page.dataset.density = 'hard';
-                page.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
-                return page;
-            });
 
-            // 6b. Khởi tạo PageFlip
-            pageFlipInstance = new St.PageFlip(bookEl, {
-                width: singlePageWidth,
-                height: finalHeight,
-                size: 'stretch',
-                drawShadow: true,
-                flippingTime: 600,
-                showCover: true,
-                disableFlipByClick: true,   // <<--- TẮT click lật
-                startPage: 0,
-                clickEventForward: false,
-                useMouseEvents: true
-            });            
 
-            pageFlipInstance.loadFromHTML(pageElements);
 
             // 6c. Chặn dblclick PageFlip, dùng riêng mở modal detail
             bookEl.addEventListener("click", (e) => {
@@ -939,7 +918,36 @@ export const guest = (() => {
                 }
                 isTouching = false;
             });
-        });        
+        });
+
+        // 6a. Tạo page elements
+        const pageElements = allImagesUrls.map((url, index) => {
+            const page = document.createElement('div');
+            page.className = 'my-page';
+            page.dataset.pageIndex = index;
+            if (index === 0 || index === allImagesUrls.length - 1) page.dataset.density = 'hard';
+            page.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+            return page;
+        });
+
+        // 6b. Khởi tạo PageFlip
+        pageFlipInstance = new St.PageFlip(bookEl, {
+            width: singlePageWidth,
+            height: finalHeight,
+            size: 'stretch',
+            drawShadow: true,
+            flippingTime: 600,
+            showCover: true,
+            disableFlipByClick: true,   // <<--- TẮT click lật
+            startPage: 0,
+            clickEventForward: false,
+            useMouseEvents: true
+        });
+
+        // ⚡ Chờ modal render xong rồi mới init PageFlip
+        modalElement.addEventListener('shown.bs.modal', () => {
+            initFlipInsideModal(bookEl);
+        }, { once: true });
 
 
         // 7. Khi modal đóng → destroy PageFlip và reset #book
@@ -968,6 +976,42 @@ export const guest = (() => {
             //bookEl.style.display = 'none';
         });
     };
+
+    function initFlipInsideModal(bookEl) {
+
+        // Tính kích thước thật sau khi modal mở
+        const screenWidth = window.innerWidth;
+        const finalWidth = Math.min(800, screenWidth * 0.95);
+        const finalHeight = finalWidth / BOOK_RATIO;
+        const singlePageWidth = finalWidth / 2;
+
+        // Tạo page elements
+        const pageElements = allImagesUrls.map((url, index) => {
+            const page = document.createElement('div');
+            page.className = 'my-page';
+            page.dataset.pageIndex = index;
+            if (index === 0 || index === allImagesUrls.length - 1) page.dataset.density = 'hard';
+            page.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+            return page;
+        });
+
+        // Khởi tạo PageFlip
+        pageFlipInstance = new St.PageFlip(bookEl, {
+            width: singlePageWidth,
+            height: finalHeight,
+            size: 'stretch',
+            drawShadow: true,
+            flippingTime: 600,
+            showCover: true,
+            disableFlipByClick: true,
+            startPage: 0
+        });
+
+        pageFlipInstance.loadFromHTML(pageElements);
+
+        console.log("PageFlip initialized successfully!");
+    }
+
 
     // ĐÓNG ALBUM
     function closeDetailModal2() {
