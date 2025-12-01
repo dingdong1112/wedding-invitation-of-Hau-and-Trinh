@@ -865,9 +865,9 @@ export const guest = (() => {
         bookEl.innerHTML = '';
         bookEl.style.display = 'block';
 
-       // 5. Show modal
-const bsModal = new bootstrap.Modal(modalElement);
-bsModal.show();
+        // 5. Show modal
+        const bsModal = new bootstrap.Modal(modalElement);
+        bsModal.show();
 
 
         // 6. Delay 1 frame để modal render xong
@@ -900,13 +900,12 @@ bsModal.show();
                 clickEventForward: false,
                 useMouseEvents: true
             });
-            
-// ⚡ Chờ modal render xong rồi mới init PageFlip
-modalElement.addEventListener('shown.bs.modal', () => {
-    pageFlipInstance.loadFromHTML(pageElements);
-}, { once: true });
 
-            
+            // ⚡ Chờ modal render xong rồi mới init PageFlip
+            modalElement.addEventListener('shown.bs.modal', () => {
+                pageFlipInstance.loadFromHTML(pageElements);
+            }, { once: true });
+
             // 6c. Chặn dblclick PageFlip, dùng riêng mở modal detail
             bookEl.addEventListener("click", (e) => {
                 e.preventDefault();
@@ -922,7 +921,7 @@ modalElement.addEventListener('shown.bs.modal', () => {
                 const pageIndex = parseInt(pageEl.dataset.pageIndex);
                 const imageUrl = allImagesUrls[pageIndex];
 
-                openDetailModal(imageUrl, `Ảnh ${pageIndex + 1}`);
+                openDetailModalSwipeZoom(imageUrl, `Ảnh ${pageIndex + 1}`);
             }, true); // capture = true
 
             // 6d. Touch swipe nâng cao
@@ -944,7 +943,7 @@ modalElement.addEventListener('shown.bs.modal', () => {
                 }
                 isTouching = false;
             });
-        });        
+        });
 
 
         // 7. Khi modal đóng → destroy PageFlip và reset #book
@@ -1130,7 +1129,7 @@ modalElement.addEventListener('shown.bs.modal', () => {
                 showStory,
                 closeInformation,
                 openAlbum: initPageFlipAlbum, // Gán hàm khởi tạo Album vào API công khai
-                openDetail: openDetailModal, // Export hàm mở chi tiết
+                openDetail: openDetailModalSwipeZoom, // Export hàm mở chi tiết
                 closeDetailModal2,
                 closeDetailModal,
             },
