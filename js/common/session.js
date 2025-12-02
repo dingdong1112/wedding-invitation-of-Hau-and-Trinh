@@ -25,12 +25,11 @@ export const session = (() => {
     // --------------------------------
 
     // --- HÀM LOGIN ĐÃ SỬA ---
-     const login = (body, serverUrl) => {
+    const login = (body, serverUrl) => {
         return request(HTTP_POST, serverUrl)
             .body(body)
             .send() 
             .then((res) => {
-                console.log("Full Response:", res); // Bật F12 để xem cái này
 
                 // TRƯỜNG HỢP 1: Response chuẩn { code: 200, data: { token: "..." } }
                 if (res.code === 200 && res.data && res.data.token) {

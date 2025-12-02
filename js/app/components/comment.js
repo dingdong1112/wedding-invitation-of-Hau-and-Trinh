@@ -173,7 +173,6 @@ export const comment = (() => {
 
     const fetchWishes = async () => {
         if (!storage('config').get('wishes_popup_enabled')) {
-            console.log("Admin đã tắt Popup Lời Chúc.");
             return;
         }
         try {

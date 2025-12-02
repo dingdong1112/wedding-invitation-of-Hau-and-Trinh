@@ -301,8 +301,6 @@ const adminModule = () => {
                     .token(session.getToken())
                     .send();
 
-                console.log("Regenerate Response:", res); // Debug xem nó trả về gì
-
                 let newToken = res.data ? res.data.token : null;
 
                 // Trường hợp 2: request trả về trực tiếp { token: ... } (hoặc res.token)
@@ -1089,7 +1087,6 @@ const adminModule = () => {
                     if (countEl) countEl.textContent = parseInt(countEl.textContent.replace('.', '')) - 1;
                 }
             } catch (e) {
-                console.log(e); // <-- Bạn nên log lỗi ra để xem nó là gì
                 util.notify("Lỗi xóa").error();
             }
         };

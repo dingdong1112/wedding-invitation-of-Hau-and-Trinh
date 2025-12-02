@@ -550,8 +550,6 @@ export const guest = (() => {
 
         if (!toggleButton || !controlsPanel) return;
 
-        console.log("Particle control button found and event listener is being attached."); // <-- DEBUG LINE
-
         // === Phần 2: Khai báo các biến trạng thái ===
         // Đặt các biến này ở phạm vi rộng hơn để chúng không bị reset
         let effectInterval = null;
@@ -769,143 +767,140 @@ export const guest = (() => {
     };*/
 
     // --- DETAIL MODAL ---
-   /**
- * Mở modal xem chi tiết ảnh
- * @param {number} startIndex - index ảnh trong allImagesUrls
- */
-function openDetailModal(startIndex = 0) {
-    if (!allImagesUrls.length) return;
+    /**
+  * Mở modal xem chi tiết ảnh
+  * @param {number} startIndex - index ảnh trong allImagesUrls
+  */
+    function openDetailModal(startIndex = 0) {
+        if (!allImagesUrls.length) return;
 
-    const detailModalEl = document.getElementById('detailModal');
-    const detailModal = new bootstrap.Modal(detailModalEl);
+        const detailModalEl = document.getElementById('detailModal');
+        const detailModal = new bootstrap.Modal(detailModalEl);
 
-    const thumbContainer = document.getElementById('detail-thumbnails');
-    const detailImage = document.getElementById('detail-fullscreen-image');
+        const thumbContainer = document.getElementById('detail-thumbnails');
+        const detailImage = document.getElementById('detail-fullscreen-image');
 
-    // ====== 1) Render thumbnails nếu chưa render ======
-    if (!thumbContainer.dataset.rendered) {
-        thumbContainer.innerHTML = '';
+        // ====== 1) Render thumbnails nếu chưa render ======
+        if (!thumbContainer.dataset.rendered) {
+            thumbContainer.innerHTML = '';
 
-        allImagesUrls.forEach((src, index) => {
-            const thumb = document.createElement('img');
-            thumb.src = src;
-            thumb.className = 'rounded-3 shadow-sm cursor-pointer mx-1';
-            thumb.style.cssText = `
+            allImagesUrls.forEach((src, index) => {
+                const thumb = document.createElement('img');
+                thumb.src = src;
+                thumb.className = 'rounded-3 shadow-sm cursor-pointer mx-1';
+                thumb.style.cssText = `
                 width: 60px;
                 height: 60px;
                 object-fit: cover;
                 opacity: 0.6;
             `;
-            thumb.onclick = () => showImageDetail(index);
-            thumb.oncontextmenu = (e) => e.preventDefault();
-            thumbContainer.appendChild(thumb);
-        });
+                thumb.onclick = () => showImageDetail(index);
+                thumb.oncontextmenu = (e) => e.preventDefault();
+                thumbContainer.appendChild(thumb);
+            });
 
-        thumbContainer.dataset.rendered = "1";
-    }
-
-    const thumbs = thumbContainer.querySelectorAll("img");
-
-    // ====== 2) Hiển thị ảnh chi tiết ======
-    function showImageDetail(index) {
-        if (index < 0 || index >= allImagesUrls.length) return;
-
-        currentDetailIndex = index;
-
-        detailImage.src = allImagesUrls[index];
-        detailImage.oncontextmenu = (e) => e.preventDefault();
-
-        // Highlight thumbnail
-        thumbs.forEach((img, i) => {
-            img.style.border = i === index ? '3px solid #ff4081' : 'none';
-            img.style.opacity = i === index ? 1 : 0.6;
-        });
-
-        // Scroll vào vị trí
-        thumbs[index].scrollIntoView({
-            behavior: 'smooth',
-            inline: 'center',
-            block: 'nearest'
-        });
-    }
-
-    // Khởi tạo hình đầu tiên
-    showImageDetail(startIndex);
-
-    // ====== 3) Zoom + Swipe ======
-    let scale = 1,
-        moveX = 0,
-        moveY = 0,
-        startDist = null,
-        startX = 0,
-        startY = 0,
-        touchStartX = 0;
-
-    detailImage.style.transition = 'transform 0.2s ease-out';
-    detailImage.style.transform = 'scale(1) translate(0,0)';
-
-    detailImage.ontouchstart = (e) => {
-        if (e.touches.length === 2) {
-            const dx = e.touches[0].pageX - e.touches[1].pageX;
-            const dy = e.touches[0].pageY - e.touches[1].pageY;
-            startDist = Math.hypot(dx, dy);
-        } else if (e.touches.length === 1 && scale > 1) {
-            startX = e.touches[0].pageX - moveX;
-            startY = e.touches[0].pageY - moveY;
+            thumbContainer.dataset.rendered = "1";
         }
-        touchStartX = e.touches[0].clientX;
-    };
 
-    detailImage.ontouchmove = (e) => {
-        e.preventDefault();
+        const thumbs = thumbContainer.querySelectorAll("img");
 
-        if (e.touches.length === 2 && startDist) {
-            const dx = e.touches[0].pageX - e.touches[1].pageX;
-            const dy = e.touches[0].pageY - e.touches[1].pageY;
-            const dist = Math.hypot(dx, dy);
+        // ====== 2) Hiển thị ảnh chi tiết ======
+        function showImageDetail(index) {
+            if (index < 0 || index >= allImagesUrls.length) return;
 
-            scale = Math.min(4, Math.max(1, scale * (dist / startDist)));
-            detailImage.style.transform = `scale(${scale}) translate(${moveX}px,${moveY}px)`;
+            currentDetailIndex = index;
 
-            startDist = dist;
-        } 
-        else if (e.touches.length === 1 && scale > 1) {
-            moveX = e.touches[0].pageX - startX;
-            moveY = e.touches[0].pageY - startY;
-            detailImage.style.transform = `scale(${scale}) translate(${moveX}px,${moveY}px)`;
+            detailImage.src = allImagesUrls[index];
+            detailImage.oncontextmenu = (e) => e.preventDefault();
+
+            // Highlight thumbnail
+            thumbs.forEach((img, i) => {
+                img.style.border = i === index ? '3px solid #ff4081' : 'none';
+                img.style.opacity = i === index ? 1 : 0.6;
+            });
+
+            // Scroll vào vị trí
+            thumbs[index].scrollIntoView({
+                behavior: 'smooth',
+                inline: 'center',
+                block: 'nearest'
+            });
         }
-    };
 
-    detailImage.ontouchend = (e) => {
-        startDist = null;
+        // Khởi tạo hình đầu tiên
+        showImageDetail(startIndex);
 
-        // Nếu không zoom => xử lý swipe trái phải
-        if (scale === 1 && e.changedTouches.length === 1) {
-            const dx = e.changedTouches[0].clientX - touchStartX;
+        // ====== 3) Zoom + Swipe ======
+        let scale = 1,
+            moveX = 0,
+            moveY = 0,
+            startDist = null,
+            startX = 0,
+            startY = 0,
+            touchStartX = 0;
 
-            if (Math.abs(dx) > 50) {
-                navigateDetail(dx < 0 ? 1 : -1);
+        detailImage.style.transition = 'transform 0.2s ease-out';
+        detailImage.style.transform = 'scale(1) translate(0,0)';
+
+        detailImage.ontouchstart = (e) => {
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].pageX - e.touches[1].pageX;
+                const dy = e.touches[0].pageY - e.touches[1].pageY;
+                startDist = Math.hypot(dx, dy);
+            } else if (e.touches.length === 1 && scale > 1) {
+                startX = e.touches[0].pageX - moveX;
+                startY = e.touches[0].pageY - moveY;
             }
-        }
-    };
+            touchStartX = e.touches[0].clientX;
+        };
 
-    // ====== 4) Hiển thị modal ======
-    detailModal.show();
-}
+        detailImage.ontouchmove = (e) => {
+            e.preventDefault();
 
+            if (e.touches.length === 2 && startDist) {
+                const dx = e.touches[0].pageX - e.touches[1].pageX;
+                const dy = e.touches[0].pageY - e.touches[1].pageY;
+                const dist = Math.hypot(dx, dy);
+
+                scale = Math.min(4, Math.max(1, scale * (dist / startDist)));
+                detailImage.style.transform = `scale(${scale}) translate(${moveX}px,${moveY}px)`;
+
+                startDist = dist;
+            }
+            else if (e.touches.length === 1 && scale > 1) {
+                moveX = e.touches[0].pageX - startX;
+                moveY = e.touches[0].pageY - startY;
+                detailImage.style.transform = `scale(${scale}) translate(${moveX}px,${moveY}px)`;
+            }
+        };
+
+        detailImage.ontouchend = (e) => {
+            startDist = null;
+
+            // Nếu không zoom => xử lý swipe trái phải
+            if (scale === 1 && e.changedTouches.length === 1) {
+                const dx = e.changedTouches[0].clientX - touchStartX;
+
+                if (Math.abs(dx) > 50) {
+                    navigateDetail(dx < 0 ? 1 : -1);
+                }
+            }
+        };
+
+        // ====== 4) Hiển thị modal ======
+        detailModal.show();
+    }
 
     // Prev/Next ảnh trong modal
     function navigateDetail(direction) {
         const total = allImagesUrls.length;
-    if (total === 0) return; // Không có ảnh thì thoát
+        if (total === 0) return; // Không có ảnh thì thoát
 
-    // Tính index mới theo vòng lặp
-    const newIndex = (currentDetailIndex + direction + total) % total;
+        // Tính index mới theo vòng lặp
+        const newIndex = (currentDetailIndex + direction + total) % total;
 
-    openDetailModal(newIndex);
+        openDetailModal(newIndex);
     }
-
-
 
     // --- PAGEFLIP ALBUM ---
     async function initPageFlipAlbum(ext = 'webp') {
@@ -966,14 +961,30 @@ function openDetailModal(startIndex = 0) {
 
             function attachPageClickEvents() {
                 document.querySelectorAll(".my-page").forEach((page) => {
-                    // Tránh gắn duplicate listeners
-                    if (page.dataset.hasDblClick) return;
-                    page.dataset.hasDblClick = "1";
+                    if (page.dataset.hasTouchHandler) return;
+                    page.dataset.hasTouchHandler = "1";
 
+                    const pageIndex = parseInt(page.dataset.pageIndex);
+
+                    // === Laptop: dblclick ===
                     page.addEventListener("dblclick", () => {
-                        const pageIndex = parseInt(page.dataset.pageIndex);
-                        console.log("OPEN IMAGE INDEX:", pageIndex);
                         openDetailModal(pageIndex);
+                    });
+
+                    // === Mobile: double tap detector ===
+                    let lastTap = 0;
+
+                    page.addEventListener("touchend", (e) => {
+                        const now = Date.now();
+                        const timeDiff = now - lastTap;
+
+                        if (timeDiff > 0 && timeDiff < 250) {
+                            // Double tap detected
+                            e.preventDefault();
+                            openDetailModal(pageIndex);
+                        }
+
+                        lastTap = now;
                     });
                 });
             }
@@ -991,7 +1002,7 @@ function openDetailModal(startIndex = 0) {
             // dblclick mở modal detail
             // 6c. Chặn dblclick PageFlip, dùng riêng mở modal detail 
             bookEl.addEventListener("dblclick", (e) => {
-              attachPageClickEvents();
+                attachPageClickEvents();
             }); // capture = true
 
             // Swipe nâng cao
@@ -1054,13 +1065,10 @@ function openDetailModal(startIndex = 0) {
         document.body.style.overflow = "";
         document.body.style.paddingRight = "";
         document.body.removeAttribute("style");
-
-        console.log("Album đã đóng và thẻ #book đã reset về trạng thái ban đầu.");
     }
 
     // --- Detail modal với swipe + pinch zoom ---
     function openDetailModalSwipeZoom(index) {
-        console.log('Da vao');
         const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
         const imgEl = document.getElementById('detail-fullscreen-image');
         imgEl.src = allImagesUrls[index];
