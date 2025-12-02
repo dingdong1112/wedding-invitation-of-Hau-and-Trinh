@@ -961,30 +961,92 @@ export const guest = (() => {
 
             function attachPageClickEvents() {
                 document.querySelectorAll(".my-page").forEach((page) => {
-                    if (page.dataset.hasTouchHandler) return;
-                    page.dataset.hasTouchHandler = "1";
+                    if (page.dataset.hasHandlers) return;
+                    page.dataset.hasHandlers = "1";
 
                     const pageIndex = parseInt(page.dataset.pageIndex);
 
-                    // === Laptop: dblclick ===
-                    page.addEventListener("dblclick", () => {
+                    let clickTimer = null;
+
+                    // --------------------------
+                    // 1) CLICK (flip) – Laptop
+                    // --------------------------
+                    page.addEventListener("click", (e) => {
+                        // Nếu click chuẩn bị thành dblclick → chặn flip
+                        if (clickTimer !== null) {
+                            clearTimeout(clickTimer);
+                            clickTimer = null;
+                            e.stopImmediatePropagation();
+                            e.preventDefault();
+                            return;
+                        }
+
+                        // Chờ xem có dblclick hay không
+                        clickTimer = setTimeout(() => {
+                            clickTimer = null;
+
+                            // Không ngăn flip nếu chỉ click 1 lần
+                            // Do not handle anything here, PageFlip will flip normally
+
+                        }, 450);
+                    });
+
+
+                    // --------------------------
+                    // 2) DBLCLICK → mở modal
+                    // --------------------------
+                    page.addEventListener("dblclick", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+
+                        // Đây là dblclick thật → chặn flip & mở modal
+                        if (clickTimer !== null) {
+                            clearTimeout(clickTimer);
+                            clickTimer = null;
+                        }
+
                         openDetailModal(pageIndex);
                     });
 
-                    // === Mobile: double tap detector ===
-                    let lastTap = 0;
+
+                    // --------------------------
+                    // 3) MOBILE DOUBLE TAP LOGIC
+                    // --------------------------
+                    let lastTapTime = 0;
+                    let tapTimer = null;
 
                     page.addEventListener("touchend", (e) => {
                         const now = Date.now();
-                        const timeDiff = now - lastTap;
+                        const timeDiff = now - lastTapTime;
 
-                        if (timeDiff > 0 && timeDiff < 250) {
-                            // Double tap detected
+                        // Nếu double tap (≤ 500ms)
+                        if (timeDiff > 0 && timeDiff < 500) {
+                            // Chặn flip
                             e.preventDefault();
+                            e.stopImmediatePropagation();
+
+                            // Hủy timer single-tap
+                            if (tapTimer) {
+                                clearTimeout(tapTimer);
+                                tapTimer = null;
+                            }
+
                             openDetailModal(pageIndex);
+                            lastTapTime = 0; // reset
+                            return;
                         }
 
-                        lastTap = now;
+                        // Chưa chắc là single tap → chờ xem có tap 2 hay không
+                        lastTapTime = now;
+
+                        tapTimer = setTimeout(() => {
+                            tapTimer = null;
+
+                            // Đây là single tap → để PageFlip flip tự nhiên
+                            // Không cần code thêm gì ở đây
+                            // PageFlip sẽ flip vì nó bắt được click/touch riêng của nó
+
+                        }, 500);
                     });
                 });
             }
@@ -1048,23 +1110,22 @@ export const guest = (() => {
         `;
         }
 
-        // Sau khi outerHTML, phải query lại #book (vì nó đã là phần tử mới)
-        bookEl = document.getElementById("book");
-
-        // === 2. Tắt modal thủ công (KHÔNG để Bootstrap xóa DOM) ===
-        if (albumModalEl) {
-            albumModalEl.classList.remove("show");
-            albumModalEl.style.display = "none";
+        // 1. Đồng bộ index modal → album
+        if (pageFlipInstance && typeof currentDetailIndex === "number") {
+            // Flip album tới trang hiện tại của modal
+            pageFlipInstance.flip(currentDetailIndex);
         }
 
-        // === 3. Xóa backdrop nếu còn ===
-        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+        /// 2. Ẩn modal chi tiết
+    const detailModalEl = document.getElementById("detailModal");
+    const detailModal = bootstrap.Modal.getInstance(detailModalEl);
+    if (detailModal) detailModal.hide();
 
-        // === 4. Gỡ toàn bộ khóa scroll của Bootstrap ===
-        document.body.classList.remove("modal-open");
-        document.body.style.overflow = "";
-        document.body.style.paddingRight = "";
-        document.body.removeAttribute("style");
+    // 3. Xóa backdrop & unlock scroll nếu cần
+    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
     }
 
     // --- Detail modal với swipe + pinch zoom ---
