@@ -16,7 +16,7 @@ import { pool } from '../../connection/request.js';
 
 // --- CẤU HÌNH VÀ BIẾN GLOBAL ---
 const VERCEL_BASE_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app';
-const BOOK_RATIO = 6 / 4; // Width / Height chuẩn, chỉnh theo ảnh thực tế
+const BOOK_RATIO = 1.4; // Width / Height chuẩn, chỉnh theo ảnh thực tế
 let allImagesUrls = [];
 let pageFlipInstance = null; // Instance của PageFlip
 let currentDetailIndex = 0;
