@@ -1116,16 +1116,23 @@ export const guest = (() => {
             pageFlipInstance.flip(currentDetailIndex);
         }
 
-        /// 2. Ẩn modal chi tiết
-    const detailModalEl = document.getElementById("detailModal");
-    const detailModal = bootstrap.Modal.getInstance(detailModalEl);
-    if (detailModal) detailModal.hide();
+        // Sau khi outerHTML, phải query lại #book (vì nó đã là phần tử mới)
+        bookEl = document.getElementById("book");
 
-    // 3. Xóa backdrop & unlock scroll nếu cần
-    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
-    document.body.classList.remove("modal-open");
-    document.body.style.overflow = "";
-    document.body.style.paddingRight = "";
+        // === 2. Tắt modal thủ công (KHÔNG để Bootstrap xóa DOM) ===
+        if (albumModalEl) {
+            albumModalEl.classList.remove("show");
+            albumModalEl.style.display = "none";
+        }
+
+        // === 3. Xóa backdrop nếu còn ===
+        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+
+        // === 4. Gỡ toàn bộ khóa scroll của Bootstrap ===
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
+        document.body.removeAttribute("style");
     }
 
     // --- Detail modal với swipe + pinch zoom ---
