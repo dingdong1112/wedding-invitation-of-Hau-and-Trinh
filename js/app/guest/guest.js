@@ -988,7 +988,7 @@ export const guest = (() => {
                             // Không ngăn flip nếu chỉ click 1 lần
                             // Do not handle anything here, PageFlip will flip normally
 
-                        }, 450);
+                        }, 1000);
                     });
 
 
