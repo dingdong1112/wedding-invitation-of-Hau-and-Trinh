@@ -930,7 +930,7 @@ function showImageDetail(index) {
     // --- PAGEFLIP ALBUM ---
     async function initPageFlipAlbum(ext = 'webp') {
         const modalElement = document.getElementById('albumModal');
-        const bookEl = document.getElementById('book'); // Container cố định
+        let bookEl = document.getElementById('book'); // Container cố định
 
         if (!bookEl) {
             const modalBody = modalElement.querySelector('.modal-body');
