@@ -842,3 +842,44 @@ svg {
 #page-indicator {
   font-size: 0.85rem;
 }
+
+/* Style cho thumbnail trong detail modal */
+.thumb-item {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    opacity: 0.6;
+    border-radius: 8px;
+    margin: 0 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+.thumb-item.active {
+    opacity: 1;
+    border-color: #ff4081;
+    transform: scale(1.1);
+}
+
+/* Icon zoom indicator trên trang sách */
+.zoom-indicator {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.4);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none; /* Để click xuyên qua */
+}
+
+/* Hiện icon khi hover chuột (desktop) hoặc luôn hiện mờ (mobile nếu cần) */
+.my-page:hover .zoom-indicator {
+    opacity: 1;
+}
