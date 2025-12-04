@@ -905,9 +905,3 @@ body:not(.modal-open) {
     height: auto !important;
     padding-right: 0 !important;
 }
-
-
-/* Chỉ khóa thẻ html khi modal thực sự mở */
-html:has(body.modal-open) {
-    overflow: hidden !important;
-}
