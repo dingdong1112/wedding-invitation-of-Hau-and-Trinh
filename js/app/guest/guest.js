@@ -791,8 +791,11 @@ export const guest = (() => {
         }
 
         // Đồng bộ biến cache nếu cần (tùy code cũ/mới của bạn)
-         const detailModalEl = document.getElementById('detailModal');
-        const detailModal = new bootstrap.Modal(detailModalEl);
+        const detailModalEl = document.getElementById('detailModal');
+        if (detailModalEl.style.display = "none") {
+            detailModalEl.style.display = "block";
+        }
+        const detailModalInstance = new bootstrap.Modal(detailModalEl);
 
         const thumbContainer = document.getElementById('detail-thumbnails');
         const detailImage = document.getElementById('detail-fullscreen-image');
@@ -823,11 +826,11 @@ export const guest = (() => {
 
             thumbContainer.dataset.rendered = "1";
         }
-        
+
         const thumbs = thumbContainer.querySelectorAll("img");
 
         // ====== 2) Hiển thị ảnh chi tiết ======
-       function showImageDetail(index) {
+        function showImageDetail(index) {
             if (index < 0 || index >= allImagesUrls.length) return;
 
             currentDetailIndex = index;
@@ -912,7 +915,7 @@ export const guest = (() => {
         // ====== 4) Hiển thị modal ======
     }
 
-    
+
     // Prev/Next ảnh trong modal
     function navigateDetail(direction) {
         const total = allImagesUrls.length;
@@ -1172,6 +1175,10 @@ export const guest = (() => {
         if (modalInstance) {
             modalInstance.hide();
         }
+
+        setTimeout(() => {
+        forceRemoveBackdrop();
+    }, 300);
     }
 
     // --- Detail modal với swipe + pinch zoom ---
@@ -1235,21 +1242,20 @@ export const guest = (() => {
         });
     }
 
+    function forceRemoveBackdrop() {
+    // 1. Xóa tất cả các thẻ div có class modal-backdrop
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+
+    // 2. Reset style của body để cuộn lại được
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
+
     //KẾT THÚC CODE PHẦN PAGE-TURNING ANIMATION CHO ẢNH THƯ VIỆN ---
 
-    function closeDetailModal() {
-        const detailModalEl = document.getElementById("detailModal");
-        const modalInstance = bootstrap.Modal.getInstance(detailModalEl);
-        if (modalInstance) modalInstance.hide();
 
-        // Nếu muốn khi đóng detail, album tự lật đến trang đó:
-        if (pageFlipInstance) {
-            // Cần setTimeout nhỏ để đợi modal album hiển thị lại
-            setTimeout(() => {
-                try { pageFlipInstance.flip(currentDetailIndex); } catch (e) { }
-            }, 300);
-        }
-    }
 
     /**
      * @returns {object}
@@ -1286,6 +1292,44 @@ export const guest = (() => {
             openDetailModal(newIndex);
         };
 
+        window.closeDetailModal = function () {
+            const detailModalEl = document.getElementById("detailModal");
+            const imgEl = document.getElementById("detail-fullscreen-image");
+
+            // 2. Đóng modal detail
+
+
+            if (detailModalEl) {
+                //detailModalEl.classList.remove("show");
+                detailModalEl.style.display = "none";
+            }
+
+            // 2. Reset Zoom ảnh (quan trọng để lần sau mở không bị lệch)
+            //const imgEl = document.getElementById("detail-fullscreen-image");
+            if (imgEl) {
+                imgEl.style.transform = "scale(1) translate(0,0)";
+            }
+
+            // 3. Xử lý backdrop (Fix lỗi màn hình đen bạn gặp trước đó)
+            setTimeout(() => {
+                const albumModal = document.getElementById('albumModal');
+                // Nếu album modal không mở thì mới xóa backdrop
+                if (!albumModal || !albumModal.classList.contains('show')) {
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                }
+            }, 300);
+
+            // Nếu muốn khi đóng detail, album tự lật đến trang đó:
+            if (pageFlipInstance) {
+                // Cần setTimeout nhỏ để đợi modal album hiển thị lại
+                setTimeout(() => {
+                    try { pageFlipInstance.flip(currentDetailIndex); } catch (e) { }
+                }, 300);
+            }
+        }
+
         return {
             util,
             theme,
@@ -1298,9 +1342,9 @@ export const guest = (() => {
                 openAlbum: initPageFlipAlbum, // Gán hàm khởi tạo Album vào API công khai
                 openDetail: openDetailModalSwipeZoom, // Export hàm mở chi tiết
                 closeDetailModal2,
-                closeDetailModal,
+                //closeDetailModal,
                 openDetailModal,
-                navigateDetail,
+                //navigateDetail,
             },
         };
     };

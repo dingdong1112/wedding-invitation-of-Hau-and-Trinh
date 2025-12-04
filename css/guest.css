@@ -883,3 +883,18 @@ svg {
 .my-page:hover .zoom-indicator {
     opacity: 1;
 }
+
+/* Đảm bảo backdrop không bao giờ che nút đóng nếu bị lỗi */
+.modal-backdrop {
+    z-index: 1040 !important; /* Mặc định bootstrap */
+}
+
+.modal {
+    z-index: 1055 !important; /* Cao hơn backdrop */
+}
+
+/* Fix lỗi màn hình đen chết chóc:
+   Nếu không có modal nào có class .show, ẩn luôn backdrop đi */
+body:not(.modal-open) .modal-backdrop {
+    display: none !important;
+}
