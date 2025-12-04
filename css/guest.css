@@ -898,3 +898,19 @@ svg {
 body:not(.modal-open) .modal-backdrop {
     display: none !important;
 }
+
+/* Khi body KHÔNG có class modal-open thì bắt buộc phải scroll được */
+body:not(.modal-open) {
+    overflow: auto !important;
+    height: auto !important;
+    padding-right: 0 !important;
+}
+
+html {
+    overflow: auto !important; /* Đảm bảo thẻ html gốc luôn cuộn được */
+}
+
+/* Chỉ khóa thẻ html khi modal thực sự mở */
+html:has(body.modal-open) {
+    overflow: hidden !important;
+}
