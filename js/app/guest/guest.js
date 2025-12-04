@@ -791,10 +791,11 @@ export const guest = (() => {
         }
 
         // Đồng bộ biến cache nếu cần (tùy code cũ/mới của bạn)
-        const imagesSource = galleryCache || allImagesUrls;
+         const detailModalEl = document.getElementById('detailModal');
+        const detailModal = new bootstrap.Modal(detailModalEl);
 
-        const detailModalEl = document.getElementById('detailModal');
-
+        const thumbContainer = document.getElementById('detail-thumbnails');
+        const detailImage = document.getElementById('detail-fullscreen-image');
         // 1. KHỞI TẠO HOẶC LẤY INSTANCE
         // Kiểm tra xem Bootstrap đã gắn instance vào element chưa
         if (!detailModalInstance) {
@@ -802,22 +803,47 @@ export const guest = (() => {
         }
 
         // 2. RENDER THUMBNAILS (Chỉ làm 1 lần)
-        const thumbContainer = document.getElementById('detail-thumbnails');
-        if (thumbContainer.innerHTML.trim() === '') {
+        if (!thumbContainer.dataset.rendered) {
             thumbContainer.innerHTML = '';
-            imagesSource.forEach((src, index) => {
+
+            allImagesUrls.forEach((src, index) => {
                 const thumb = document.createElement('img');
                 thumb.src = src;
-                thumb.className = 'rounded-3 shadow-sm cursor-pointer mx-1 border border-2 border-transparent';
-                thumb.style.width = '60px';
-                thumb.style.height = '60px';
-                thumb.style.objectFit = 'cover';
+                thumb.className = 'rounded-3 shadow-sm cursor-pointer mx-1';
+                thumb.style.cssText = `
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                opacity: 0.6;
+            `;
                 thumb.onclick = () => showImageDetail(index);
+                thumb.oncontextmenu = (e) => e.preventDefault();
                 thumbContainer.appendChild(thumb);
             });
+
+            thumbContainer.dataset.rendered = "1";
+        }
+        
+        const thumbs = thumbContainer.querySelectorAll("img");
+
+        // ====== 2) Hiển thị ảnh chi tiết ======
+       function showImageDetail(index) {
+            if (index < 0 || index >= allImagesUrls.length) return;
+
+            currentDetailIndex = index;
+
+            detailImage.src = allImagesUrls[index];
+            detailImage.oncontextmenu = (e) => e.preventDefault();
+
+            // Highlight thumbnail
+            thumbs.forEach((img, i) => {
+                img.style.border = i === index ? '3px solid #ff4081' : 'none';
+                img.style.opacity = i === index ? 1 : 0.6;
+            });
+
         }
 
-        // 3. HIỂN THỊ ẢNH
+        // Khởi tạo hình đầu tiên
         showImageDetail(startIndex);
 
         // 4. CHỈ SHOW MODAL NẾU NÓ CHƯA HIỆN
@@ -886,36 +912,7 @@ export const guest = (() => {
         // ====== 4) Hiển thị modal ======
     }
 
-    // Hàm hiển thị ảnh (Tách riêng logic UI)
-function showImageDetail(index) {
-    const imagesSource = galleryCache || allImagesUrls;
-    if (index < 0 || index >= imagesSource.length) return;
-
-    currentDetailIndex = index;
-    const detailImage = document.getElementById('detail-fullscreen-image');
-    const thumbs = document.querySelectorAll('#detail-thumbnails img');
-
-    // Reset zoom trước khi đổi ảnh
-    detailImage.style.transform = 'scale(1) translate(0,0)';
     
-    // Đổi ảnh
-    detailImage.src = imagesSource[index];
-
-    // Highlight thumbnail
-    thumbs.forEach((img, i) => {
-        if (i === index) {
-            img.style.borderColor = '#ff4081';
-            img.style.opacity = '1';
-            img.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        } else {
-            img.style.borderColor = 'transparent';
-            img.style.opacity = '0.6';
-        }
-    });
-}
-
-
-
     // Prev/Next ảnh trong modal
     function navigateDetail(direction) {
         const total = allImagesUrls.length;
@@ -941,7 +938,18 @@ function showImageDetail(index) {
 
         // 1. Tải ảnh
         const images = await fetchGalleryImages(ext);
+        allImagesUrls = images;
         if (!images.length) return;
+
+
+        // Destroy instance cũ
+        if (pageFlipInstance) {
+            pageFlipInstance.destroy();
+            pageFlipInstance = null;
+        }
+
+        bookEl.innerHTML = '';
+        bookEl.style.display = 'block';
 
         // 2. Hiển thị Modal trước để tính toán kích thước chính xác
         const bsModal = new bootstrap.Modal(modalElement);
@@ -963,17 +971,16 @@ function showImageDetail(index) {
             const singlePageWidth = finalWidth / 2;
 
             // Render HTML string cho các trang
-            const pagesHTML = images.map((url, index) => `
-            <div class="my-page" data-page-index="${index}" data-density="${(index === 0 || index === images.length - 1) ? 'hard' : 'soft'}">
-                <div class="page-content" style="width:100%; height:100%; position:relative; overflow:hidden;">
-                    <img src="${url}" loading="lazy" style="width:100%; height:100%; object-fit:cover;" ondragstart="return false;">
-                    <!-- Thêm icon zoom nhỏ ở góc để người dùng dễ nhận biết -->
-                    <div class="zoom-indicator"><i class="fa-solid fa-expand"></i></div>
-                </div>
-            </div>
-        `).join('');
+            const pageElements = allImagesUrls.map((url, index) => {
+                const page = document.createElement('div');
+                page.className = 'my-page';
+                page.dataset.pageIndex = index;
+                if (index === 0 || index === allImagesUrls.length - 1) page.dataset.density = 'hard';
+                page.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+                return page;
+            })
 
-            bookEl.innerHTML = pagesHTML;
+            //bookEl.innerHTML = pagesHTML;
 
             // Khởi tạo PageFlip
             pageFlipInstance = new St.PageFlip(bookEl, {
@@ -990,11 +997,119 @@ function showImageDetail(index) {
                 // QUAN TRỌNG: Để thư viện tự xử lý click để lật trang
                 disableFlipByClick: false
             });
+            pageFlipInstance.loadFromHTML(pageElements);
 
-            pageFlipInstance.loadFromHTML(bookEl.querySelectorAll('.my-page'));
+            function attachPageClickEvents() {
+                document.querySelectorAll(".my-page").forEach((page) => {
+                    if (page.dataset.hasHandlers) return;
+                    page.dataset.hasHandlers = "1";
+
+                    const pageIndex = parseInt(page.dataset.pageIndex);
+
+                    let clickTimer = null;
+
+                    // --------------------------
+                    // 1) CLICK (flip) – Laptop
+                    // --------------------------
+                    page.addEventListener("click", (e) => {
+                        // Nếu click chuẩn bị thành dblclick → chặn flip
+                        if (clickTimer !== null) {
+                            clearTimeout(clickTimer);
+                            clickTimer = null;
+                            e.stopImmediatePropagation();
+                            e.preventDefault();
+                            return;
+                        }
+
+                        // Chờ xem có dblclick hay không
+                        clickTimer = setTimeout(() => {
+                            clickTimer = null;
+
+                            // Không ngăn flip nếu chỉ click 1 lần
+                            // Do not handle anything here, PageFlip will flip normally
+
+                        }, 1000);
+                    });
+
+
+                    // --------------------------
+                    // 2) DBLCLICK → mở modal
+                    // --------------------------
+                    page.addEventListener("dblclick", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+
+                        // Đây là dblclick thật → chặn flip & mở modal
+                        if (clickTimer !== null) {
+                            clearTimeout(clickTimer);
+                            clickTimer = null;
+                        }
+
+                        openDetailModal(pageIndex);
+                    });
+
+
+                    // --------------------------
+                    // 3) MOBILE DOUBLE TAP LOGIC
+                    // --------------------------
+                    let lastTapTime = 0;
+                    let tapTimer = null;
+
+                    page.addEventListener("touchend", (e) => {
+                        const now = Date.now();
+                        const timeDiff = now - lastTapTime;
+
+                        // Nếu double tap (≤ 500ms)
+                        if (timeDiff > 0 && timeDiff < 500) {
+                            // Chặn flip
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+
+                            // Hủy timer single-tap
+                            if (tapTimer) {
+                                clearTimeout(tapTimer);
+                                tapTimer = null;
+                            }
+
+                            openDetailModal(pageIndex);
+                            lastTapTime = 0; // reset
+                            return;
+                        }
+
+                        // Chưa chắc là single tap → chờ xem có tap 2 hay không
+                        lastTapTime = now;
+
+                        tapTimer = setTimeout(() => {
+                            tapTimer = null;
+
+                            // Đây là single tap → để PageFlip flip tự nhiên
+                            // Không cần code thêm gì ở đây
+                            // PageFlip sẽ flip vì nó bắt được click/touch riêng của nó
+
+                        }, 500);
+                    });
+                });
+            }
+
+            // Gắn khi init
+            pageFlipInstance.on("init", attachPageClickEvents);
+
+            // Gắn lại khi lật trang (DOM thay đổi)
+            pageFlipInstance.on("flip", attachPageClickEvents);
+
+            // Nếu bạn dùng changeState
+            pageFlipInstance.on("changeState", attachPageClickEvents);
+
+
+            // dblclick mở modal detail
+            // 6c. Chặn dblclick PageFlip, dùng riêng mở modal detail 
+            bookEl.addEventListener("dblclick", (e) => {
+                attachPageClickEvents();
+            }); // capture = true
+
 
             // --- EVENT DELEGATION (Xử lý sự kiện tập trung) ---
-            setupAlbumEvents(bookEl);
+            //setupAlbumEvents(bookEl);
 
         }, { once: true });
     }
@@ -1006,8 +1121,11 @@ function showImageDetail(index) {
         // Xử lý Double Click (Desktop) & Double Tap (Mobile)
         // Thay vì can thiệp vào từng page, ta bắt sự kiện trên wrapper cha
         const handleAction = (e) => {
-            const pageEl = e.target.closest('.my-page');
-            if (!pageEl) return;
+            let pageEl = e.target.closest(".my-page") || e.target.querySelector(".my-page");
+            if (!pageEl) {
+                console.log('pageEl not found', e.target);
+                return;
+            }
 
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
