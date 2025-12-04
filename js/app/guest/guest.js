@@ -705,36 +705,36 @@ export const guest = (() => {
     //BẮT ĐẦU CODE PHẦN PAGE-TURNING ANIMATION CHO ẢNH THƯ VIỆN ---
     // --- HÀM 1: TẢI DANH SÁCH ẢNH TỪ API (Đã sửa để dùng Vercel URL) ---
     /** @returns {Promise<string[]>} */
-const fetchGalleryImages = async (ext = 'webp') => {
-    // 1. KIỂM TRA CACHE: Nếu đã có dữ liệu, trả về luôn
-    if (galleryCache && galleryCache.length > 0) {
-        console.log("Load ảnh từ Cache (Không gọi API)"); // Log để bạn kiểm tra
-        return galleryCache;
-    }
-
-    // 2. NẾU CHƯA CÓ CACHE: Mới gọi API
-    try {
-        console.log("Đang gọi API tải ảnh...");
-        const apiUrl = `${VERCEL_BASE_URL}/api/gallery?ext=${ext}`;
-        const res = await fetch(apiUrl);
-
-        if (res.status !== 200) {
-            throw new Error(`API returned status ${res.status}`);
-        }
-        const json = await res.json();
-
-        if (json.success && json.files.length > 0) {
-            // 3. LƯU KẾT QUẢ VÀO CACHE
-            galleryCache = json.files; 
+    const fetchGalleryImages = async (ext = 'webp') => {
+        // 1. KIỂM TRA CACHE: Nếu đã có dữ liệu, trả về luôn
+        if (galleryCache && galleryCache.length > 0) {
+            console.log("Load ảnh từ Cache (Không gọi API)"); // Log để bạn kiểm tra
             return galleryCache;
         }
-        return [];
-    } catch (e) {
-        console.error("Lỗi tải danh sách ảnh:", e);
-        // util.notify("Không thể tải Album ảnh.").error();
-        return [];
-    }
-};
+
+        // 2. NẾU CHƯA CÓ CACHE: Mới gọi API
+        try {
+            console.log("Đang gọi API tải ảnh...");
+            const apiUrl = `${VERCEL_BASE_URL}/api/gallery?ext=${ext}`;
+            const res = await fetch(apiUrl);
+
+            if (res.status !== 200) {
+                throw new Error(`API returned status ${res.status}`);
+            }
+            const json = await res.json();
+
+            if (json.success && json.files.length > 0) {
+                // 3. LƯU KẾT QUẢ VÀO CACHE
+                galleryCache = json.files;
+                return galleryCache;
+            }
+            return [];
+        } catch (e) {
+            console.error("Lỗi tải danh sách ảnh:", e);
+            // util.notify("Không thể tải Album ảnh.").error();
+            return [];
+        }
+    };
 
     // --- HÀM 2: MỞ MODAL XEM CHI TIẾT (Thay thế Turn.js) ---
     /*
@@ -779,6 +779,9 @@ const fetchGalleryImages = async (ext = 'webp') => {
 
     // --- DETAIL MODAL ---
     let detailModalInstance = null; // Lưu instance để tái sử dụng
+    let detailImage = null;
+    let thumbs = null;
+
 
     /**
      * Mở modal xem chi tiết ảnh
@@ -806,7 +809,7 @@ const fetchGalleryImages = async (ext = 'webp') => {
         detailModalInstance = new bootstrap.Modal(detailModalEl);
 
         const thumbContainer = document.getElementById('detail-thumbnails');
-        const detailImage = document.getElementById('detail-fullscreen-image');
+        detailImage = document.getElementById('detail-fullscreen-image');
         // 1. KHỞI TẠO HOẶC LẤY INSTANCE
         // Kiểm tra xem Bootstrap đã gắn instance vào element chưa
         if (!detailModalInstance) {
@@ -835,24 +838,9 @@ const fetchGalleryImages = async (ext = 'webp') => {
             thumbContainer.dataset.rendered = "1";
         }
 
-        const thumbs = thumbContainer.querySelectorAll("img");
+        thumbs = thumbContainer.querySelectorAll("img");
 
         // ====== 2) Hiển thị ảnh chi tiết ======
-        function showImageDetail(index) {
-            if (index < 0 || index >= allImagesUrls.length) return;
-
-            currentDetailIndex = index;
-
-            detailImage.src = allImagesUrls[index];
-            detailImage.oncontextmenu = (e) => e.preventDefault();
-
-            // Highlight thumbnail
-            thumbs.forEach((img, i) => {
-                img.style.border = i === index ? '3px solid #ff4081' : 'none';
-                img.style.opacity = i === index ? 1 : 0.6;
-            });
-
-        }
 
         // Khởi tạo hình đầu tiên
         showImageDetail(startIndex);
@@ -921,6 +909,22 @@ const fetchGalleryImages = async (ext = 'webp') => {
         };
 
         // ====== 4) Hiển thị modal ======
+    }
+
+    function showImageDetail(index) {
+        if (index < 0 || index >= allImagesUrls.length) return;
+
+        currentDetailIndex = index;
+
+        detailImage.src = allImagesUrls[index];
+        detailImage.oncontextmenu = (e) => e.preventDefault();
+
+        // Highlight thumbnail
+        thumbs.forEach((img, i) => {
+            img.style.border = i === index ? '3px solid #ff4081' : 'none';
+            img.style.opacity = i === index ? 1 : 0.6;
+        });
+
     }
 
 
@@ -1166,25 +1170,31 @@ const fetchGalleryImages = async (ext = 'webp') => {
         const albumModalEl = document.getElementById("albumModal");
         const bookEl = document.getElementById("book");
 
-        // 1. Hủy instance PageFlip
-        if (pageFlipInstance) {
-            pageFlipInstance.destroy();
-            pageFlipInstance = null;
-        }
+       const modalInstance = bootstrap.Modal.getInstance(albumModalEl);
+    if (modalInstance) {
+        modalInstance.hide();
+    } else {
+        // Fallback nếu không lấy được instance
+        albumModalEl.classList.remove('show');
+        albumModalEl.style.display = 'none';
+        albumModalEl.removeAttribute('role');
+        albumModalEl.removeAttribute('aria-modal');
+    }
 
-        // 2. Ẩn và xóa nội dung sách
-        if (bookEl) {
-            bookEl.style.display = 'none';
-            bookEl.innerHTML = '';
-        }
+    // 2. Hủy instance PageFlip & xóa DOM
+    // (Làm cái này ngay cũng được, hoặc đợi setTimeout cũng được)
+    if (pageFlipInstance) {
+        pageFlipInstance.destroy();
+        pageFlipInstance = null;
+    }
 
-        // 3. Đóng Modal Bootstrap đúng chuẩn
-        const modalInstance = bootstrap.Modal.getInstance(albumModalEl);
-        if (modalInstance) {
-            modalInstance.hide();
-        }
+    if (bookEl) {
+        bookEl.style.display = 'none';
+        bookEl.innerHTML = '';
+    }
 
-        setTimeout(() => {
+    // 3. Gọi hàm Force Remove Backdrop sau 300ms (thời gian animation của modal)
+    setTimeout(() => {
         forceRemoveBackdrop();
     }, 300);
     }
@@ -1251,14 +1261,21 @@ const fetchGalleryImages = async (ext = 'webp') => {
     }
 
     function forceRemoveBackdrop() {
-    // 1. Xóa tất cả các thẻ div có class modal-backdrop
+    // 1. Xóa tất cả các lớp mờ đen (backdrop)
     const backdrops = document.querySelectorAll('.modal-backdrop');
     backdrops.forEach(backdrop => backdrop.remove());
 
-    // 2. Reset style của body để cuộn lại được
+    // 2. MỞ KHÓA SCROLL CHO BODY (QUAN TRỌNG)
+    // Thay vì gán rỗng, hãy gán 'auto' hoặc 'visible' để ép trình duyệt cho phép cuộn
+    document.body.style.overflow = 'auto'; 
+    document.body.style.height = 'auto'; // Phòng trường hợp body bị set height 100%
     document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
+    document.body.style.paddingRight = '0px';
+
+    // 3. MỞ KHÓA SCROLL CHO HTML (Phòng hờ)
+    // Một số trình duyệt hoặc thư viện mobile set overflow trên cả thẻ html
+    //document.documentElement.style.overflow = 'auto';
+   //document.documentElement.style.height = 'auto';
 }
 
     //KẾT THÚC CODE PHẦN PAGE-TURNING ANIMATION CHO ẢNH THƯ VIỆN ---
@@ -1294,10 +1311,17 @@ const fetchGalleryImages = async (ext = 'webp') => {
         });
 
         window.navigateDetail = function (direction) {
-            let newIndex = currentDetailIndex + direction;
-            if (newIndex >= allImagesUrls.length) newIndex = 0;
-            if (newIndex < 0) newIndex = allImagesUrls.length - 1;
-            openDetailModal(newIndex);
+            const total = allImagesUrls.length;
+            if (!total) return;
+            const newIndex = (currentDetailIndex + direction + total) % total;
+            // nếu modal đã mở, cập nhật nội dung thay vì reopen
+            const thumbContainer = document.getElementById('detail-thumbnails');
+            if (thumbContainer && thumbContainer.dataset.rendered) {
+                // gọi trực tiếp hàm showImageDetail (nếu ở scope) hoặc implement helper
+                showImageDetail(newIndex); // cần đưa showImageDetail ra scope ngoài openDetailModal
+            } else {
+                openDetailModal(newIndex);
+            }
         };
 
         window.closeDetailModal = function () {
