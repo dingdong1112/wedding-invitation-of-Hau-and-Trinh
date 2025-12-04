@@ -706,32 +706,48 @@ export const guest = (() => {
     // --- HÀM 1: TẢI DANH SÁCH ẢNH TỪ API (Đã sửa để dùng Vercel URL) ---
     /** @returns {Promise<string[]>} */
     const fetchGalleryImages = async (ext = 'webp') => {
-        // 1. KIỂM TRA CACHE: Nếu đã có dữ liệu, trả về luôn
-        if (galleryCache && galleryCache.length > 0) {
-            console.log("Load ảnh từ Cache (Không gọi API)"); // Log để bạn kiểm tra
-            return galleryCache;
+        // 1. KIỂM TRA TRONG LOCAL STORAGE (Lưu cache kể cả khi F5)
+        const CACHE_KEY = `gallery_images_${ext}`;
+        const cachedData = localStorage.getItem(CACHE_KEY);
+
+        if (cachedData) {
+            // Parse dữ liệu từ string về object
+            const parsedData = JSON.parse(cachedData);
+
+            // (Tùy chọn) Kiểm tra thời hạn cache. Ví dụ: 1 giờ
+            const now = new Date().getTime();
+            if (now - parsedData.timestamp < 3600 * 1000) {
+                console.log("Load danh sách ảnh từ LocalStorage (Không tốn lượt gọi API)");
+                // Cập nhật biến global để code khác dùng
+                galleryCache = parsedData.files;
+                return parsedData.files;
+            }
         }
 
-        // 2. NẾU CHƯA CÓ CACHE: Mới gọi API
+        // 2. NẾU KHÔNG CÓ CACHE HOẶC HẾT HẠN -> GỌI API
         try {
-            console.log("Đang gọi API tải ảnh...");
+            console.log("Gọi API Vercel lấy danh sách...");
             const apiUrl = `${VERCEL_BASE_URL}/api/gallery?ext=${ext}`;
             const res = await fetch(apiUrl);
 
-            if (res.status !== 200) {
-                throw new Error(`API returned status ${res.status}`);
-            }
+            if (!res.ok) throw new Error(`Status ${res.status}`);
             const json = await res.json();
 
             if (json.success && json.files.length > 0) {
-                // 3. LƯU KẾT QUẢ VÀO CACHE
+                // Cập nhật biến global
                 galleryCache = json.files;
-                return galleryCache;
+
+                // 3. LƯU VÀO LOCAL STORAGE (Kèm thời gian hiện tại)
+                localStorage.setItem(CACHE_KEY, JSON.stringify({
+                    files: json.files,
+                    timestamp: new Date().getTime()
+                }));
+
+                return json.files;
             }
             return [];
         } catch (e) {
-            console.error("Lỗi tải danh sách ảnh:", e);
-            // util.notify("Không thể tải Album ảnh.").error();
+            console.error("Lỗi tải ảnh:", e);
             return [];
         }
     };
@@ -943,6 +959,13 @@ export const guest = (() => {
     async function initPageFlipAlbum(ext = 'webp') {
         const modalElement = document.getElementById('albumModal');
         let bookEl = document.getElementById('book'); // Container cố định
+        // --- ĐOẠN SỬA ĐỔI: NẾU ĐÃ CÓ SÁCH THÌ KHÔNG TẠO LẠI ---
+        if (pageFlipInstance) {
+            // Chỉ cần show modal lên là xong
+            const bsModal = new bootstrap.Modal(modalElement);
+            bsModal.show();
+            return; // Dừng hàm tại đây
+        }
 
         if (!bookEl) {
             const modalBody = modalElement.querySelector('.modal-body');
@@ -1170,33 +1193,25 @@ export const guest = (() => {
         const albumModalEl = document.getElementById("albumModal");
         const bookEl = document.getElementById("book");
 
-       const modalInstance = bootstrap.Modal.getInstance(albumModalEl);
-    if (modalInstance) {
-        modalInstance.hide();
-    } else {
-        // Fallback nếu không lấy được instance
-        albumModalEl.classList.remove('show');
-        albumModalEl.style.display = 'none';
-        albumModalEl.removeAttribute('role');
-        albumModalEl.removeAttribute('aria-modal');
-    }
+        const modalInstance = bootstrap.Modal.getInstance(albumModalEl);
+        if (modalInstance) {
+            modalInstance.hide();
+        } else {
+            // Fallback nếu không lấy được instance
+            albumModalEl.classList.remove('show');
+            albumModalEl.style.display = 'none';
+            albumModalEl.removeAttribute('role');
+            albumModalEl.removeAttribute('aria-modal');
+        }
 
-    // 2. Hủy instance PageFlip & xóa DOM
-    // (Làm cái này ngay cũng được, hoặc đợi setTimeout cũng được)
-    if (pageFlipInstance) {
-        pageFlipInstance.destroy();
-        pageFlipInstance = null;
-    }
+        // 2. Hủy instance PageFlip & xóa DOM
+        // (Làm cái này ngay cũng được, hoặc đợi setTimeout cũng được)
 
-    if (bookEl) {
-        bookEl.style.display = 'none';
-        bookEl.innerHTML = '';
-    }
 
-    // 3. Gọi hàm Force Remove Backdrop sau 300ms (thời gian animation của modal)
-    setTimeout(() => {
-        forceRemoveBackdrop();
-    }, 300);
+        // 3. Gọi hàm Force Remove Backdrop sau 300ms (thời gian animation của modal)
+        setTimeout(() => {
+            forceRemoveBackdrop();
+        }, 300);
     }
 
     // --- Detail modal với swipe + pinch zoom ---
@@ -1261,22 +1276,22 @@ export const guest = (() => {
     }
 
     function forceRemoveBackdrop() {
-    // 1. Xóa tất cả các lớp mờ đen (backdrop)
-    const backdrops = document.querySelectorAll('.modal-backdrop');
-    backdrops.forEach(backdrop => backdrop.remove());
+        // 1. Xóa tất cả các lớp mờ đen (backdrop)
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
 
-    // 2. MỞ KHÓA SCROLL CHO BODY (QUAN TRỌNG)
-    // Thay vì gán rỗng, hãy gán 'auto' hoặc 'visible' để ép trình duyệt cho phép cuộn
-    document.body.style.overflow = 'auto'; 
-    document.body.style.height = 'auto'; // Phòng trường hợp body bị set height 100%
-    document.body.classList.remove('modal-open');
-    document.body.style.paddingRight = '0px';
+        // 2. MỞ KHÓA SCROLL CHO BODY (QUAN TRỌNG)
+        // Thay vì gán rỗng, hãy gán 'auto' hoặc 'visible' để ép trình duyệt cho phép cuộn
+        document.body.style.overflow = 'auto';
+        document.body.style.height = 'auto'; // Phòng trường hợp body bị set height 100%
+        document.body.classList.remove('modal-open');
+        document.body.style.paddingRight = '0px';
 
-    // 3. MỞ KHÓA SCROLL CHO HTML (Phòng hờ)
-    // Một số trình duyệt hoặc thư viện mobile set overflow trên cả thẻ html
-    //document.documentElement.style.overflow = 'auto';
-   document.documentElement.style.height = 'auto';
-}
+        // 3. MỞ KHÓA SCROLL CHO HTML (Phòng hờ)
+        // Một số trình duyệt hoặc thư viện mobile set overflow trên cả thẻ html
+        //document.documentElement.style.overflow = 'auto';
+        document.documentElement.style.height = 'auto';
+    }
 
     //KẾT THÚC CODE PHẦN PAGE-TURNING ANIMATION CHO ẢNH THƯ VIỆN ---
 
