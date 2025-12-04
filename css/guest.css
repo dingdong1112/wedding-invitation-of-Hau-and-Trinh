@@ -906,9 +906,6 @@ body:not(.modal-open) {
     padding-right: 0 !important;
 }
 
-html {
-    overflow: auto !important; /* Đảm bảo thẻ html gốc luôn cuộn được */
-}
 
 /* Chỉ khóa thẻ html khi modal thực sự mở */
 html:has(body.modal-open) {
