@@ -705,28 +705,36 @@ export const guest = (() => {
     //BẮT ĐẦU CODE PHẦN PAGE-TURNING ANIMATION CHO ẢNH THƯ VIỆN ---
     // --- HÀM 1: TẢI DANH SÁCH ẢNH TỪ API (Đã sửa để dùng Vercel URL) ---
     /** @returns {Promise<string[]>} */
-    const fetchGalleryImages = async (ext = 'webp') => {
-        // Nếu đã có cache thì trả về luôn, không gọi API nữa
-        if (galleryCache && galleryCache.length > 0) return galleryCache;
+const fetchGalleryImages = async (ext = 'webp') => {
+    // 1. KIỂM TRA CACHE: Nếu đã có dữ liệu, trả về luôn
+    if (galleryCache && galleryCache.length > 0) {
+        console.log("Load ảnh từ Cache (Không gọi API)"); // Log để bạn kiểm tra
+        return galleryCache;
+    }
 
-        try {
-            const apiUrl = `${VERCEL_BASE_URL}/api/gallery?ext=${ext}`;
-            const res = await fetch(apiUrl);
+    // 2. NẾU CHƯA CÓ CACHE: Mới gọi API
+    try {
+        console.log("Đang gọi API tải ảnh...");
+        const apiUrl = `${VERCEL_BASE_URL}/api/gallery?ext=${ext}`;
+        const res = await fetch(apiUrl);
 
-            if (!res.ok) throw new Error(`Status ${res.status}`);
-            const json = await res.json();
-
-            if (json.success && json.files.length > 0) {
-                galleryCache = json.files; // Lưu vào cache
-                return galleryCache;
-            }
-            return [];
-        } catch (e) {
-            console.error("Lỗi tải danh sách ảnh:", e);
-            // util.notify("Không thể tải Album ảnh.").error(); // Uncomment nếu có util
-            return [];
+        if (res.status !== 200) {
+            throw new Error(`API returned status ${res.status}`);
         }
-    };
+        const json = await res.json();
+
+        if (json.success && json.files.length > 0) {
+            // 3. LƯU KẾT QUẢ VÀO CACHE
+            galleryCache = json.files; 
+            return galleryCache;
+        }
+        return [];
+    } catch (e) {
+        console.error("Lỗi tải danh sách ảnh:", e);
+        // util.notify("Không thể tải Album ảnh.").error();
+        return [];
+    }
+};
 
     // --- HÀM 2: MỞ MODAL XEM CHI TIẾT (Thay thế Turn.js) ---
     /*
@@ -795,7 +803,7 @@ export const guest = (() => {
         if (detailModalEl.style.display = "none") {
             detailModalEl.style.display = "block";
         }
-        const detailModalInstance = new bootstrap.Modal(detailModalEl);
+        detailModalInstance = new bootstrap.Modal(detailModalEl);
 
         const thumbContainer = document.getElementById('detail-thumbnails');
         const detailImage = document.getElementById('detail-fullscreen-image');
