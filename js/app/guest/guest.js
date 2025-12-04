@@ -1275,7 +1275,7 @@ export const guest = (() => {
     // 3. MỞ KHÓA SCROLL CHO HTML (Phòng hờ)
     // Một số trình duyệt hoặc thư viện mobile set overflow trên cả thẻ html
     //document.documentElement.style.overflow = 'auto';
-   //document.documentElement.style.height = 'auto';
+   document.documentElement.style.height = 'auto';
 }
 
     //KẾT THÚC CODE PHẦN PAGE-TURNING ANIMATION CHO ẢNH THƯ VIỆN ---
