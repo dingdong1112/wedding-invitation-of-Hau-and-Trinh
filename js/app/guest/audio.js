@@ -37,6 +37,7 @@ export const audio = (() => {
 
     let isShuffle = false;
     let loopMode = 1;
+    let wasPlayingBeforeVideo = false;
 
     // Các Element giao diện
     const els = {
@@ -44,6 +45,23 @@ export const audio = (() => {
         playBtn: null, title: null, playlistUl: null,
         playlistContainer: null, vinyl: null,
         shuffleBtn: null, loopBtn: null
+    };
+
+    const pauseForVideo = () => {
+        if (isPlaying) {
+            wasPlayingBeforeVideo = true; // Ghi nhớ là nhạc đang bật
+            pause(); // Tạm dừng nhạc
+        } else {
+            wasPlayingBeforeVideo = false; // Nhạc đang tắt thì thôi
+        }
+    };
+
+    // 3. THÊM HÀM MỚI: TIẾP TỤC SAU VIDEO
+    const resumeAfterVideo = () => {
+        // Chỉ mở lại nếu trước đó nhạc ĐANG BẬT
+        if (wasPlayingBeforeVideo) {
+            play();
+        }
     };
 
     // --- HÀM ĐÓNG BẢNG NHẠC ---
@@ -300,7 +318,9 @@ export const audio = (() => {
         play, pause, toggle, next, prev,
         setVolume, togglePlaylist,
         toggleShuffle, toggleLoop,
-        closePanel
+        closePanel,
+        pauseForVideo,
+        resumeAfterVideo
     };
 
     return { init, load: () => { } };

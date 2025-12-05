@@ -1340,6 +1340,10 @@ export const guest = (() => {
 
     /* --- QUẢN LÝ VIDEO PLAYER --- */
     function playVideo(videoId, title) {
+        // 1. GỌI HÀM TẠM DỪNG NHẠC NỀN
+        if (window.musicPlayer && typeof window.musicPlayer.pauseForVideo === 'function') {
+            window.musicPlayer.pauseForVideo();
+        }
         const videoModal = document.getElementById('videoPlayerModal');
         const container = document.getElementById('youtubePlayerContainer');
         const titleEl = document.getElementById('playerTitle');
@@ -1348,7 +1352,7 @@ export const guest = (() => {
         if (titleEl) titleEl.innerText = title;
 
         // Tạo iframe Youtube (Autoplay)
-       const iframeHtml = `
+        const iframeHtml = `
         <iframe 
             src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}&loop=1&playlist=${videoId}" 
             title="YouTube video player" 
@@ -1376,6 +1380,11 @@ export const guest = (() => {
         setTimeout(() => {
             container.innerHTML = '';
         }, 300);
+
+        // 1. GỌI HÀM TIẾP TỤC NHẠC NỀN
+        if (window.musicPlayer && typeof window.musicPlayer.resumeAfterVideo === 'function') {
+            window.musicPlayer.resumeAfterVideo();
+        }
 
         const storyModal = document.getElementById('storyTimelineModal');
         if (!storyModal.classList.contains('active')) {
