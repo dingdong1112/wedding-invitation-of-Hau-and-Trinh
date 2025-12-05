@@ -121,132 +121,70 @@ svg {
 /* --- BẮT ĐẦU CODE HIỆU ỨNG GỢN SÓNG --- */
 
 /* 1. Định nghĩa chuyển động lên-xuống */
+/* 1. Keyframes Animation (Giữ nguyên) */
 @keyframes wavy {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-8px);
-    /* Chữ sẽ nhô cao lên 8px */
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
-/* 2. Style cho cả cụm từ */
+/* 2. Style cho cả cụm từ (Giữ nguyên) */
 .wavy-text {
   display: flex;
-  /* Dùng flexbox để các ký tự xếp hàng ngang */
   justify-content: center;
   font-family: 'Dancing Script', 'Esthetic', sans-serif;
-  /* Giữ lại font chữ đẹp */
   font-size: 2.5rem;
   margin: 1.5rem 0;
-  /* Tương đương my-4 của Bootstrap */
+  
+  /* Hiệu ứng phản chiếu (Box Reflect) */
+  /* Lưu ý: Hiệu ứng này chủ yếu chạy tốt trên Chrome/Safari */
   -webkit-box-reflect: below -15px linear-gradient(transparent, rgba(0, 0, 0, 0.2));
-  /* Hiệu ứng phản chiếu mờ ảo (tùy chọn) */
 }
 
-/* 3. Style và áp dụng animation cho từng ký tự */
+/* 3. Style cho từng ký tự (ĐÃ SỬA MÀU SẮC) */
 .wavy-text span {
   position: relative;
   display: inline-block;
-  color: #ffffff;
-  /* Đảm bảo chữ màu trắng */
-  /*text-transform: uppercase; /* Chuyển thành chữ hoa nếu muốn */
+  
+  /* --- SỬA Ở ĐÂY --- */
+  /* Mặc định (Light Mode) là màu ĐỎ */
+  color: indianred; 
+  /* ---------------- */
+
   animation: wavy 2.5s ease-in-out infinite;
-  /* Áp dụng animation */
   animation-delay: calc(0.1s * var(--i));
-  /* Đây là phép màu tạo độ trễ */
 }
 
-/* 4. Gán độ trễ lần lượt cho từng ký tự */
-.wavy-text span:nth-child(1) {
-  --i: 1;
+/* --- THÊM ĐOẠN NÀY: CẤU HÌNH DARK MODE --- */
+/* Khi bật chế độ tối -> Chuyển thành màu TRẮNG */
+body.dark-mode .wavy-text span,
+[data-bs-theme="dark"] .wavy-text span,
+[data-theme="dark"] .wavy-text span {
+    color: #ffffff !important;
+    /* Thêm chút bóng sáng (Glow) cho đẹp trên nền đen */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
-.wavy-text span:nth-child(2) {
-  --i: 2;
-}
-
-.wavy-text span:nth-child(3) {
-  --i: 3;
-}
-
-.wavy-text span:nth-child(4) {
-  --i: 4;
-}
-
-/* Dấu cách */
-.wavy-text span:nth-child(5) {
-  --i: 5;
-}
-
-.wavy-text span:nth-child(6) {
-  --i: 6;
-}
-
-.wavy-text span:nth-child(7) {
-  --i: 7;
-}
-
-.wavy-text span:nth-child(8) {
-  --i: 8;
-}
-
-/* Dấu cách */
-.wavy-text span:nth-child(9) {
-  --i: 9;
-}
-
-/* & */
-.wavy-text span:nth-child(10) {
-  --i: 10;
-}
-
-/* Dấu cách */
-.wavy-text span:nth-child(11) {
-  --i: 11;
-}
-
-.wavy-text span:nth-child(12) {
-  --i: 12;
-}
-
-.wavy-text span:nth-child(13) {
-  --i: 13;
-}
-
-.wavy-text span:nth-child(14) {
-  --i: 14;
-}
-
-.wavy-text span:nth-child(15) {
-  --i: 15;
-}
-
-/* Dấu cách */
-.wavy-text span:nth-child(16) {
-  --i: 16;
-}
-
-.wavy-text span:nth-child(17) {
-  --i: 17;
-}
-
-.wavy-text span:nth-child(18) {
-  --i: 18;
-}
-
-.wavy-text span:nth-child(19) {
-  --i: 19;
-}
-
-.wavy-text span:nth-child(20) {
-  --i: 20;
-}
-
+/* 4. Gán độ trễ (Giữ nguyên phần đếm số thứ tự) */
+.wavy-text span:nth-child(1) { --i: 1; }
+.wavy-text span:nth-child(2) { --i: 2; }
+.wavy-text span:nth-child(3) { --i: 3; }
+.wavy-text span:nth-child(4) { --i: 4; }
+.wavy-text span:nth-child(5) { --i: 5; }
+.wavy-text span:nth-child(6) { --i: 6; }
+.wavy-text span:nth-child(7) { --i: 7; }
+.wavy-text span:nth-child(8) { --i: 8; }
+.wavy-text span:nth-child(9) { --i: 9; }
+.wavy-text span:nth-child(10) { --i: 10; }
+.wavy-text span:nth-child(11) { --i: 11; }
+.wavy-text span:nth-child(12) { --i: 12; }
+.wavy-text span:nth-child(13) { --i: 13; }
+.wavy-text span:nth-child(14) { --i: 14; }
+.wavy-text span:nth-child(15) { --i: 15; }
+.wavy-text span:nth-child(16) { --i: 16; }
+.wavy-text span:nth-child(17) { --i: 17; }
+.wavy-text span:nth-child(18) { --i: 18; }
+.wavy-text span:nth-child(19) { --i: 19; }
+.wavy-text span:nth-child(20) { --i: 20; }
 /* --- KẾT THÚC CODE HIỆU ỨNG GỢN SÓNG --- */
 
 /* --- CSS CHO VIDEO YOUTUBE RESPONSIVE --- */
@@ -1643,4 +1581,31 @@ body.dark-mode .gift-stationery .fs-5,
 body.dark-mode .gift-stationery .btn-link,
 [data-bs-theme="dark"] .gift-stationery .btn-link {
     color: #ffd700 !important; /* Icon copy màu vàng */
+}
+
+/* Tùy chỉnh Navbar Bottom */
+#navbar-menu {
+    /* Hiệu ứng kính mờ (Glassmorphism) nhìn cho sang */
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px); 
+    border-top: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+/* Chế độ tối cho Navbar */
+body.dark-mode #navbar-menu,
+[data-bs-theme="dark"] #navbar-menu {
+    background-color: rgba(33, 37, 41, 0.95) !important;
+    border-top: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* Màu icon khi chưa bấm */
+#navbar-menu .nav-link {
+    color: #999 !important;
+    transition: color 0.3s;
+}
+
+/* Màu icon khi đang Active hoặc Hover (Màu chủ đạo) */
+#navbar-menu .nav-link:hover,
+#navbar-menu .nav-link.active {
+    color: indianred !important;
 }
