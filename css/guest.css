@@ -1264,6 +1264,17 @@ body.modal-open {
 /* --- MOBILE RESPONSIVE FIX (FINAL V2) --- */
 @media (max-width: 768px) {
 
+   .wavy-text {
+        font-size: 1.5rem !important; /* Trên điện thoại thu nhỏ còn 1.5rem */
+        flex-wrap: wrap; /* Nếu tên quá dài, cho phép rớt dòng */
+        margin: 1rem 0;
+    }
+    
+    /* Điều chỉnh khoảng cách các chữ cái trên mobile cho đỡ thưa */
+    .wavy-text span {
+        margin: 0 1px; 
+    }
+
   /* 1. Dời đường kẻ sang trái */
   .timeline-line {
     left: 30px;
@@ -1608,4 +1619,14 @@ body.dark-mode #navbar-menu,
 #navbar-menu .nav-link:hover,
 #navbar-menu .nav-link.active {
     color: indianred !important;
+}
+
+/* --- FIX LỖI TRÀN MÀN HÌNH TRÊN MOBILE --- */
+html, body {
+    max-width: 100% !important;
+    position: relative; /* Giữ vị trí chuẩn */
+}
+
+section {
+    overflow-x: hidden; /* Đảm bảo từng section không bị tràn */
 }
