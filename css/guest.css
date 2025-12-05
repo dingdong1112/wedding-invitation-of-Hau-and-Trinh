@@ -974,13 +974,13 @@ body.modal-open {
 
   /* QUAN TRỌNG: Ngăn chặn cuộn lan ra body khi hết trang */
   overscroll-behavior: contain;
-  pointer-events: none; 
+  pointer-events: none;
 }
 
 .story-modal.active {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto; 
+  pointer-events: auto;
 }
 
 .close-modal-btn {
@@ -1261,14 +1261,14 @@ body.modal-open {
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-    pointer-events: none;     
-    transition: all 0.3s ease;
+  pointer-events: none;
+  transition: all 0.3s ease;
 }
 
 .video-modal.active {
   opacity: 1;
   visibility: visible;
-   pointer-events: auto; 
+  pointer-events: auto;
 }
 
 .video-modal-backdrop {
@@ -1393,4 +1393,254 @@ body.modal-open {
   .visible .final-heart-icon {
     animation: pulse-heart 1.5s infinite;
   }
+}
+
+/* --- FIX LỖI DARK MODE CHO THIỆP MỜI --- */
+/* --- ADAPTIVE CARD: TỰ ĐỔI MÀU THEO CHẾ ĐỘ SÁNG/TỐI --- */
+
+/* 1. CHẾ ĐỘ SÁNG (Mặc định) - Nền Kem, Chữ Đen */
+.invitation-card {
+  background-color: #fffcf5 !important;
+  /* Màu kem sữa dịu mắt */
+  color: #444444 !important;
+  border: 1px solid #e8e0cc !important;
+  transition: all 0.3s ease;
+  /* Hiệu ứng chuyển màu mượt mà */
+}
+
+.invitation-card .btn {
+    color: #333333 !important;
+    border-color: #333333 !important;
+}
+
+.invitation-card .btn:hover {
+    background-color: #333333 !important;
+    color: #ffffff !important; /* Di chuột vào thì chữ trắng nền đen */
+}
+
+
+/* 2. CHẾ ĐỘ TỐI (DARK MODE) */
+/* Nút chuyển sang màu Trắng hoàn toàn để nổi trên nền tối */
+body.dark-mode .invitation-card .btn,
+[data-bs-theme="dark"] .invitation-card .btn,
+[data-theme="dark"] .invitation-card .btn {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* Hover ở chế độ tối */
+body.dark-mode .invitation-card .btn:hover,
+[data-bs-theme="dark"] .invitation-card .btn:hover,
+[data-theme="dark"] .invitation-card .btn:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important; /* Di chuột vào thì chữ đen nền trắng */
+}
+
+.invitation-card .text-muted {
+  color: #777777 !important;
+}
+
+.invitation-card .border-secondary {
+  border-color: #dcd6c8 !important;
+}
+
+/* 2. CHẾ ĐỘ TỐI (Dark Mode) - Nền Xám Tối, Chữ Trắng (Giống Hình 1) */
+/* Code này sẽ kích hoạt khi body có class dark-mode hoặc thuộc tính dark */
+body.dark-mode .invitation-card,
+body.dark-version .invitation-card,
+[data-bs-theme="dark"] .invitation-card,
+[data-theme="dark"] .invitation-card {
+  background-color: #26282b !important;
+  /* Màu xám tối sang trọng */
+  color: #ffffff !important;
+  /* Chữ trắng */
+  border: 1px solid #444444 !important;
+  /* Viền tối */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5) !important;
+  /* Bóng đổ đậm hơn */
+}
+
+/* Ép các thành phần con đổi màu theo nền */
+body.dark-mode .invitation-card h1,
+body.dark-mode .invitation-card h2,
+body.dark-mode .invitation-card h3,
+body.dark-mode .invitation-card h5,
+body.dark-mode .invitation-card strong,
+body.dark-mode .invitation-card span,
+/* Và các biến thể khác */
+[data-bs-theme="dark"] .invitation-card h2,
+[data-bs-theme="dark"] .invitation-card span {
+  color: #ffffff !important;
+}
+
+body.dark-mode .invitation-card .text-muted,
+[data-bs-theme="dark"] .invitation-card .text-muted {
+  color: #adb5bd !important;
+  /* Màu xám sáng cho chữ phụ */
+}
+
+body.dark-mode .invitation-card .border-secondary,
+[data-bs-theme="dark"] .invitation-card .border-secondary {
+  border-color: #495057 !important;
+}
+
+/* Màu đỏ chủ đạo (Indianred) vẫn giữ nguyên hoặc sáng hơn xíu ở chế độ tối */
+.text-indianred {
+  color: indianred !important;
+}
+
+/* --- DRESS CODE STYLES --- */
+.color-swatch {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  /* Viền trắng tạo độ nổi */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.color-swatch:hover {
+  transform: translateY(-5px) scale(1.1);
+  /* Hiệu ứng bay lên khi di chuột */
+  z-index: 10;
+}
+
+.color-name {
+  font-size: 0.75rem;
+  margin-top: 5px;
+  font-weight: 600;
+  color: #666;
+  display: block;
+  line-height: 1.2;
+}
+
+/* --- STYLE CHO DRESS CODE KHÔNG CARD --- */
+
+/* Mặc định (Chế độ sáng) */
+.color-name {
+    font-weight: 600;
+    color: #555;
+    transition: color 0.3s;
+}
+
+/* Chế độ tối (Dark Mode) - Đổi màu chữ sang trắng */
+body.dark-mode .color-name,
+body.dark-mode p, /* Các đoạn văn bản nằm ngoài card */
+[data-bs-theme="dark"] .color-name,
+[data-bs-theme="dark"] p {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .text-muted,
+[data-bs-theme="dark"] .text-muted {
+    color: #aaa !important;
+}
+
+/* Hiệu ứng Color Swatch khi không có card */
+.color-item {
+    transition: transform 0.3s;
+}
+.color-item:hover {
+    transform: translateY(-5px);
+}
+
+/* --- PHONG CÁCH "WAX SEAL STATIONERY" (THƯ TAY CÓ CON DẤU) --- */
+
+/* --- PHONG CÁCH "WAX SEAL STATIONERY" (THƯ TAY) --- */
+
+/* 1. GIAO DIỆN SÁNG (MẶC ĐỊNH) */
+.gift-stationery {
+    position: relative;
+    background-color: #fff5f5; /* Nền hồng phấn nhạt */
+    padding: 3rem 1.5rem 2rem 1.5rem;
+    margin-top: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Viền nét đứt bên trong */
+.gift-stationery::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border: 1px dashed indianred;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Con dấu sáp */
+.wax-seal {
+    position: absolute;
+    top: -25px; left: 50%;
+    transform: translateX(-50%);
+    width: 50px; height: 50px;
+    background-color: #A52A2A;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center;
+    color: #ffd700; font-size: 1.2rem; z-index: 10;
+}
+.wax-seal::after {
+    content: ''; position: absolute;
+    top: 2px; left: 2px; right: 2px; bottom: 2px;
+    border: 1px solid rgba(255,255,255,0.3); border-radius: 50%;
+}
+
+.gift-stationery:hover { transform: translateY(-5px); }
+
+
+/* 2. GIAO DIỆN TỐI (DARK MODE - FIX LỖI MÀU XẤU & CHỮ CHÌM) */
+body.dark-mode .gift-stationery,
+[data-bs-theme="dark"] .gift-stationery {
+    /* Đổi nền sang màu Xám Đen (Black Luxury) thay vì Đỏ nâu */
+    background-color: #212529 !important; 
+    border: 1px solid #444; /* Viền nhẹ để tách biệt với nền body */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+/* Đổi màu viền nét đứt sang màu Vàng Kim cho sang */
+body.dark-mode .gift-stationery::before,
+[data-bs-theme="dark"] .gift-stationery::before {
+    border-color: #ffd700 !important;
+    opacity: 0.3;
+}
+
+/* Viền con dấu đổi sang màu trùng nền tối */
+body.dark-mode .wax-seal,
+[data-bs-theme="dark"] .wax-seal {
+    border-color: #212529 !important;
+}
+
+/* --- QUAN TRỌNG: ÉP MÀU CHỮ TRẮNG --- */
+
+/* Tên Cô dâu / Chú rể */
+body.dark-mode .gift-stationery h4,
+[data-bs-theme="dark"] .gift-stationery h4 {
+    color: #ffd700 !important; /* Tên màu vàng kim nổi bật */
+}
+
+/* Các chữ phụ (text-muted) chuyển sang trắng mờ */
+body.dark-mode .gift-stationery .text-muted,
+[data-bs-theme="dark"] .gift-stationery .text-muted,
+body.dark-mode .gift-stationery p,
+[data-bs-theme="dark"] .gift-stationery p {
+    color: #cccccc !important;
+}
+
+/* SỐ TÀI KHOẢN (Fix lỗi bị xám) */
+body.dark-mode .gift-stationery .fs-5,
+[data-bs-theme="dark"] .gift-stationery .fs-5 {
+    color: #ffffff !important; /* Số tài khoản trắng tinh */
+}
+
+/* Nút Copy */
+body.dark-mode .gift-stationery .btn-link,
+[data-bs-theme="dark"] .gift-stationery .btn-link {
+    color: #ffd700 !important; /* Icon copy màu vàng */
 }
