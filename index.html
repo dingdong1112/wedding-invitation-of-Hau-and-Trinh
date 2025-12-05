@@ -352,146 +352,43 @@
                     </div>
                 </section>
 
-                <!-- Love Story -->
-                <section class="bg-light-dark pt-2 pb-4">
+                <!-- === LAYER 1: MAIN TRIGGER (HIỂN THỊ TRÊN TRANG CHỦ) === -->
+                <section class="bg-light-dark pt-2 pb-4" id="love-story-section">
                     <div class="container">
-                        <div class="bg-theme-auto rounded-5 shadow p-3">
+                        <div class="bg-theme-auto rounded-5 shadow p-4 text-center">
+
+                            <!-- Title -->
                             <p class="mb-0"
-                                style="font-size: 1.7rem; font-style: italic; font-family: Dancing Script; text-align: center; font-weight: bold; color: indianred;">
-                                Our love story</p>
-                            <h2 class="font-esthetic1 text-center py-1 mb-2" style="font-size: 2.125rem;">CHUYỆN TÌNH
-                                YÊU
-                            </h2>
+                                style="font-size: 1.7rem; font-style: italic; font-family: 'Dancing Script', cursive; font-weight: bold; color: indianred;">
+                                Our love story
+                            </p>
+                            <h2 class="font-esthetic1 py-1 mb-4" style="font-size: 2.125rem;">CHUYỆN TÌNH YÊU</h2>
 
-                            <!-- Jika tidak ingin menggunakan video, hapus seluruh tag dengan id="video-love-story" di bawah ini. -->
-                            <!-- If you don't want to use the video, remove the entire tag with id="video-love-story" below. -->
+                            <!-- Poster Trigger -->
+                            <div class="main-story-trigger position-relative rounded-4 overflow-hidden shadow-lg mx-auto"
+                                style="max-width: 600px; cursor: pointer;" onclick="undangan.guest.openStoryTimeline()">
 
-                            <div id="video-love-stroy" class="position-relative rounded-4 mb-2 pb-0"
-                                data-src="./assets/video/dancing.mp4"
-                                data-vid-class="w-100 rounded-4 shadow-sm m-0 p-0">
-                                <div class="position-absolute d-flex flex-column justify-content-center align-items-center top-50 start-50 translate-middle w-100 h-100 bg-overlay-auto rounded-4 z-3"
-                                    id="video-love-stroy-loading">
-                                    <div class="progress w-25" role="progressbar" style="height: 0.5rem;"
-                                        aria-label="progress bar">
-                                        <div class="progress-bar" id="progress-bar-video-love-stroy" style="width: 0%;">
-                                        </div>
+                                <!-- Ảnh Poster Chính (Thay ảnh đẹp nhất của 2 bạn) -->
+                                <img src="./assets/images/placeholder.webp" data-src="./assets/images/_HIP0811.webp"
+                                    alt="Love Story Poster" class="w-100 object-fit-cover"
+                                    style="height: 400px; transition: transform 0.5s;">
+
+                                <!-- Overlay -->
+                                <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+
+                                <!-- Nội dung trên Poster -->
+                                <div
+                                    class="position-absolute top-50 start-50 translate-middle text-center w-100 px-3 z-3">
+                                    <div class="btn-play-pulse mb-3 mx-auto">
+                                        <i class="fas fa-play text-white fs-3"></i>
                                     </div>
-                                    <small class="mt-1 text-theme-auto bg-theme-auto py-0 px-2 rounded-4"
-                                        id="progress-info-video-love-stroy" style="font-size: 0.7rem;"></small>
-                                </div>
-                            </div>
-
-                            <!-- ĐÂY LÀ CODE NHÚNG VIDEO YOUTUBE MỚI (ĐÃ SỬA LẠI ĐÚNG ID) -->
-                            <!-- BỌC LẠI KHỐI VIDEO CONTAINER -->
-                            <div class="video-wrapper position-relative rounded-4 mb-2 shadow-sm">
-                                <div class="video-container">
-                                    <iframe id="youtube-player"
-                                        src="https://www.youtube.com/embed/neR2Lfl7jrA?autoplay=1&mute=1&loop=1&playlist=neR2Lfl7jrA&controls=0&modestbranding=1&rel=0&enablejsapi=1"
-                                        title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;
-                                    picture-in-picture" allowfullscreen
-                                        referrerpolicy="strict-origin-when-cross-origin">
-                                    </iframe>
-                                </div>
-                                <!-- NÚT BẬT/TẮT ÂM THANH -->
-                                <button id="volume-toggle" class="btn btn-light btn-sm rounded-circle shadow-sm">
-                                    <i class="fas fa-volume-mute"></i>
-                                </button>
-                            </div>
-
-                            <div class="position-relative">
-                                <div class="position-absolute d-flex justify-content-center align-items-center top-50 start-50 translate-middle w-100 h-100 bg-overlay-auto z-3"
-                                    style="opacity: 100%; background-color: unset;">
-                                    <button class="btn btn-outline-auto btn-sm rounded-4 shadow-sm"
-                                        onclick="undangan.guest.showStory(this.parentNode)"><i
-                                            class="fa-solid fa-heart fa-bounce me-2"></i>Câu chuyện tình yêu</button>
-                                </div>
-
-                                <div class="overflow-y-scroll overflow-x-hidden p-2 with-scrollbar"
-                                    style="height: 15rem;">
-                                    <div class="row">
-                                        <div class="col-auto position-relative">
-                                            <p class="position-relative d-flex justify-content-center align-items-center bg-theme-auto border border-secondary border-2 opacity-100 rounded-circle m-0 p-0 z-1"
-                                                style="width: 2rem; height: 2rem;">1</p>
-                                            <hr
-                                                class="position-absolute top-0 start-50 translate-middle-x border border-secondary h-100 z-0 opacity-100 m-0 rounded-4 shadow-none">
-                                        </div>
-                                        <div class="col mt-1 mb-3 ps-0">
-                                            <p class="fw-bold mb-2">💼 Awal Pertemuan Sederhana</p>
-                                            <p class="small mb-0">
-                                                Pada Januari 2025, Wahyu, seorang desainer grafis berusia 28 tahun,
-                                                bertemu Riski, copywriter yang dikenal cerdas dan pendiam, dalam proyek
-                                                branding perusahaan. Interaksi mereka di ruang rapat terbatas pada
-                                                urusan kerja, penuh adab dan profesional. Tanpa Wahyu ketahui, Riski
-                                                sebenarnya pernah melihat karya desain Wahyu di lomba nasional dua tahun
-                                                lalu dan kagum dengan bakatnya. Namun, sesuai prinsipnya, Riski menjaga
-                                                jarak dan hanya fokus pada tugas, menghindari interaksi yang tidak
-                                                perlu.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-auto position-relative">
-                                            <p class="position-relative d-flex justify-content-center align-items-center bg-theme-auto border border-secondary border-2 opacity-100 rounded-circle m-0 p-0 z-1"
-                                                style="width: 2rem; height: 2rem;">2</p>
-                                            <hr
-                                                class="position-absolute top-0 start-50 translate-middle-x border border-secondary h-100 z-0 opacity-100 m-0 rounded-4 shadow-none">
-                                        </div>
-                                        <div class="col mt-1 mb-3 ps-0">
-                                            <p class="fw-bold mb-2">💞 Benih Cinta dalam Ujian</p>
-                                            <p class="small mb-0">
-                                                Memasuki Februari 2025, proyek mereka menghadapi krisis: klien menolak
-                                                konsep awal dan mengancam membatalkan kontrak. Di tengah tekanan, Riski
-                                                tampil dengan solusi kreatif yang menyelamatkan proyek, membuat Wahyu
-                                                terkesan dengan ketenangan dan kecerdasannya. Diam-diam, Wahyu mulai
-                                                memperhatikan Riski lebih dalam, terutama melalui unggahan media
-                                                sosialnya yang penuh dengan nilai keimanan dan kesabaran. Merasa ada
-                                                kesamaan visi, Wahyu beristikharah dan memutuskan memulai taaruf. Ia
-                                                menghubungi seorang ustaz terpercaya sebagai perantara. Kejutan muncul
-                                                saat Riski mengaku bahwa ia juga telah lama memperhatikan Wahyu, namun
-                                                menahan diri hingga ada niat yang jelas, sebuah pengakuan yang membuat
-                                                hati Wahyu hangat.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-auto position-relative">
-                                            <p class="position-relative d-flex justify-content-center align-items-center bg-theme-auto border border-secondary border-2 opacity-100 rounded-circle m-0 p-0 z-1"
-                                                style="width: 2rem; height: 2rem;">3</p>
-                                            <hr
-                                                class="position-absolute top-0 start-50 translate-middle-x border border-secondary h-100 z-0 opacity-100 m-0 rounded-4 shadow-none">
-                                        </div>
-                                        <div class="col mt-1 mb-3 ps-0">
-                                            <p class="fw-bold mb-2">💍 Langkah Menuju Ridha Allah</p>
-                                            <p class="small mb-0">
-                                                Proses taaruf berjalan penuh keikhlasan, dengan pendamping yang
-                                                memastikan setiap langkah sesuai syariat. Wahyu dan Riski saling terbuka
-                                                tentang impian membangun keluarga yang diridhai Allah. Namun, sebuah
-                                                ujian datang: keluarga Riski ragu karena latar belakang ekonomi Wahyu
-                                                yang sederhana. Di sinilah plot twist terungkap—Wahyu mempresentasikan
-                                                rencana usaha sosial berbasis seni yang telah ia kembangkan diam-diam,
-                                                menunjukkan visinya untuk memberi manfaat bagi umat. Presentasi itu
-                                                meluluhkan hati keluarga Riski. Pada Maret 2025, setelah istikharah dan
-                                                mendapat restu keluarga, Wahyu melamar Riski dalam acara sederhana namun
-                                                penuh makna. Dengan niat tulus, mereka melangkah menuju pernikahan,
-                                                yakin bahwa Allah telah merajut kisah mereka dengan indah.
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <h4 class="text-white fw-bold text-uppercase mb-1">Nhấn vào để khám phá</h4>
+                                    <p class="text-white-50 small fst-italic mb-0">Hành trình 15 năm thanh xuân</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
-
-                <!-- Wave Separator -->
-                <div class="svg-wrapper">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"
-                        class="color-theme-svg no-gap-bottom">
-                        <path fill="currentColor" fill-opacity="1"
-                            d="M0,96L30,106.7C60,117,120,139,180,154.7C240,171,300,181,360,186.7C420,192,480,192,540,181.3C600,171,660,149,720,154.7C780,160,840,192,900,208C960,224,1020,224,1080,208C1140,192,1200,160,1260,138.7C1320,117,1380,107,1410,101.3L1440,96L1440,320L1410,320C1380,320,1320,320,1260,320C1200,320,1140,320,1080,320C1020,320,960,320,900,320C840,320,780,320,720,320C660,320,600,320,540,320C480,320,420,320,360,320C300,320,240,320,180,320C120,320,60,320,30,320L0,320Z">
-                        </path>
-                    </svg>
-                </div>
 
                 <!-- Wedding Date -->
                 <section class="bg-white-black pb-2" id="wedding-date">
@@ -641,7 +538,8 @@
                         <div class="modal-content bg-black">
                             <!-- Nút đóng (Dùng để quay lại Album) -->
                             <button type="button" class="btn btn-light rounded-circle shadow-lg position-absolute z-1"
-                                style="top: 10px; left: 10px; z-index: 10;" id="btn-close-detail" onclick="closeDetailModal()">
+                                style="top: 10px; left: 10px; z-index: 10;" id="btn-close-detail"
+                                onclick="closeDetailModal()">
                                 <i class="fa-solid fa-angle-left"></i>
                             </button>
 
@@ -1589,6 +1487,216 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- === LAYER 2: TIMELINE MODAL (DÒNG THỜI GIAN) === -->
+    <div id="storyTimelineModal" class="story-modal">
+        <!-- Nút đóng -->
+        <button class="close-modal-btn" onclick="undangan.guest.closeStoryTimeline()">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="story-content-container">
+            <div class="container py-5">
+                <h2 class="text-center text-white font-esthetic1 mb-5 reveal-text" style="font-size: 2.5rem;">Dòng Thời
+                    Gian</h2>
+
+                <div class="timeline-centered">
+                    <!-- Đường kẻ dọc nối liền mạch -->
+                    <div class="timeline-line"></div>
+
+                    <!-- 1. TRAILER (CENTER - START) -->
+                    <div class="timeline-section-center start-node">
+                        <!-- MARKER MỚI: Icon Cuộn Phim/Camera -->
+                        <div class="start-icon-marker scroll-reveal">
+                            <i class="fas fa-film"></i>
+                        </div>
+
+                        <div class="scroll-reveal w-100 mt-2">
+                            <!-- BADGE MỚI: Mở màn -->
+                            <div class="mb-2 badge-wrapper">
+                                <span class="date-badge bg-dark text-white shadow-sm border border-secondary">Mở
+                                    màn</span>
+                            </div>
+
+                            <!-- Card Video (Giữ nguyên) -->
+                            <div class="card bg-theme-auto shadow-lg border-0 rounded-4 overflow-hidden w-100">
+                                <div class="video-thumbnail-wrapper"
+                                    onclick="undangan.guest.playVideo('neR2Lfl7jrA', 'Trailer: Khởi Đầu')">
+                                    <img src="./assets/images/placeholder.webp" data-src="./assets/images/_HIP0811.webp"
+                                        class="w-100" alt="Trailer">
+                                    <div class="play-icon pulse-white"><i class="fas fa-play"></i></div>
+                                </div>
+                                <div class="card-body p-4 text-center">
+                                    <h4 class="fw-bold text-indianred text-uppercase">🎬 Trailer: Khởi Đầu
+                                    </h4>
+                                    <p class="text-muted mb-0">Những thước phim tóm tắt lại 15 năm rực rỡ
+                                        của chúng mình.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. CÁC TẬP (ZIGZAG) -->
+
+                    <!-- Tập 1: Xuân (Trái) -->
+                    <div class="timeline-row">
+                        <div class="timeline-item item-left">
+                            <div class="timeline-content scroll-reveal">
+                                <span class="date-badge bg-success">Tháng 1/2010</span>
+                                <div class="card bg-theme-auto shadow border-0 rounded-4 overflow-hidden">
+                                    <div class="video-thumbnail-wrapper"
+                                        onclick="undangan.guest.playVideo('ID_VIDEO_XUAN', 'Tập 1: Mùa Xuân')">
+                                        <img src="./assets/images/placeholder.webp"
+                                            data-src="./assets/images/_HIP0811.webp" class="w-100" alt="Xuân">
+                                        <div class="play-icon"><i class="fas fa-play"></i></div>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <h5 class="fw-bold text-success">🌱 Tập 1: Gặp Gỡ</h5>
+                                        <p class="small text-muted mb-0">Lần đầu tiên ánh mắt chạm nhau,
+                                            tình yêu chớm nở.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-dot"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tập 2: Hạ (Phải) -->
+                    <div class="timeline-row">
+                        <div class="timeline-item item-right">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content scroll-reveal">
+                                <span class="date-badge bg-warning text-dark">Năm 2012</span>
+                                <div class="card bg-theme-auto shadow border-0 rounded-4 overflow-hidden">
+                                    <div class="video-thumbnail-wrapper"
+                                        onclick="undangan.guest.playVideo('ID_VIDEO_HA', 'Tập 2: Mùa Hạ')">
+                                        <img src="./assets/images/placeholder.webp"
+                                            data-src="./assets/images/_HIP0811.webp" class="w-100" alt="Hạ">
+                                        <div class="play-icon"><i class="fas fa-play"></i></div>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <h5 class="fw-bold text-warning">☀️ Tập 2: Nồng Nhiệt</h5>
+                                        <p class="small text-muted mb-0">Những năm tháng sôi nổi, thử thách
+                                            và trưởng thành.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tập 3: Thu (Trái) -->
+                    <div class="timeline-row">
+                        <div class="timeline-item item-left">
+                            <div class="timeline-content scroll-reveal">
+                                <span class="date-badge bg-danger">Năm 2018</span>
+                                <div class="card bg-theme-auto shadow border-0 rounded-4 overflow-hidden">
+                                    <div class="video-thumbnail-wrapper"
+                                        onclick="undangan.guest.playVideo('ID_VIDEO_THU', 'Tập 3: Mùa Thu')">
+                                        <img src="./assets/images/placeholder.webp"
+                                            data-src="./assets/images/_HIP0811.webp" class="w-100" alt="Thu">
+                                        <div class="play-icon"><i class="fas fa-play"></i></div>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <h5 class="fw-bold text-danger">🍁 Tập 3: Dịu Dàng</h5>
+                                        <p class="small text-muted mb-0">Học cách lắng nghe, bao dung và
+                                            thấu hiểu nhau hơn.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-dot"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tập 4: Đông (Phải) -->
+                    <div class="timeline-row">
+                        <div class="timeline-item item-right">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content scroll-reveal">
+                                <span class="date-badge bg-info">Năm 2022</span>
+                                <div class="card bg-theme-auto shadow border-0 rounded-4 overflow-hidden">
+                                    <div class="video-thumbnail-wrapper"
+                                        onclick="undangan.guest.playVideo('ID_VIDEO_DONG', 'Tập 4: Mùa Đông')">
+                                        <img src="./assets/images/placeholder.webp"
+                                            data-src="./assets/images/_HIP0811.webp" class="w-100" alt="Đông">
+                                        <div class="play-icon"><i class="fas fa-play"></i></div>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <h5 class="fw-bold text-info">❄️ Tập 4: Ấm Áp</h5>
+                                        <p class="small text-muted mb-0">Cùng nhau nắm tay đi qua những bão
+                                            giông cuộc đời.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. LỄ ĐƯỜNG (CENTER - END) -->
+                    <div class="timeline-section-center end-node">
+                        <!-- Heart Marker (Trái tim đỏ) -->
+                        <div class="final-heart-icon scroll-reveal">
+                            <i class="fas fa-heart"></i>
+                        </div>
+
+                        <div class="scroll-reveal w-100 mt-2">
+                            <!-- Bỏ d-flex center để dễ canh trái trên mobile -->
+                            <!-- THÊM MỚI: Badge "Hiện tại" -->
+                            <div class="mb-2 badge-wrapper">
+                                <span class="date-badge bg-danger shadow-sm">Hiện tại</span>
+                            </div>
+
+                            <!-- Card Video -->
+                            <div
+                                class="card bg-theme-auto shadow-lg border-2 border-danger rounded-4 overflow-hidden w-100">
+                                <div class="video-thumbnail-wrapper"
+                                    onclick="undangan.guest.playVideo('ID_VIDEO_WEDDING', 'Tập Cuối: Lễ Đường')">
+                                    <img src="./assets/images/placeholder.webp" data-src="./assets/images/_HIP0811.webp"
+                                        class="w-100" alt="Wedding">
+                                    <div class="play-icon heart-beat"><i class="fas fa-heart"></i></div>
+                                </div>
+                                <div class="card-body p-4 text-center">
+                                    <h4 class="fw-bold text-danger">💍 The Happy Ending</h4>
+                                    <p class="small text-muted mb-0">Cái kết viên mãn cho hành trình 15 năm
+                                        yêu nhau.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- End Timeline Centered -->
+
+                <div class="text-center mt-5 pb-5">
+                    <p class="text-white-50 small fst-italic">Cảm ơn bạn đã theo dõi câu chuyện của chúng
+                        mình ❤️</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === LAYER 3: VIDEO PLAYER MODAL (XEM PHIM) === -->
+    <div id="videoPlayerModal" class="video-modal">
+        <div class="video-modal-backdrop" onclick="undangan.guest.closeVideoPlayer()"></div>
+        <div class="video-modal-content rounded-4 overflow-hidden shadow-lg">
+            <div class="d-flex justify-content-between align-items-center bg-dark p-3 border-bottom border-secondary">
+                <h6 class="text-white m-0 text-truncate pe-3" id="playerTitle">Video Title</h6>
+                <button class="btn btn-sm btn-outline-light rounded-circle border-0"
+                    onclick="undangan.guest.closeVideoPlayer()">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="ratio ratio-16x9 bg-black">
+                <div id="youtubePlayerContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wave Separator -->
+    <div class="svg-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="color-theme-svg no-gap-bottom">
+            <path fill="currentColor" fill-opacity="1"
+                d="M0,96L30,106.7C60,117,120,139,180,154.7C240,171,300,181,360,186.7C420,192,480,192,540,181.3C600,171,660,149,720,154.7C780,160,840,192,900,208C960,224,1020,224,1080,208C1140,192,1200,160,1260,138.7C1320,117,1380,107,1410,101.3L1440,96L1440,320L1410,320C1380,320,1320,320,1260,320C1200,320,1140,320,1080,320C1020,320,960,320,900,320C840,320,780,320,720,320C660,320,600,320,540,320C480,320,420,320,360,320C300,320,240,320,180,320C120,320,60,320,30,320L0,320Z">
+            </path>
+        </svg>
     </div>
     <!-- Popup Lời Chúc Góc Phải -->
     <div id="wish-notification" class="wish-box">

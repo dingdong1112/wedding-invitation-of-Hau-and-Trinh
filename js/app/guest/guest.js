@@ -1292,10 +1292,107 @@ export const guest = (() => {
         //document.documentElement.style.overflow = 'auto';
         document.documentElement.style.height = 'auto';
     }
-
     //KẾT THÚC CODE PHẦN PAGE-TURNING ANIMATION CHO ẢNH THƯ VIỆN ---
 
+    /* --- QUẢN LÝ HIỆU ỨNG CUỘN (SCROLL REVEAL) --- */
+    function initScrollObserver() {
+        // Chọn tất cả thành phần cần hiệu ứng: Center Section & Zigzag Rows
+        const items = document.querySelectorAll('.timeline-section-center, .timeline-row');
 
+        const observerOptions = {
+            root: document.getElementById('storyTimelineModal'), // Quan sát trong Modal
+            threshold: 0.15, // Hiện 15% là kích hoạt
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // observer.unobserve(entry.target); // Bỏ comment nếu muốn chỉ chạy 1 lần
+                }
+            });
+        }, observerOptions);
+
+        items.forEach(item => {
+            observer.observe(item);
+        });
+    }
+
+    /* --- QUẢN LÝ MODAL TIMELINE --- */
+    function openStoryTimeline() {
+        const modal = document.getElementById('storyTimelineModal');
+        modal.classList.add('active');
+
+        document.body.classList.add('modal-open'); // Khóa cuộn trang chủ
+
+        // Kích hoạt Observer sau khi modal mở để tính toán vị trí đúng
+        setTimeout(() => {
+            initScrollObserver();
+        }, 300);
+    }
+
+    function closeStoryTimeline() {
+        const modal = document.getElementById('storyTimelineModal');
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+
+    /* --- QUẢN LÝ VIDEO PLAYER --- */
+    function playVideo(videoId, title) {
+        const videoModal = document.getElementById('videoPlayerModal');
+        const container = document.getElementById('youtubePlayerContainer');
+        const titleEl = document.getElementById('playerTitle');
+
+        // Set tiêu đề
+        if (titleEl) titleEl.innerText = title;
+
+        // Tạo iframe Youtube (Autoplay)
+       const iframeHtml = `
+        <iframe 
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}" 
+            title="YouTube video player" 
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen 
+            class="w-100 h-100 absolute top-0 left-0">
+        </iframe>
+    `;
+
+        container.innerHTML = iframeHtml;
+        videoModal.classList.add('active');
+
+        document.body.classList.add('modal-open');
+    }
+
+    function closeVideoPlayer() {
+        const videoModal = document.getElementById('videoPlayerModal');
+        const container = document.getElementById('youtubePlayerContainer');
+
+        videoModal.classList.remove('active');
+
+        // Xóa iframe sau khi đóng để tắt tiếng
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 300);
+
+        const storyModal = document.getElementById('storyTimelineModal');
+        if (!storyModal.classList.contains('active')) {
+            document.body.classList.remove('modal-open');
+        }
+    }
+
+    /* --- PHÍM TẮT (ESC) --- */
+    document.addEventListener('keydown', function (event) {
+        if (event.key === "Escape") {
+            if (document.getElementById('videoPlayerModal').classList.contains('active')) {
+                closeVideoPlayer();
+            } else if (document.getElementById('storyTimelineModal').classList.contains('active')) {
+                closeStoryTimeline();
+            }
+        }
+    });
 
     /**
      * @returns {object}
@@ -1389,8 +1486,11 @@ export const guest = (() => {
                 openAlbum: initPageFlipAlbum, // Gán hàm khởi tạo Album vào API công khai
                 openDetail: openDetailModalSwipeZoom, // Export hàm mở chi tiết
                 closeDetailModal2,
-                //closeDetailModal,
+                openStoryTimeline,
                 openDetailModal,
+                closeStoryTimeline,
+                closeVideoPlayer,
+                playVideo
                 //navigateDetail,
             },
         };

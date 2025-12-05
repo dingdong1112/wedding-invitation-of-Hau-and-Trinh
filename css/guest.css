@@ -663,7 +663,7 @@ svg {
   padding: 12px;
   display: flex;
   align-items: flex-start;
-/*  z-index: 9998;*/
+  /*  z-index: 9998;*/
 
   /* --- FIX LỖI KẸT & CHUYỂN ĐỘNG --- */
   opacity: 0;
@@ -845,63 +845,552 @@ svg {
 
 /* Style cho thumbnail trong detail modal */
 .thumb-item {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    opacity: 0.6;
-    border-radius: 8px;
-    margin: 0 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 2px solid transparent;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  opacity: 0.6;
+  border-radius: 8px;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
 }
+
 .thumb-item.active {
-    opacity: 1;
-    border-color: #ff4081;
-    transform: scale(1.1);
+  opacity: 1;
+  border-color: #ff4081;
+  transform: scale(1.1);
 }
 
 /* Icon zoom indicator trên trang sách */
 .zoom-indicator {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: rgba(0,0,0,0.4);
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none; /* Để click xuyên qua */
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  /* Để click xuyên qua */
 }
 
 /* Hiện icon khi hover chuột (desktop) hoặc luôn hiện mờ (mobile nếu cần) */
 .my-page:hover .zoom-indicator {
-    opacity: 1;
+  opacity: 1;
 }
 
 /* Đảm bảo backdrop không bao giờ che nút đóng nếu bị lỗi */
 .modal-backdrop {
-    z-index: 1040 !important; /* Mặc định bootstrap */
+  z-index: 1040 !important;
+  /* Mặc định bootstrap */
 }
 
 .modal {
-    z-index: 1055 !important; /* Cao hơn backdrop */
+  z-index: 1055 !important;
+  /* Cao hơn backdrop */
 }
 
 /* Fix lỗi màn hình đen chết chóc:
    Nếu không có modal nào có class .show, ẩn luôn backdrop đi */
 body:not(.modal-open) .modal-backdrop {
-    display: none !important;
+  display: none !important;
 }
 
 /* Khi body KHÔNG có class modal-open thì bắt buộc phải scroll được */
 body:not(.modal-open) {
-    overflow: auto !important;
-    height: auto !important;
-    padding-right: 0 !important;
+  overflow: auto !important;
+  height: auto !important;
+  padding-right: 0 !important;
+}
+
+body.modal-open {
+  overflow: hidden !important;
+  height: 100vh;
+  /* Giúp khóa chặt trên iOS */
+}
+
+/* --- 1. MAIN TRIGGER STYLES --- */
+.main-story-trigger {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.main-story-trigger:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+.main-story-trigger:hover img {
+  transform: scale(1.05);
+}
+
+/* Nút Play rung động */
+.btn-play-pulse {
+  width: 60px;
+  height: 60px;
+  background: rgba(205, 92, 92, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(205, 92, 92, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 20px rgba(205, 92, 92, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(205, 92, 92, 0);
+  }
+}
+
+/* --- 2. TIMELINE MODAL STYLES --- */
+.story-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(18, 18, 18, 0.98);
+  z-index: 9990;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+
+  /* Cho phép cuộn dọc */
+  overflow-y: auto;
+
+  /* QUAN TRỌNG: Ngăn chặn cuộn lan ra body khi hết trang */
+  overscroll-behavior: contain;
+  pointer-events: none; 
+}
+
+.story-modal.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto; 
+}
+
+.close-modal-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.2rem;
+  z-index: 9992;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.close-modal-btn:hover {
+  background: indianred;
+  border-color: indianred;
+  transform: rotate(90deg);
+}
+
+/* --- 3. TIMELINE LAYOUT (ZIGZAG & CENTER) --- */
+.timeline-centered {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Đường kẻ dọc nối xuyên suốt */
+.timeline-line {
+  position: absolute;
+  top: 50px;
+  bottom: 50px;
+  left: 50%;
+  width: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-50%);
+  border-radius: 2px;
+  z-index: 0;
+}
+
+/* Phần Center (Trailer & Wedding) */
+.timeline-section-center {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  margin-bottom: 60px;
+}
+
+.timeline-section-center.start-node {
+  margin-bottom: 80px;
+}
+
+/* Phần Zigzag (Các tập) */
+.timeline-row {
+  display: flex;
+  width: 100%;
+  margin-bottom: 60px;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-item {
+  width: 50%;
+  position: relative;
+  padding: 0 50px;
+  /* Khoảng cách từ nội dung đến đường kẻ */
+}
+
+/* Định vị Trái - Phải */
+.item-left {
+  left: 0;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.item-left .timeline-content {
+  text-align: left;
+}
+
+/* Reset text align cho card */
+.item-right {
+  left: 50%;
+  text-align: left;
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Dấu chấm (Dot) */
+.timeline-dot {
+  position: absolute;
+  top: 30px;
+  width: 20px;
+  height: 20px;
+  background: #222;
+  border: 4px solid indianred;
+  border-radius: 50%;
+  z-index: 10;
+  transition: all 0.5s ease;
+  transform: scale(0);
+  /* Mặc định ẩn */
+}
+
+.item-left .timeline-dot {
+  right: -10px;
+}
+
+.item-right .timeline-dot {
+  left: -10px;
+}
+
+/* Trái tim kết thúc */
+.final-heart-icon {
+  width: 50px;
+  height: 50px;
+  background: indianred;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  color: white;
+
+  /* Dùng Flexbox để căn icon trái tim nhỏ vào giữa hình tròn */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1.5rem;
+  z-index: 10;
+
+  /* QUAN TRỌNG: Lệnh này ép buộc khối này ra giữa màn hình */
+  margin: 0 auto 20px auto !important;
+
+  box-shadow: 0 0 15px rgba(205, 92, 92, 0.6);
+}
+
+/* --- 4. CARD & THUMBNAIL STYLES --- */
+.video-thumbnail-wrapper {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  padding-top: 56.25%;
+  /* 16:9 Aspect Ratio */
+}
+
+.video-thumbnail-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.video-thumbnail-wrapper:hover img {
+  transform: scale(1.1);
+}
+
+.play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  border: 2px solid #fff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.video-thumbnail-wrapper:hover .play-icon {
+  background: indianred;
+  border-color: indianred;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Áp dụng animation mới này cho nút play */
+.play-icon.heart-beat {
+  /* Sử dụng animation mới đã bao gồm lệnh căn giữa */
+  animation: pulse-heart-centered 1.5s infinite;
+
+  /* Đảm bảo vị trí gốc là ở giữa */
+  top: 50%;
+  left: 50%;
+  /* Không cần transform ở đây nữa vì đã có trong animation, 
+       nhưng cứ để transform gốc để phòng khi animation chưa chạy */
+  transform: translate(-50%, -50%);
+}
+
+.date-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* --- 5. ANIMATION (SCROLL REVEAL) --- */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Khi có class visible */
+.visible .scroll-reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.visible .timeline-dot {
+  transform: scale(1.2);
+}
+
+.visible .final-heart-icon {
+  transform: scale(1);
+  animation: pulse-heart 1.5s infinite;
+}
+
+@keyframes pulse-heart {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Định nghĩa lại Animation riêng cho nút Play ở giữa */
+@keyframes pulse-heart-centered {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    /* Phóng to nhưng vẫn giữ căn giữa */
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* --- 6. VIDEO PLAYER MODAL --- */
+.video-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9995;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+    pointer-events: none;     
+    transition: all 0.3s ease;
+}
+
+.video-modal.active {
+  opacity: 1;
+  visibility: visible;
+   pointer-events: auto; 
+}
+
+.video-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(5px);
+}
+
+.video-modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 900px;
+  background: #000;
+  z-index: 9996;
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.video-modal.active .video-modal-content {
+  transform: scale(1);
+}
+
+/* --- STYLE CHO MARKER MỞ ĐẦU (TRAILER) --- */
+.start-icon-marker {
+  width: 50px;
+  height: 50px;
+  background: #212529;
+  /* Màu tối Cinematic */
+  border: 3px solid #fff;
+  border-radius: 50%;
+  color: white;
+
+  /* Căn giữa icon bên trong */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  z-index: 10;
+
+  /* Căn giữa màn hình (Desktop) */
+  margin: 0 auto 10px auto;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Hiệu ứng khi hiện ra */
+.visible .start-icon-marker {
+  transform: scale(1.1);
+}
+
+/* --- 7. RESPONSIVE (MOBILE) --- */
+/* --- MOBILE RESPONSIVE FIX (FINAL V2) --- */
+@media (max-width: 768px) {
+
+  /* 1. Dời đường kẻ sang trái */
+  .timeline-line {
+    left: 30px;
+    top: 0;
+  }
+
+  /* 2. Cấu hình chung Item */
+  .timeline-item {
+    width: 100%;
+    left: 0 !important;
+    padding-left: 70px;
+    padding-right: 15px;
+    text-align: left;
+    justify-content: flex-start;
+  }
+
+  /* 3. Dot tròn các tập */
+  .item-left .timeline-dot,
+  .item-right .timeline-dot {
+    left: 22px;
+    right: auto;
+  }
+
+  /* --- 4. CẤU HÌNH CHUNG CHO TRAILER & ENDING --- */
+  .timeline-section-center {
+    align-items: flex-start !important;
+    padding-left: 70px;
+    padding-right: 15px;
+    margin-bottom: 50px;
+    position: relative;
+  }
+
+  .timeline-section-center .card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .badge-wrapper {
+    text-align: left;
+    width: 100%;
+  }
+
+  /* --- 5. XỬ LÝ VỊ TRÍ MARKER (CẢ ĐẦU VÀ CUỐI) --- */
+  /* Logic: Left = 30px(line) + 2px(tâm) - 25px(nửa icon) = 7px */
+
+  .start-icon-marker,
+  .final-heart-icon {
+    position: absolute !important;
+    left: 7px !important;
+    top: 0;
+    margin: 0 !important;
+    transform: scale(1);
+  }
+
+  /* Animation giữ nguyên vị trí */
+  .visible .start-icon-marker,
+  .visible .final-heart-icon {
+    position: absolute !important;
+    left: 7px !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Riêng tim đỏ thì có nhịp đập */
+  .visible .final-heart-icon {
+    animation: pulse-heart 1.5s infinite;
+  }
 }
