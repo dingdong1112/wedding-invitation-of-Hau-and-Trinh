@@ -70,7 +70,7 @@ export const audio = (() => {
             gainNode.connect(audioCtx.destination);
 
             // Set âm lượng mặc định (0.8)
-            gainNode.gain.value = 0.8;
+            gainNode.gain.value = 0.6;
         }
 
         // Resume nếu bị trình duyệt treo
