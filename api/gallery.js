@@ -1,29 +1,39 @@
 // api/gallery.js
-const fs = require('fs/promises'); // Dùng Node.js file system
+const fs = require('fs');
 const path = require('path');
 
-// Cấu hình Vercel để chạy trong thư mục gốc
 export const config = {
     runtime: 'nodejs',
 };
 
-// ĐƯỜNG DẪN TỚI THƯ MỤC ẢNH
-// process.cwd() là thư mục gốc của dự án trên Vercel
-const ASSETS_PATH = path.join(process.cwd(), 'assets', 'images'); 
-const BASE_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app'; // <--- THAY LINK CỦA BẠN
-
 export default async function handler(req, res) {
+    // Cho phép gọi từ mọi nơi (CORS)
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate'); // Cache kết quả API trong 1 giờ
 
     try {
-        // Lấy tham số ext (đuôi file) từ query string (mặc định là webp)
+        // 1. Xác định đường dẫn
+        // Cố gắng tìm trong folder public trước (Chuẩn Vercel), nếu không thấy thì tìm ở root
+        let directoryPath = path.join(process.cwd(), 'public', 'assets', 'images');
+        
+        if (!fs.existsSync(directoryPath)) {
+            // Fallback: Tìm ở thư mục gốc nếu chưa chuyển vào public
+            directoryPath = path.join(process.cwd(), 'assets', 'images');
+        }
+
         const ext = req.query.ext ? req.query.ext.toLowerCase() : 'webp';
 
-        const files = await fs.readdir(ASSETS_PATH);
-        
+        // 2. Đọc file
+        const files = await fs.promises.readdir(directoryPath);
+
+        // 3. Lọc và Sắp xếp (Sort) quan trọng để ảnh không bị lộn xộn
         const imageUrls = files
             .filter(file => file.toLowerCase().endsWith('.' + ext))
-            .map(file => `${BASE_URL}/assets/images/${file}`);
+            .sort((a, b) => {
+                // Sắp xếp thông minh: file_1.webp sẽ đứng trước file_10.webp
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            })
+            .map(file => `/assets/images/${file}`); // Dùng đường dẫn tương đối
 
         res.status(200).json({
             success: true,
@@ -31,7 +41,8 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error("Lỗi quét thư mục:", error);
-        res.status(500).json({ success: false, error: 'Failed to read directory' });
+        console.error("API Error:", error);
+        // Trả về mảng rỗng để web không bị crash
+        res.status(200).json({ success: false, files: [] });
     }
 }
