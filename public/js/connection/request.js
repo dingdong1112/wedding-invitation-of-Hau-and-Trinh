@@ -450,10 +450,7 @@ export const request = (method, path) => {
          * @returns {ReturnType<typeof request>}
          */
         token(token) {
-            if (token.split('.').length === 3) {
-                req.headers.append('Authorization', 'Bearer ' + token);
-                return this;
-            }
+            req.headers.append('Authorization', token);
 
             req.headers.append('x-access-key', token);
             return this;

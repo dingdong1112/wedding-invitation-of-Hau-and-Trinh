@@ -1,120 +1,74 @@
+// File js/common/session.js (BẢN FIX CHUẨN 100%)
 import { util } from './util.js';
 import { storage } from './storage.js';
-import { dto } from '../connection/dto.js';
 import { request, HTTP_POST, HTTP_GET, HTTP_STATUS_OK } from '../connection/request.js';
 
 export const session = (() => {
 
-    /**
-     * @type {ReturnType<typeof storage>|null}
-     */
-    let ses = null;
+    // Dùng localStorage để lưu token vĩnh viễn
+    const TOKEN_KEY = 'admin_token'; 
 
-    /**
-     * @returns {string|null}
-     */
-    const getToken = () => ses.get('token');
+    const getToken = () => localStorage.getItem(TOKEN_KEY);
+    const setToken = (token) => localStorage.setItem(TOKEN_KEY, token);
+    const logout = () => localStorage.removeItem(TOKEN_KEY);
 
-    /**
-     * @param {string} token
-     * @returns {void}
-     */
-    const setToken = (token) => ses.set('token', token);
-
-    /**
-     * @param {object} body
-     * @returns {Promise<boolean>}
-     */
-    const login = (body) => {
-        return request(HTTP_POST, '/api/session')
-            .body(body)
-            .send(dto.tokenResponse)
-            .then((res) => {
-                if (res.code === HTTP_STATUS_OK) {
-                    setToken(res.data.token);
-                }
-
-                return res.code === HTTP_STATUS_OK;
-            });
+    const isAdmin = () => {
+        const token = getToken();
+        // Chỉ cần có token (khác null/empty) là coi như Admin ở phía Client
+        // Việc token đúng hay sai sẽ do API Backend quyết định khi gửi request
+        return !!token && token.length > 0;
     };
 
-    /**
-     * @returns {void}
-     */
-    const logout = () => ses.unset('token');
-
-    /**
-     * @returns {boolean}
-     */
-    const isAdmin = () => String(getToken() ?? '.').split('.').length === 3;
-
-    /**
-     * @param {string} token
-     * @returns {Promise<object>}
-     */
-    const guest = (token) => {
-        return request(HTTP_GET, '/api/v2/config')
-            .withCache(1000 * 60 * 30)
-            .withForceCache()
-            .token(token)
-            .send()
-            .then((res) => {
-                if (res.code !== HTTP_STATUS_OK) {
-                    throw new Error('failed to get config.');
-                }
-
-                const config = storage('config');
-                for (const [k, v] of Object.entries(res.data)) {
-                    config.set(k, v);
-                }
-
-                setToken(token);
-                return res;
-            });
-    };
-
-    /**
-     * @returns {object|null}
-     */
-    const decode = () => {
-        if (!isAdmin()) {
-            return null;
-        }
-
-        try {
-            return JSON.parse(util.base64Decode(getToken().split('.')[1]));
-        } catch {
-            return null;
-        }
-    };
-
-    /**
-     * @returns {boolean}
-     */
     const isValid = () => {
-        if (!isAdmin()) {
-            return false;
-        }
+        return isAdmin();
+    };
+    // --------------------------------
 
-        return (decode()?.exp ?? 0) > (Date.now() / 1000);
+    // --- HÀM LOGIN ĐÃ SỬA ---
+    const login = (body, serverUrl) => {
+        return request(HTTP_POST, serverUrl)
+            .body(body)
+            .send() 
+            .then((res) => {
+
+                // TRƯỜNG HỢP 1: Response chuẩn { code: 200, data: { token: "..." } }
+                if (res.code === 200 && res.data && res.data.token) {
+                    setToken(res.data.token);
+                    return true;
+                }
+
+                // TRƯỜNG HỢP 2: Response bị lồng data { code: 200, data: { data: { token: "..." } } }
+                // (Do một số thư viện tự bọc data)
+                if (res.code === 200 && res.data && res.data.data && res.data.data.token) {
+                    setToken(res.data.data.token);
+                    return true;
+                }
+
+                // TRƯỜNG HỢP 3: Response trực tiếp (ít gặp nhưng có thể)
+                if (res.token) {
+                    setToken(res.token);
+                    return true;
+                }
+
+                console.error("Cấu trúc response lạ:", res);
+                return false;
+            })
+            .catch(err => {
+                console.error("Lỗi Login:", err);
+                return false;
+            });
     };
 
-    /**
-     * @returns {void}
-     */
-    const init = () => {
-        ses = storage('session');
+     const guest = (token) => Promise.resolve(); 
+
+    const decode = () => {
+        if (!isAdmin()) return null;
+        try { return JSON.parse(util.base64Decode(getToken().split('.')[1])); } catch { return null; }
     };
+
+    const init = () => {};
 
     return {
-        init,
-        guest,
-        isValid,
-        login,
-        logout,
-        decode,
-        isAdmin,
-        setToken,
-        getToken,
+        init, guest, isValid, login, logout, decode, isAdmin, setToken, getToken,
     };
 })();

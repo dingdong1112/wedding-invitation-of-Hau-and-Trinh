@@ -1,195 +1,241 @@
-import { gif } from './gif.js';
-import { card } from './card.js';
-import { like } from './like.js';
 import { util } from '../../common/util.js';
-import { pagination } from './pagination.js';
-import { dto } from '../../connection/dto.js';
-import { lang } from '../../common/language.js';
 import { storage } from '../../common/storage.js';
+import { request, HTTP_GET, HTTP_DELETE } from '../../connection/request.js';
+// Cần thêm import card và session, nhưng vì không có, ta giả lập.
+// Import các module Admin mà bạn có:
+import { card } from './card.js';
 import { session } from '../../common/session.js';
-import { request, HTTP_GET, HTTP_POST, HTTP_DELETE, HTTP_PUT, HTTP_STATUS_CREATED } from '../../connection/request.js';
 
 export const comment = (() => {
 
-    /**
-     * @type {ReturnType<typeof storage>|null}
-     */
-    let owns = null;
+    // --- DÁN URL MỚI VÀO ĐÂY (URL BẠN VỪA DEPLOY NEW VERSION) ---
+    const SCRIPT_URL = '/api/wishes';
+    const SERVER_URL = 'https://wedding-invitation-of-hau-and-chin.vercel.app';
+    const config = storage('config');
 
-    /**
-     * @type {ReturnType<typeof storage>|null}
-     */
-    let showHide = null;
+    let wishesData = [];
+    let currentIndex = 0;
+    let isWishesActive = true;
 
-    /**
-     * @type {HTMLElement|null}
-     */
-    let comments = null;
+    // Biến lưu bộ đếm giờ
+    let hideTimer = null;
+    let nextTimer = null;
 
-    /**
-     * @type {string[]}
-     */
-    const lastRender = [];
+    const init = async () => {
+        // 1. LẤY CẤU HÌNH
+        const isLocked = config.get('comment_lock_enabled') || false;
+        try {
+            const res = await fetch('https://wedding-invitation-of-hau-and-chin.vercel.app/api/config');
+            const json = await res.json();
+            // Tận dụng trường can_delete làm cờ "Khóa"
+            //isLocked = json.data.can_delete;
+        } catch (e) { }
 
-    /**
-     * @returns {string}
-     */
-    const onNullComment = () => {
-        const desc = lang
-            .on('id', '📢 Yuk, share undangan ini biar makin rame komentarnya! 🎉')
-            .on('en', '📢 Let\'s share this invitation to get more comments! 🎉')
-            .get();
+        const form = document.getElementById('wishes-form');
+        const btn = document.getElementById('btn-send-wish');
 
-        return `<div class="text-center p-4 mx-0 mt-0 mb-3 bg-theme-auto rounded-4 shadow"><p class="fw-bold p-0 m-0" style="font-size: 0.95rem;">${desc}</p></div>`;
+        // 2. XỬ LÝ KHÓA
+        if (isLocked && form) {
+            // Vô hiệu hóa toàn bộ form
+            const inputs = form.querySelectorAll('input, textarea, select, button');
+            inputs.forEach(i => i.disabled = true);
+
+            // Đổi nút gửi thành thông báo
+            if (btn) {
+                btn.innerHTML = '<i class="fa-solid fa-lock me-2"></i>Đã đóng nhận lời chúc';
+                btn.classList.replace('btn-primary', 'btn-secondary');
+            }
+            form.remove();
+
+            return; // Dừng lại, không gắn sự kiện submit nữa
+        }
+        setupFormSubmit();
+        fetchWishes();
+        setupToggleButton();
+        setupInteraction(); // Cài đặt tương tác Chuột/Cảm ứng
     };
 
-    /**
-     * @param {string} id 
-     * @param {boolean} disabled 
-     * @returns {void}
-     */
-    const changeActionButton = (id, disabled) => {
-        document.querySelector(`[data-button-action="${id}"]`).childNodes.forEach((e) => {
-            e.disabled = disabled;
+    // --- 1. CÀI ĐẶT TƯƠNG TÁC (QUAN TRỌNG NHẤT) ---
+    const setupInteraction = () => {
+        const box = document.getElementById('wish-notification');
+        if (!box) return;
+
+        // A. DÀNH CHO LAPTOP (Chuột)
+        // Khi chuột vào: Hủy lệnh ẩn -> Giữ nguyên hiển thị
+        box.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimer);
+            // Đảm bảo trạng thái rõ nét
+            box.classList.add('is-hovered');
         });
-    };
 
-    /**
-     * @param {string} id
-     * @returns {void}
-     */
-    const removeInnerForm = (id) => {
-        changeActionButton(id, false);
-        document.getElementById(`inner-${id}`).remove();
-    };
+        // Khi chuột ra: Đếm ngược 2s rồi ẩn
+        box.addEventListener('mouseleave', () => {
+            box.classList.remove('is-hovered');
+            // Nếu đang hiện thì mới hẹn giờ ẩn
+            if (box.classList.contains('show')) {
+                startHideTimer(2000); // Đọc xong bỏ chuột ra thì 2s sau mới ẩn
+            }
+        });
 
-    /**
-     * @param {HTMLButtonElement} button 
-     * @returns {void}
-     */
-    const showOrHide = (button) => {
-        const ids = button.getAttribute('data-uuids').split(',');
-        const isShow = button.getAttribute('data-show') === 'true';
-        const uuid = button.getAttribute('data-uuid');
-        const currentShow = showHide.get('show');
+        // B. DÀNH CHO ĐIỆN THOẠI (Cảm ứng)
+        // Chạm vào: Hủy ẩn -> Sáng lên
+        box.addEventListener('touchstart', () => {
+            clearTimeout(hideTimer);
+            box.classList.add('is-touched');
+        }, { passive: true });
 
-        button.setAttribute('data-show', isShow ? 'false' : 'true');
-        button.innerText = isShow ? `Show replies (${ids.length})` : 'Hide replies';
-        showHide.set('show', isShow ? currentShow.filter((i) => i !== uuid) : [...currentShow, uuid]);
-
-        for (const id of ids) {
-            showHide.set('hidden', showHide.get('hidden').map((i) => {
-                if (i.uuid === id) {
-                    i.show = !isShow;
+        // Thả tay ra: Đếm ngược 5s rồi ẩn
+        box.addEventListener('touchend', () => {
+            setTimeout(() => {
+                box.classList.remove('is-touched');
+                if (box.classList.contains('show')) {
+                    startHideTimer(5000);
                 }
-
-                return i;
-            }));
-
-            document.getElementById(id).classList.toggle('d-none', isShow);
-        }
+            }, 200); // Delay nhỏ để mượt UI
+        }, { passive: true });
     };
 
-    /**
-     * @param {HTMLAnchorElement} anchor 
-     * @param {string} uuid 
-     * @returns {void}
-     */
-    const showMore = (anchor, uuid) => {
-        const content = document.getElementById(`content-${uuid}`);
-        const original = util.base64Decode(content.getAttribute('data-comment'));
-        const isCollapsed = anchor.getAttribute('data-show') === 'false';
-
-        util.safeInnerHTML(content, util.convertMarkdownToHTML(util.escapeHtml(isCollapsed ? original : original.slice(0, card.maxCommentLength) + '...')));
-        anchor.innerText = isCollapsed ? 'Sebagian' : 'Selengkapnya';
-        anchor.setAttribute('data-show', isCollapsed ? 'true' : 'false');
+    // --- 2. HÀM BẮT ĐẦU ĐẾM NGƯỢC ĐỂ ẨN ---
+    const startHideTimer = (duration) => {
+        clearTimeout(hideTimer); // Xóa timer cũ nếu có
+        hideTimer = setTimeout(() => {
+            hideAndNext();
+        }, duration);
     };
 
-    /**
-     * @param {ReturnType<typeof dto.getCommentResponse>} c
-     * @returns {Promise<void>}
-     */
-    const fetchTracker = async (c) => {
-        if (c.comments) {
-            await Promise.all(c.comments.map((v) => fetchTracker(v)));
-        }
+    // --- 3. HÀM ẨN VÀ CHUYỂN TIẾP ---
+    const hideAndNext = () => {
+        const box = document.getElementById('wish-notification');
+        if (!box) return;
 
-        if (!c.ip || !c.user_agent || c.is_admin) {
+        // Bắt đầu trượt ra
+        box.classList.remove('show');
+
+        // Reset các trạng thái sáng (để lần sau hiện lên là mờ)
+        box.classList.remove('is-touched');
+        box.classList.remove('is-hovered');
+
+        // Đợi 0.8s cho CSS trượt xong hẳn rồi mới gọi cái mới
+        // (CSS transition đang để 0.6s, ta đợi 0.8s cho an toàn)
+        clearTimeout(nextTimer);
+        nextTimer = setTimeout(() => {
+            currentIndex++;
+            if (currentIndex >= wishesData.length) currentIndex = 0;
+            if (currentIndex === 0) shuffleArray(wishesData);
+
+            // Gọi cái tiếp theo
+            showNextWish();
+        }, 3000); // Nghỉ 3s giữa 2 tin
+    };
+
+    // --- 4. HÀM HIỂN THỊ ---
+    const showNextWish = () => {
+        if (!isWishesActive) return;
+
+        const box = document.getElementById('wish-notification');
+        const nameEl = document.getElementById('wish-name');
+        const msgEl = document.getElementById('wish-message');
+
+        if (!box || wishesData.length === 0) return;
+
+        // Reset timer
+        clearTimeout(hideTimer);
+        clearTimeout(nextTimer);
+
+        // Cập nhật nội dung
+        const item = wishesData[currentIndex];
+        nameEl.innerText = item.name;
+        msgEl.innerText = item.message;
+
+        // Hiện lên (Trạng thái mờ mặc định)
+        box.classList.add('show');
+
+        // Tính thời gian hiển thị tự động
+        let displayTime = 3000;
+        const length = item.message.length;
+        if (length < 70) displayTime = 3000;
+        else if (length < 180) displayTime = 6000;
+        else displayTime = 9000;
+
+        // Bắt đầu đếm giờ ẩn (Nếu người dùng không tương tác)
+        startHideTimer(displayTime);
+    };
+
+    // ... (Các phần fetchWishes, shuffleArray, setupFormSubmit giữ nguyên) ...
+
+    const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    };
+
+    const fetchWishes = async () => {
+        if (!storage('config').get('wishes_popup_enabled')) {
             return;
         }
-
-        /**
-         * @param {string} result 
-         * @returns {void}
-         */
-        const setResult = (result) => {
-            const commentIp = document.getElementById(`ip-${util.escapeHtml(c.uuid)}`);
-            util.safeInnerHTML(commentIp, `<i class="fa-solid fa-location-dot me-1"></i>${util.escapeHtml(c.ip)} <strong>${util.escapeHtml(result)}</strong>`);
-        };
-
-        // Free for commercial and non-commercial use.
-        await request(HTTP_GET, `https://apip.cc/api-json/${c.ip}`)
-            .withCache()
-            .withRetry()
-            .default()
-            .then((res) => res.json())
-            .then((res) => {
-                let result = 'localhost';
-
-                if (res.status === 'success') {
-                    if (res.City.length !== 0 && res.RegionName.length !== 0) {
-                        result = res.City + ' - ' + res.RegionName;
-                    } else if (res.Capital.length !== 0 && res.CountryName.length !== 0) {
-                        result = res.Capital + ' - ' + res.CountryName;
-                    }
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const json = await response.json();
+            if (config.get('wishes_popup_enabled') === false) return;
+            if (json.result === 'success' && json.data.length > 0) {
+                let rawData = json.data.filter(item => item.message && item.message.trim() !== "");
+                wishesData = shuffleArray(rawData);
+                if (wishesData.length > 0) {
+                    if (isWishesActive) setTimeout(showNextWish, 3000);
                 }
-
-                setResult(result);
-            })
-            .catch((err) => setResult(err.message));
+            }
+        } catch (error) { console.error(error); }
     };
 
-    /**
-     * @param {ReturnType<typeof dto.getCommentsResponse>} items 
-     * @param {ReturnType<typeof dto.commentShowMore>[]} hide 
-     * @returns {ReturnType<typeof dto.commentShowMore>[]}
-     */
-    const traverse = (items, hide = []) => {
-        const dataShow = showHide.get('show');
 
-        const buildHide = (lists) => lists.forEach((item) => {
-            if (hide.find((i) => i.uuid === item.uuid)) {
-                buildHide(item.comments);
-                return;
-            }
-
-            hide.push(dto.commentShowMore(item.uuid));
-            buildHide(item.comments);
-        });
-
-        const setVisible = (lists) => lists.forEach((item) => {
-            if (!dataShow.includes(item.uuid)) {
-                setVisible(item.comments);
-                return;
-            }
-
-            item.comments.forEach((c) => {
-                const i = hide.findIndex((h) => h.uuid === c.uuid);
-                if (i !== -1) {
-                    hide[i].show = true;
+    const setupToggleButton = () => {
+        const btn = document.getElementById('wishes-toggle-button');
+        const box = document.getElementById('wish-notification');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                isWishesActive = !isWishesActive;
+                if (isWishesActive) {
+                    btn.classList.add('active');
+                    showNextWish();
+                } else {
+                    btn.classList.remove('active');
+                    if (box) box.classList.remove('show');
+                    clearTimeout(hideTimer);
+                    clearTimeout(nextTimer);
                 }
             });
-
-            setVisible(item.comments);
-        });
-
-        buildHide(items);
-        setVisible(items);
-
-        return hide;
+        }
     };
 
-    /**
+    // --- 5. HÀM XÓA COMMENT ---
+    const remove = async (button) => {
+        if (!util.ask("Bạn chắc chắn muốn xóa?")) return;
+
+        const id = button.getAttribute('data-uuid'); // Lấy ID MongoDB
+        const btn = util.disableButton(button);
+
+        // GỌI API XÓA MỚI
+        // URL: /api/wishes/:id
+        const res = await request(HTTP_DELETE, `${SERVER_URL}/api/wishes/${id}`)
+            .token(session.getToken())
+            .send();
+
+        if (res.code === 200) {
+            document.getElementById(id).remove(); // Xóa khỏi giao diện
+            util.notify("Đã xóa thành công").success();
+
+            // Cập nhật lại số lượng comment trên Dashboard nếu cần
+            // ...
+        } else {
+            btn.restore();
+            util.notify("Xóa thất bại").error();
+        }
+    };
+    //--------------------
+
+     /**
      * @returns {Promise<ReturnType<typeof dto.getCommentsResponse>>}
      */
     const show = () => {
@@ -251,454 +297,65 @@ export const comment = (() => {
             });
     };
 
-    /**
-     * @param {HTMLButtonElement} button 
-     * @returns {Promise<void>}
-     */
-    const remove = async (button) => {
-        if (!util.ask('Are you sure?')) {
-            return;
-        }
-
-        const id = button.getAttribute('data-uuid');
-
-        if (session.isAdmin()) {
-            owns.set(id, button.getAttribute('data-own'));
-        }
-
-        changeActionButton(id, true);
-        const btn = util.disableButton(button);
-        const likes = like.getButtonLike(id);
-        likes.disabled = true;
-
-        const status = await request(HTTP_DELETE, '/api/comment/' + owns.get(id))
-            .token(session.getToken())
-            .send(dto.statusResponse)
-            .then((res) => res.data.status);
-
-        if (!status) {
-            btn.restore();
-            likes.disabled = false;
-            changeActionButton(id, false);
-            return;
-        }
-
-        document.querySelectorAll('a[onclick="undangan.comment.showOrHide(this)"]').forEach((n) => {
-            const oldUuids = n.getAttribute('data-uuids').split(',');
-
-            if (oldUuids.includes(id)) {
-                const uuids = oldUuids.filter((i) => i !== id).join(',');
-                uuids.length === 0 ? n.remove() : n.setAttribute('data-uuids', uuids);
-            }
-        });
-
-        owns.unset(id);
-        document.getElementById(id).remove();
-
-        if (comments.children.length === 0) {
-            comments.innerHTML = onNullComment();
-        }
-    };
-
-    /**
-     * @param {HTMLButtonElement} button 
-     * @returns {Promise<void>}
-     */
-    const update = async (button) => {
-        const id = button.getAttribute('data-uuid');
-
-        let isPresent = false;
-        const presence = document.getElementById(`form-inner-presence-${id}`);
-        if (presence) {
-            presence.disabled = true;
-            isPresent = presence.value === '1';
-        }
-
-        const badge = document.getElementById(`badge-${id}`);
-        const isChecklist = !!badge && badge.getAttribute('data-is-presence') === 'true';
-
-        const gifIsOpen = gif.isOpen(id);
-        const gifId = gif.getResultId(id);
-        const gifCancel = gif.buttonCancel(id);
-
-        if (gifIsOpen && gifId) {
-            gifCancel.hide();
-        }
-
-        const form = document.getElementById(`form-inner-${id}`);
-
-        if (id && !gifIsOpen && util.base64Encode(form.value) === form.getAttribute('data-original') && isChecklist === isPresent) {
-            removeInnerForm(id);
-            return;
-        }
-
-        if (!gifIsOpen && form.value?.trim().length === 0) {
-            util.notify('Comments cannot be empty.').warning();
-            return;
-        }
+    const setupFormSubmit = () => {
+        const form = document.getElementById('wishes-form');
+        const btn = document.getElementById('btn-send-wish');
+        const successMsg = document.getElementById('success-msg');
 
         if (form) {
-            form.disabled = true;
-        }
-
-        const cancel = document.querySelector(`[onclick="undangan.comment.cancel(this, '${id}')"]`);
-        if (cancel) {
-            cancel.disabled = true;
-        }
-
-        const btn = util.disableButton(button);
-
-        const status = await request(HTTP_PUT, `/api/comment/${owns.get(id)}?lang=${lang.getLanguage()}`)
-            .token(session.getToken())
-            .body(dto.updateCommentRequest(presence ? isPresent : null, gifIsOpen ? null : form.value, gifId))
-            .send(dto.statusResponse)
-            .then((res) => res.data.status);
-
-        if (form) {
-            form.disabled = false;
-        }
-
-        if (cancel) {
-            cancel.disabled = false;
-        }
-
-        if (presence) {
-            presence.disabled = false;
-        }
-
-        btn.restore();
-
-        if (gifIsOpen && gifId) {
-            gifCancel.show();
-        }
-
-        if (!status) {
-            return;
-        }
-
-        if (gifIsOpen && gifId) {
-            document.getElementById(`img-gif-${id}`).src = document.getElementById(`gif-result-${id}`)?.querySelector('img').src;
-            gifCancel.click();
-        }
-
-        removeInnerForm(id);
-
-        if (!gifIsOpen) {
-            const showButton = document.querySelector(`[onclick="undangan.comment.showMore(this, '${id}')"]`);
-
-            const content = document.getElementById(`content-${id}`);
-            content.setAttribute('data-comment', util.base64Encode(form.value));
-
-            const original = util.convertMarkdownToHTML(util.escapeHtml(form.value));
-            if (form.value.length > card.maxCommentLength) {
-                util.safeInnerHTML(content, showButton?.getAttribute('data-show') === 'false' ? original.slice(0, card.maxCommentLength) + '...' : original);
-                showButton?.classList.replace('d-none', 'd-block');
-            } else {
-                util.safeInnerHTML(content, original);
-                showButton?.classList.replace('d-block', 'd-none');
-            }
-        }
-
-        if (presence) {
-            document.getElementById('form-presence').value = isPresent ? '1' : '2';
-            storage('information').set('presence', isPresent);
-        }
-
-        if (!presence || !badge) {
-            return;
-        }
-
-        badge.classList.toggle('fa-circle-xmark', !isPresent);
-        badge.classList.toggle('text-danger', !isPresent);
-
-        badge.classList.toggle('fa-circle-check', isPresent);
-        badge.classList.toggle('text-success', isPresent);
-    };
-
-    /**
-     * @param {HTMLButtonElement} button 
-     * @returns {Promise<void>}
-     */
-    const send = async (button) => {
-        const id = button.getAttribute('data-uuid');
-
-        const name = document.getElementById('form-name');
-        const nameValue = name.value;
-
-        if (nameValue.length === 0) {
-            util.notify('Name cannot be empty.').warning();
-
-            if (id) {
-                // scroll to form.
-                name.scrollIntoView({ block: 'center' });
-            }
-            return;
-        }
-
-        const presence = document.getElementById('form-presence');
-        if (!id && presence && presence.value === '0') {
-            util.notify('Please select your attendance status.').warning();
-            return;
-        }
-
-        const gifIsOpen = gif.isOpen(id ? id : gif.default);
-        const gifId = gif.getResultId(id ? id : gif.default);
-        const gifCancel = gif.buttonCancel(id);
-
-        if (gifIsOpen && !gifId) {
-            util.notify('Gif cannot be empty.').warning();
-            return;
-        }
-
-        if (gifIsOpen && gifId) {
-            gifCancel.hide();
-        }
-
-        const form = document.getElementById(`form-${id ? `inner-${id}` : 'comment'}`);
-        if (!gifIsOpen && form.value?.trim().length === 0) {
-            util.notify('Comments cannot be empty.').warning();
-            return;
-        }
-
-        if (!id && name && !session.isAdmin()) {
-            name.disabled = true;
-        }
-
-        if (!session.isAdmin() && presence && presence.value !== '0') {
-            presence.disabled = true;
-        }
-
-        if (form) {
-            form.disabled = true;
-        }
-
-        const cancel = document.querySelector(`[onclick="undangan.comment.cancel(this, '${id}')"]`);
-        if (cancel) {
-            cancel.disabled = true;
-        }
-
-        const btn = util.disableButton(button);
-        const isPresence = presence ? presence.value === '1' : true;
-
-        if (!session.isAdmin()) {
-            const info = storage('information');
-            info.set('name', nameValue);
-
-            if (!id) {
-                info.set('presence', isPresence);
-            }
-        }
-
-        const response = await request(HTTP_POST, `/api/comment?lang=${lang.getLanguage()}`)
-            .token(session.getToken())
-            .body(dto.postCommentRequest(id, nameValue, isPresence, gifIsOpen ? null : form.value, gifId))
-            .send(dto.getCommentResponse);
-
-        if (name) {
-            name.disabled = false;
-        }
-
-        if (form) {
-            form.disabled = false;
-        }
-
-        if (cancel) {
-            cancel.disabled = false;
-        }
-
-        if (presence) {
-            presence.disabled = false;
-        }
-
-        if (gifIsOpen && gifId) {
-            gifCancel.show();
-        }
-
-        btn.restore();
-
-        if (!response || response.code !== HTTP_STATUS_CREATED) {
-            return;
-        }
-
-        owns.set(response.data.uuid, response.data.own);
-
-        if (form) {
-            form.value = null;
-        }
-
-        if (gifIsOpen && gifId) {
-            gifCancel.click();
-        }
-
-        if (!id) {
-            if (pagination.reset()) {
-                await show();
-                comments.scrollIntoView();
-                return;
-            }
-
-            pagination.setTotal(pagination.geTotal() + 1);
-            if (comments.children.length === pagination.getPer()) {
-                comments.lastElementChild.remove();
-            }
-
-            response.data.is_parent = true;
-            response.data.is_admin = session.isAdmin();
-            comments.insertAdjacentHTML('afterbegin', await card.renderContentMany([response.data]));
-            comments.scrollIntoView();
-        }
-
-        if (id) {
-            showHide.set('hidden', showHide.get('hidden').concat([dto.commentShowMore(response.data.uuid, true)]));
-            showHide.set('show', showHide.get('show').concat([id]));
-
-            removeInnerForm(id);
-
-            response.data.is_parent = false;
-            response.data.is_admin = session.isAdmin();
-            document.getElementById(`reply-content-${id}`).insertAdjacentHTML('beforeend', await card.renderContentSingle(response.data));
-
-            const anchorTag = document.getElementById(`button-${id}`).querySelector('a');
-            if (anchorTag) {
-                if (anchorTag.getAttribute('data-show') === 'false') {
-                    showOrHide(anchorTag);
-                }
-
-                anchorTag.remove();
-            }
-
-            const uuids = [response.data.uuid];
-            const readMoreElement = document.createRange().createContextualFragment(card.renderReadMore(id, anchorTag ? anchorTag.getAttribute('data-uuids').split(',').concat(uuids) : uuids));
-
-            const buttonLike = like.getButtonLike(id);
-            buttonLike.parentNode.insertBefore(readMoreElement, buttonLike);
-        }
-
-        like.addListener(response.data.uuid);
-        lastRender.push(response.data.uuid);
-    };
-
-    /**
-     * @param {HTMLButtonElement} button
-     * @param {string} id
-     * @returns {Promise<void>}
-     */
-    const cancel = async (button, id) => {
-        const presence = document.getElementById(`form-inner-presence-${id}`);
-        const isPresent = presence ? presence.value === '1' : false;
-
-        const badge = document.getElementById(`badge-${id}`);
-        const isChecklist = badge && owns.has(id) && presence ? badge.getAttribute('data-is-presence') === 'true' : false;
-
-        const btn = util.disableButton(button);
-
-        if (gif.isOpen(id) && ((!gif.getResultId(id) && isChecklist === isPresent) || util.ask('Are you sure?'))) {
-            await gif.remove(id);
-            removeInnerForm(id);
-            return;
-        }
-
-        const form = document.getElementById(`form-inner-${id}`);
-        if (form.value.length === 0 || (util.base64Encode(form.value) === form.getAttribute('data-original') && isChecklist === isPresent) || util.ask('Are you sure?')) {
-            removeInnerForm(id);
-            return;
-        }
-
-        btn.restore();
-    };
-
-    /**
-     * @param {string} uuid 
-     * @returns {void}
-     */
-    const reply = (uuid) => {
-        changeActionButton(uuid, true);
-
-        gif.remove(uuid).then(() => {
-            gif.onOpen(uuid, () => gif.removeGifSearch(uuid));
-            document.getElementById(`button-${uuid}`).insertAdjacentElement('afterend', card.renderReply(uuid));
-        });
-    };
-
-    /**
-     * @param {HTMLButtonElement} button 
-     * @param {boolean} is_parent
-     * @returns {Promise<void>}
-     */
-    const edit = async (button, is_parent) => {
-        const id = button.getAttribute('data-uuid');
-
-        changeActionButton(id, true);
-
-        if (session.isAdmin()) {
-            owns.set(id, button.getAttribute('data-own'));
-        }
-
-        const badge = document.getElementById(`badge-${id}`);
-        const isChecklist = !!badge && badge.getAttribute('data-is-presence') === 'true';
-
-        const gifImage = document.getElementById(`img-gif-${id}`);
-        if (gifImage) {
-            await gif.remove(id);
-        }
-
-        const isParent = is_parent && !session.isAdmin();
-        document.getElementById(`button-${id}`).insertAdjacentElement('afterend', card.renderEdit(id, isChecklist, isParent, !!gifImage));
-
-        if (gifImage) {
-            gif.onOpen(id, () => {
-                gif.removeGifSearch(id);
-                gif.removeButtonBack(id);
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const originalBtnText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang gửi...';
+
+                // --- 1. ĐỌC FORM DATA VÀ CHUYỂN THÀNH OBJECT JSON ---
+                const data = new FormData(form);
+                const formDataObject = {};
+
+                // Chuyển FormData sang Object JS
+                data.forEach((value, key) => {
+                    // Chúng ta chỉ cần Ten, ThamDu và LoiChuc
+                    formDataObject[key] = value;
+                });
+
+                // --- 2. THỰC HIỆN FETCH GỬI JSON ---
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Báo cho Server biết đây là JSON
+                    },
+                    body: JSON.stringify(formDataObject) // Gửi dữ liệu JSON
+                })
+                    .then(response => response.json()) // Đọc Response dưới dạng JSON
+                    .then(json => {
+                        if (json.result !== 'success') {
+                            throw new Error(json.error || "Lỗi gửi không xác định.");
+                        }
+
+                        form.reset();
+                        successMsg.classList.remove('d-none');
+                        setTimeout(() => successMsg.classList.add('d-none'), 5000);
+
+                        // Logic hiển thị lời chúc mới
+                        const tempWish = { name: formDataObject.Ten, message: formDataObject.LoiChuc };
+                        wishesData.unshift(tempWish);
+                        if (isWishesActive) {
+                            currentIndex = 0;
+                            clearTimeout(hideTimer);
+                            clearTimeout(nextTimer);
+                            document.getElementById('wish-notification')?.classList.remove('show');
+                            setTimeout(showNextWish, 600);
+                        }
+                    })
+                    .catch(error => { util.notify("Lỗi gửi lời chúc: " + error.message).error(); })
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = originalBtnText;
+                    });
             });
-
-            await gif.open(id);
-            return;
-        }
-
-        const formInner = document.getElementById(`form-inner-${id}`);
-        const original = util.base64Decode(document.getElementById(`content-${id}`)?.getAttribute('data-comment'));
-
-        formInner.value = original;
-        formInner.setAttribute('data-original', util.base64Encode(original));
-    };
-
-    /**
-     * @returns {void}
-     */
-    const init = () => {
-        gif.init();
-        like.init();
-        card.init();
-        pagination.init();
-
-        comments = document.getElementById('comments');
-        comments.addEventListener('undangan.comment.show', show);
-
-        owns = storage('owns');
-        showHide = storage('comment');
-
-        if (!showHide.has('hidden')) {
-            showHide.set('hidden', []);
-        }
-
-        if (!showHide.has('show')) {
-            showHide.set('show', []);
         }
     };
 
-    return {
-        gif,
-        like,
-        pagination,
-        init,
-        send,
-        edit,
-        reply,
-        remove,
-        update,
-        cancel,
-        show,
-        showMore,
-        showOrHide,
-    };
+    return { init, show: () => { }, send: () => { } };
 })();
