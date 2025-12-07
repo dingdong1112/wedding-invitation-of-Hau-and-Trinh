@@ -1,51 +1,25 @@
-# 💌 Template website undangan pernikahan sederhana
-
-![Thumbnail](/assets/images/banner.webp)
-
-[![Netlify Status](https://api.netlify.com/api/v1/badges/cef32dbf-f26f-4865-84a9-b85a439c9994/deploy-status)](https://app.netlify.com/sites/ulems/deploys)
-[![Hits](https://dikit.my.id/0b3y8q)](https://cie.my.id)
-[![GitHub repo size](https://img.shields.io/github/repo-size/dewanakl/undangan?color=brightgreen)](https://shields.io)
-[![GitHub License](https://img.shields.io/github/license/dewanakl/undangan?color=brightgreen)](https://shields.io)
-
-## 🚀 Demo
-Untuk kamu yang ingin melihat demo terlebih dahulu:
-
-[https://ulems.my.id/?to=Teman teman semua](https://ulems.my.id/?to=Teman%20teman%20semua)
-
 ## 📦 Documentation
 
-* Jalankan perintah `npm install`, lalu `npm run dev`, dan buka `http://localhost:8080`.
-* Ubah isi file `index.html` sesuai keinginanmu.
-* Jika tidak ingin menggunakan **fitur komentar**, hapus atribut `data-url` dan `data-key` di elemen `<body>` pada index.html.
-* Sesuaikan `data-url` pada `<body>` di index dan dashboard sesuai dengan URL backend (jika kamu meng-hosting sendiri).
-* Sesuaikan juga `data-key` di index dengan access key yang bisa kamu ambil dari dashboard.
-* Jika ingin menggunakan GIF, dapatkan Tenor API key di [developers.google.com/tenor](https://developers.google.com/tenor/guides/quickstart).
-* Untuk deployment, jalankan `npm run build:public`. Folder `public` adalah yang akan kamu upload.
-* Untuk backend self-hosting, lihat penjelasan di bawah, atau gunakan **trial API** secara gratis.
+- Chạy lệnh npm install, sau đó là npm run dev, và mở trình duyệt tại địa chỉ http://localhost:8080.
+- Thay đổi nội dung file index.html theo ý muốn của bạn.
+- Nếu không muốn sử dụng tính năng bình luận, hãy xóa thuộc tính data-url và data-key trong thẻ <body> tại file index.html.
+- Điều chỉnh data-url trong thẻ <body> ở file index và dashboard sao cho khớp với URL backend (nếu bạn tự hosting).
+- Đồng thời điều chỉnh data-key ở file index bằng access key mà bạn có thể lấy từ dashboard.
+- Nếu muốn sử dụng GIF, hãy lấy Tenor API key tại developers.google.com/tenor.
+- Để triển khai (deployment), chạy lệnh npm run build:public. Thư mục public là thư mục bạn sẽ dùng để upload.
+- Đối với backend tự host (self-hosting), xem giải thích bên dưới, hoặc sử dụng trial API miễn phí.
+- Thiệp mời này chỉ sử dụng HTML, CSS, và JavaScript thuần. NPM được sử dụng để file JavaScript có thể được thực thi ngay lập tức (không còn là dạng module nữa).
+- Nếu bạn vẫn muốn dùng mà không có NPM, hãy đổi src="./dist/guest.js" thành src="./js/guest.js" type="module" trong thẻ <head> ở file index và dashboard.html, tuy nhiên sẽ có rủi ro bị lỗi giao diện (glitch) khi mới tải trang.
+- Nếu bạn có câu hỏi, hãy sử dụng tính năng discussions để các bạn khác cũng có thể đọc được.
 
-> Undangan ini hanya menggunakan HTML, CSS, dan JavaScript biasa. NPM digunakan agar file JavaScript bisa langsung dieksekusi (bukan bertipe module lagi).
-
-> Jika tetap ingin tanpa NPM, ubah `src="./dist/guest.js"` menjadi `src="./js/guest.js" type="module"` pada tag `<head>` di index dan dashboard.html, dengan risiko glitch tema di awal loading.
-
-> Jika kamu punya pertanyaan, gunakan fitur `discussions` agar bisa dibaca juga oleh teman-teman lainnya.
-
-> [!WARNING]  
-> Gunakan versi 3.14.0, untuk versi 4 masih tahap pengembangan dan berpotensi teredapat bug 🐛
+[!WARNING]   Hãy sử dụng phiên bản 3.14.0, vì phiên bản 4 vẫn đang trong giai đoạn phát triển và có khả năng chứa lỗi (bug) 🐛
 
 ## 🔥 Deployment API
 
-- Video\
-    otw
+- Video
+    đang cập nhật (otw)
 
-- Presentation
-    [https://docs.google.com/presentation](https://docs.google.com/presentation/d/1EY2YmWdZUI7ASoo0f2wvU7ec_Yt0uZanYa8YLbfNysk/edit)
-
-## ⏰ Trial API
-Untuk kamu yang ingin mencoba secara gratis:
-
-[https://trial.ulems.my.id](https://trial.ulems.my.id)
-
-## ⚙️ Tech stack
+## ⚙️ Công nghệ sử dụng (Tech stack)
 
 - Bootstrap 5.3.8
 - AOS 2.3.4
@@ -55,16 +29,8 @@ Untuk kamu yang ingin mencoba secara gratis:
 - Vanilla JS
 
 ## 🎨 Credit
-All visual assets in this project are sourced from Pixabay.
+Tất cả tài nguyên hình ảnh trong dự án này đều được lấy từ hình ảnh cá nhân.
 
 ## 🤝 Contributing
 
-I'm very open to those of you who want to contribute to the undangan!
-
-## 🐞 Security Vulnerabilities
-
-If you find any security vulnerabilities in this undangan, please email DKL via [dewanakretarta29@gmail.com](mailto:dewanakretarta29@gmail.com).
-
-## 📜 License
-
-Undangan is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Tôi rất hoan nghênh những bạn nào muốn đóng góp cho dự án thiệp mời này!

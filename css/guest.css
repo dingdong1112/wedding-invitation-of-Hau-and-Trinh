@@ -123,8 +123,15 @@ svg {
 /* 1. Định nghĩa chuyển động lên-xuống */
 /* 1. Keyframes Animation (Giữ nguyên) */
 @keyframes wavy {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 /* 2. Style cho cả cụm từ (Giữ nguyên) */
@@ -134,7 +141,7 @@ svg {
   font-family: 'Dancing Script', 'Esthetic', sans-serif;
   font-size: 2.5rem;
   margin: 1.5rem 0;
-  
+
   /* Hiệu ứng phản chiếu (Box Reflect) */
   /* Lưu ý: Hiệu ứng này chủ yếu chạy tốt trên Chrome/Safari */
   -webkit-box-reflect: below -15px linear-gradient(transparent, rgba(0, 0, 0, 0.2));
@@ -144,10 +151,10 @@ svg {
 .wavy-text span {
   position: relative;
   display: inline-block;
-  
+
   /* --- SỬA Ở ĐÂY --- */
   /* Mặc định (Light Mode) là màu ĐỎ */
-  color: indianred; 
+  color: indianred;
   /* ---------------- */
 
   animation: wavy 2.5s ease-in-out infinite;
@@ -159,32 +166,92 @@ svg {
 body.dark-mode .wavy-text span,
 [data-bs-theme="dark"] .wavy-text span,
 [data-theme="dark"] .wavy-text span {
-    color: #ffffff !important;
-    /* Thêm chút bóng sáng (Glow) cho đẹp trên nền đen */
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  color: #ffffff !important;
+  /* Thêm chút bóng sáng (Glow) cho đẹp trên nền đen */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 /* 4. Gán độ trễ (Giữ nguyên phần đếm số thứ tự) */
-.wavy-text span:nth-child(1) { --i: 1; }
-.wavy-text span:nth-child(2) { --i: 2; }
-.wavy-text span:nth-child(3) { --i: 3; }
-.wavy-text span:nth-child(4) { --i: 4; }
-.wavy-text span:nth-child(5) { --i: 5; }
-.wavy-text span:nth-child(6) { --i: 6; }
-.wavy-text span:nth-child(7) { --i: 7; }
-.wavy-text span:nth-child(8) { --i: 8; }
-.wavy-text span:nth-child(9) { --i: 9; }
-.wavy-text span:nth-child(10) { --i: 10; }
-.wavy-text span:nth-child(11) { --i: 11; }
-.wavy-text span:nth-child(12) { --i: 12; }
-.wavy-text span:nth-child(13) { --i: 13; }
-.wavy-text span:nth-child(14) { --i: 14; }
-.wavy-text span:nth-child(15) { --i: 15; }
-.wavy-text span:nth-child(16) { --i: 16; }
-.wavy-text span:nth-child(17) { --i: 17; }
-.wavy-text span:nth-child(18) { --i: 18; }
-.wavy-text span:nth-child(19) { --i: 19; }
-.wavy-text span:nth-child(20) { --i: 20; }
+.wavy-text span:nth-child(1) {
+  --i: 1;
+}
+
+.wavy-text span:nth-child(2) {
+  --i: 2;
+}
+
+.wavy-text span:nth-child(3) {
+  --i: 3;
+}
+
+.wavy-text span:nth-child(4) {
+  --i: 4;
+}
+
+.wavy-text span:nth-child(5) {
+  --i: 5;
+}
+
+.wavy-text span:nth-child(6) {
+  --i: 6;
+}
+
+.wavy-text span:nth-child(7) {
+  --i: 7;
+}
+
+.wavy-text span:nth-child(8) {
+  --i: 8;
+}
+
+.wavy-text span:nth-child(9) {
+  --i: 9;
+}
+
+.wavy-text span:nth-child(10) {
+  --i: 10;
+}
+
+.wavy-text span:nth-child(11) {
+  --i: 11;
+}
+
+.wavy-text span:nth-child(12) {
+  --i: 12;
+}
+
+.wavy-text span:nth-child(13) {
+  --i: 13;
+}
+
+.wavy-text span:nth-child(14) {
+  --i: 14;
+}
+
+.wavy-text span:nth-child(15) {
+  --i: 15;
+}
+
+.wavy-text span:nth-child(16) {
+  --i: 16;
+}
+
+.wavy-text span:nth-child(17) {
+  --i: 17;
+}
+
+.wavy-text span:nth-child(18) {
+  --i: 18;
+}
+
+.wavy-text span:nth-child(19) {
+  --i: 19;
+}
+
+.wavy-text span:nth-child(20) {
+  --i: 20;
+}
+
 /* --- KẾT THÚC CODE HIỆU ỨNG GỢN SÓNG --- */
 
 /* --- CSS CHO VIDEO YOUTUBE RESPONSIVE --- */
@@ -958,7 +1025,6 @@ body.modal-open {
 /* Đường kẻ dọc nối xuyên suốt */
 .timeline-line {
   position: absolute;
-  top: 50px;
   bottom: 50px;
   left: 50%;
   width: 4px;
@@ -966,6 +1032,8 @@ body.modal-open {
   transform: translateX(-50%);
   border-radius: 2px;
   z-index: 0;
+  left: 30px;
+  top: 0;
 }
 
 /* Phần Center (Trailer & Wedding) */
@@ -974,9 +1042,11 @@ body.modal-open {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   z-index: 2;
-  margin-bottom: 60px;
+  align-items: flex-start !important;
+  padding-left: 70px;
+  padding-right: 15px;
+  margin-bottom: 50px;
 }
 
 .timeline-section-center.start-node {
@@ -993,10 +1063,15 @@ body.modal-open {
 }
 
 .timeline-item {
-  width: 50%;
   position: relative;
   padding: 0 50px;
   /* Khoảng cách từ nội dung đến đường kẻ */
+  width: 100%;
+  left: 0 !important;
+  padding-left: 70px;
+  padding-right: 15px;
+  text-align: left;
+  justify-content: flex-start;
 }
 
 /* Định vị Trái - Phải */
@@ -1264,21 +1339,17 @@ body.modal-open {
 /* --- MOBILE RESPONSIVE FIX (FINAL V2) --- */
 @media (max-width: 768px) {
 
-   .wavy-text {
-        font-size: 1.5rem !important; /* Trên điện thoại thu nhỏ còn 1.5rem */
-        flex-wrap: wrap; /* Nếu tên quá dài, cho phép rớt dòng */
-        margin: 1rem 0;
-    }
-    
-    /* Điều chỉnh khoảng cách các chữ cái trên mobile cho đỡ thưa */
-    .wavy-text span {
-        margin: 0 1px; 
-    }
+  .wavy-text {
+    font-size: 1.5rem !important;
+    /* Trên điện thoại thu nhỏ còn 1.5rem */
+    flex-wrap: wrap;
+    /* Nếu tên quá dài, cho phép rớt dòng */
+    margin: 1rem 0;
+  }
 
-  /* 1. Dời đường kẻ sang trái */
-  .timeline-line {
-    left: 30px;
-    top: 0;
+  /* Điều chỉnh khoảng cách các chữ cái trên mobile cho đỡ thưa */
+  .wavy-text span {
+    margin: 0 1px;
   }
 
   /* 2. Cấu hình chung Item */
@@ -1296,15 +1367,6 @@ body.modal-open {
   .item-right .timeline-dot {
     left: 22px;
     right: auto;
-  }
-
-  /* --- 4. CẤU HÌNH CHUNG CHO TRAILER & ENDING --- */
-  .timeline-section-center {
-    align-items: flex-start !important;
-    padding-left: 70px;
-    padding-right: 15px;
-    margin-bottom: 50px;
-    position: relative;
   }
 
   .timeline-section-center .card {
@@ -1358,13 +1420,14 @@ body.modal-open {
 }
 
 .invitation-card .btn {
-    color: #333333 !important;
-    border-color: #333333 !important;
+  color: #333333 !important;
+  border-color: #333333 !important;
 }
 
 .invitation-card .btn:hover {
-    background-color: #333333 !important;
-    color: #ffffff !important; /* Di chuột vào thì chữ trắng nền đen */
+  background-color: #333333 !important;
+  color: #ffffff !important;
+  /* Di chuột vào thì chữ trắng nền đen */
 }
 
 
@@ -1373,16 +1436,17 @@ body.modal-open {
 body.dark-mode .invitation-card .btn,
 [data-bs-theme="dark"] .invitation-card .btn,
 [data-theme="dark"] .invitation-card .btn {
-    color: #ffffff !important;
-    border-color: #ffffff !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
 }
 
 /* Hover ở chế độ tối */
 body.dark-mode .invitation-card .btn:hover,
 [data-bs-theme="dark"] .invitation-card .btn:hover,
 [data-theme="dark"] .invitation-card .btn:hover {
-    background-color: #ffffff !important;
-    color: #000000 !important; /* Di chuột vào thì chữ đen nền trắng */
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  /* Di chuột vào thì chữ đen nền trắng */
 }
 
 .invitation-card .text-muted {
@@ -1470,30 +1534,32 @@ body.dark-mode .invitation-card .border-secondary,
 
 /* Mặc định (Chế độ sáng) */
 .color-name {
-    font-weight: 600;
-    color: #555;
-    transition: color 0.3s;
+  font-weight: 600;
+  color: #555;
+  transition: color 0.3s;
 }
 
 /* Chế độ tối (Dark Mode) - Đổi màu chữ sang trắng */
 body.dark-mode .color-name,
-body.dark-mode p, /* Các đoạn văn bản nằm ngoài card */
+body.dark-mode p,
+/* Các đoạn văn bản nằm ngoài card */
 [data-bs-theme="dark"] .color-name,
 [data-bs-theme="dark"] p {
-    color: #e0e0e0 !important;
+  color: #e0e0e0 !important;
 }
 
 body.dark-mode .text-muted,
 [data-bs-theme="dark"] .text-muted {
-    color: #aaa !important;
+  color: #aaa !important;
 }
 
 /* Hiệu ứng Color Swatch khi không có card */
 .color-item {
-    transition: transform 0.3s;
+  transition: transform 0.3s;
 }
+
 .color-item:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
 }
 
 /* --- PHONG CÁCH "WAX SEAL STATIONERY" (THƯ TAY CÓ CON DẤU) --- */
@@ -1502,68 +1568,87 @@ body.dark-mode .text-muted,
 
 /* 1. GIAO DIỆN SÁNG (MẶC ĐỊNH) */
 .gift-stationery {
-    position: relative;
-    background-color: #fff5f5; /* Nền hồng phấn nhạt */
-    padding: 3rem 1.5rem 2rem 1.5rem;
-    margin-top: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease, background-color 0.3s ease;
+  position: relative;
+  background-color: #fff5f5;
+  /* Nền hồng phấn nhạt */
+  padding: 3rem 1.5rem 2rem 1.5rem;
+  margin-top: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 /* Viền nét đứt bên trong */
 .gift-stationery::before {
-    content: '';
-    position: absolute;
-    top: 10px; left: 10px; right: 10px; bottom: 10px;
-    border: 1px dashed indianred;
-    border-radius: 8px;
-    pointer-events: none;
-    opacity: 0.5;
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border: 1px dashed indianred;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 /* Con dấu sáp */
 .wax-seal {
-    position: absolute;
-    top: -25px; left: 50%;
-    transform: translateX(-50%);
-    width: 50px; height: 50px;
-    background-color: #A52A2A;
-    border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    display: flex; align-items: center; justify-content: center;
-    color: #ffd700; font-size: 1.2rem; z-index: 10;
-}
-.wax-seal::after {
-    content: ''; position: absolute;
-    top: 2px; left: 2px; right: 2px; bottom: 2px;
-    border: 1px solid rgba(255,255,255,0.3); border-radius: 50%;
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  background-color: #A52A2A;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd700;
+  font-size: 1.2rem;
+  z-index: 10;
 }
 
-.gift-stationery:hover { transform: translateY(-5px); }
+.wax-seal::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+.gift-stationery:hover {
+  transform: translateY(-5px);
+}
 
 
 /* 2. GIAO DIỆN TỐI (DARK MODE - FIX LỖI MÀU XẤU & CHỮ CHÌM) */
 body.dark-mode .gift-stationery,
 [data-bs-theme="dark"] .gift-stationery {
-    /* Đổi nền sang màu Xám Đen (Black Luxury) thay vì Đỏ nâu */
-    background-color: #212529 !important; 
-    border: 1px solid #444; /* Viền nhẹ để tách biệt với nền body */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  /* Đổi nền sang màu Xám Đen (Black Luxury) thay vì Đỏ nâu */
+  background-color: #212529 !important;
+  border: 1px solid #444;
+  /* Viền nhẹ để tách biệt với nền body */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
 }
 
 /* Đổi màu viền nét đứt sang màu Vàng Kim cho sang */
 body.dark-mode .gift-stationery::before,
 [data-bs-theme="dark"] .gift-stationery::before {
-    border-color: #ffd700 !important;
-    opacity: 0.3;
+  border-color: #ffd700 !important;
+  opacity: 0.3;
 }
 
 /* Viền con dấu đổi sang màu trùng nền tối */
 body.dark-mode .wax-seal,
 [data-bs-theme="dark"] .wax-seal {
-    border-color: #212529 !important;
+  border-color: #212529 !important;
 }
 
 /* --- QUAN TRỌNG: ÉP MÀU CHỮ TRẮNG --- */
@@ -1571,7 +1656,8 @@ body.dark-mode .wax-seal,
 /* Tên Cô dâu / Chú rể */
 body.dark-mode .gift-stationery h4,
 [data-bs-theme="dark"] .gift-stationery h4 {
-    color: #ffd700 !important; /* Tên màu vàng kim nổi bật */
+  color: #ffd700 !important;
+  /* Tên màu vàng kim nổi bật */
 }
 
 /* Các chữ phụ (text-muted) chuyển sang trắng mờ */
@@ -1579,54 +1665,59 @@ body.dark-mode .gift-stationery .text-muted,
 [data-bs-theme="dark"] .gift-stationery .text-muted,
 body.dark-mode .gift-stationery p,
 [data-bs-theme="dark"] .gift-stationery p {
-    color: #cccccc !important;
+  color: #cccccc !important;
 }
 
 /* SỐ TÀI KHOẢN (Fix lỗi bị xám) */
 body.dark-mode .gift-stationery .fs-5,
 [data-bs-theme="dark"] .gift-stationery .fs-5 {
-    color: #ffffff !important; /* Số tài khoản trắng tinh */
+  color: #ffffff !important;
+  /* Số tài khoản trắng tinh */
 }
 
 /* Nút Copy */
 body.dark-mode .gift-stationery .btn-link,
 [data-bs-theme="dark"] .gift-stationery .btn-link {
-    color: #ffd700 !important; /* Icon copy màu vàng */
+  color: #ffd700 !important;
+  /* Icon copy màu vàng */
 }
 
 /* Tùy chỉnh Navbar Bottom */
 #navbar-menu {
-    /* Hiệu ứng kính mờ (Glassmorphism) nhìn cho sang */
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px); 
-    border-top: 1px solid rgba(0,0,0,0.05) !important;
+  /* Hiệu ứng kính mờ (Glassmorphism) nhìn cho sang */
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Chế độ tối cho Navbar */
 body.dark-mode #navbar-menu,
 [data-bs-theme="dark"] #navbar-menu {
-    background-color: rgba(33, 37, 41, 0.95) !important;
-    border-top: 1px solid rgba(255,255,255,0.1) !important;
+  background-color: rgba(33, 37, 41, 0.95) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Màu icon khi chưa bấm */
 #navbar-menu .nav-link {
-    color: #999 !important;
-    transition: color 0.3s;
+  color: #999 !important;
+  transition: color 0.3s;
 }
 
 /* Màu icon khi đang Active hoặc Hover (Màu chủ đạo) */
 #navbar-menu .nav-link:hover,
 #navbar-menu .nav-link.active {
-    color: indianred !important;
+  color: indianred !important;
 }
 
 /* --- FIX LỖI TRÀN MÀN HÌNH TRÊN MOBILE --- */
-html, body {
-    max-width: 100% !important;
-    position: relative; /* Giữ vị trí chuẩn */
+html,
+body {
+  max-width: 100% !important;
+  position: relative;
+  /* Giữ vị trí chuẩn */
 }
 
 section {
-    overflow-x: hidden; /* Đảm bảo từng section không bị tràn */
+  overflow-x: hidden;
+  /* Đảm bảo từng section không bị tràn */
 }
