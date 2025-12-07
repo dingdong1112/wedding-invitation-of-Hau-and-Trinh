@@ -1022,10 +1022,17 @@ export const guest = (() => {
         let bookEl = document.getElementById('book'); // Container cố định
         // --- ĐOẠN SỬA ĐỔI: NẾU ĐÃ CÓ SÁCH THÌ KHÔNG TẠO LẠI ---
         if (pageFlipInstance) {
-            // Chỉ cần show modal lên là xong
-            const bsModal = new bootstrap.Modal(modalElement);
+             const bsModal = bootstrap.Modal.getOrCreateInstance(modalElement);
             bsModal.show();
-            return; // Dừng hàm tại đây
+
+            // QUAN TRỌNG: Đợi modal hiện xong (300ms) rồi ép sách tính lại vị trí
+            // Fix lỗi sách bị nhảy lên góc trái trên điện thoại
+            setTimeout(() => {
+                if (pageFlipInstance) {
+                    pageFlipInstance.update(); // Lệnh cập nhật kích thước
+                }
+            }, 500); // Tăng lên 500ms cho chắc ăn trên mobile
+            return; 
         }
 
         if (!bookEl) {
