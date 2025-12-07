@@ -1674,3 +1674,78 @@ section {
 .fade-in-enter {
     animation: fadeInSmooth 1s ease-out forwards;
 }
+
+/* --- PH
+
+/* 2. Hiệu ứng Sách Thật (Book Container) */
+.stf__wrapper {
+    /* Tạo bóng đổ lớn xuống nền để sách trông như đang nổi lên */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8) !important;
+    perspective: 2000px;
+}
+
+/* 3. Trang giấy (Page) */
+.my-page {
+    background-color: #fff; /* Màu giấy trắng */
+    border-right: 1px solid #ddd; /* Viền trang */
+    overflow: hidden;
+}
+
+/* --- QUAN TRỌNG: TẠO HIỆU ỨNG CONG GÁY SÁCH (SHADOW GRADIENT) --- */
+
+/* Bóng đổ cho trang bên TRÁI (Tối ở mép phải - gáy sách) */
+.my-page:nth-child(even)::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 40px; /* Độ rộng vùng bóng tối */
+    background: linear-gradient(to left, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 100%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Bóng đổ cho trang bên PHẢI (Tối ở mép trái - gáy sách) */
+.my-page:nth-child(odd)::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 40px;
+    background: linear-gradient(to right, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 100%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* 4. Style cho dòng hướng dẫn (Nhỏ gọn, tinh tế hơn) */
+#flip-instructions {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
+    padding: 8px 20px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* 5. Nút đóng (X) */
+#btn-close-detail2 {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    transition: all 0.3s;
+}
+#btn-close-detail2:hover {
+    background: #dc3545; /* Màu đỏ khi hover */
+    border-color: #dc3545;
+    transform: rotate(90deg);
+}
+
+/* Animation nhẹ cho mũi tên */
+.instruction-arrow i {
+    animation: sideMove 1.5s infinite ease-in-out;
+}
+@keyframes sideMove {
+    0%, 100% { transform: translateX(0); opacity: 0.5; }
+    50% { transform: translateX(3px); opacity: 1; }
+}
