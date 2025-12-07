@@ -1424,14 +1424,13 @@ export const guest = (() => {
         }
 
         window.addEventListener('load', () => {
-            /*pool.init(pageLoaded, [
+            pool.init(pageLoaded, [
                 'image',
                 'video',
                 'audio',
                 'libs',
                 'gif',
-            ]);*/
-            pageLoaded();
+            ]);
             // CHẠY HÀM TẠO LỊCH CỦA CHÚNG TA SAU KHI MỌI THỨ ĐÃ TẢI XONG
             initializeCalendarLinks();
             //setupParticleControls();
