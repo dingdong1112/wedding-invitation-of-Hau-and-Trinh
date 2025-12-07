@@ -496,7 +496,7 @@ export const guest = (() => {
 
         console.log("Ép chạy booting...");
         setTimeout(() => {
-            booting(); 
+            booting();
         }, 500); // Chờ 0.5s rồi ép mở màn hình
     };
 
@@ -653,6 +653,19 @@ export const guest = (() => {
             }
 
             window.confetti(confettiOptions);
+
+            // === PHẦN MỚI: Tự động dừng khi ẩn Tab (Tiết kiệm Pin) ===
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    // Người dùng chuyển tab -> Dừng hiệu ứng
+                    if (effectInterval) clearInterval(effectInterval);
+                    if (durationTimeout) clearTimeout(durationTimeout);
+                    console.log("Tab ẩn -> Dừng hiệu ứng để tiết kiệm pin");
+                } else {
+                    // Người dùng quay lại -> Nếu nút đang bật thì chạy lại
+                    // (Logic tùy chọn, ở đây ta để user tự bật lại cho nhẹ)
+                }
+            });
         };
 
         // === Phần 4: Hàm để Bắt đầu hoặc Cập nhật hiệu ứng ===
@@ -711,43 +724,42 @@ export const guest = (() => {
     // --- HÀM 1: TẢI DANH SÁCH ẢNH TỪ API (Đã sửa để dùng Vercel URL) ---
     /** @returns {Promise<string[]>} */
     const fetchGalleryImages = async (ext = 'webp') => {
-        // 1. KIỂM TRA TRONG LOCAL STORAGE (Lưu cache kể cả khi F5)
-        const CACHE_KEY = `gallery_images_${ext}`;
-        const cachedData = localStorage.getItem(CACHE_KEY);
+        // 1. Dùng Cache 24 giờ (86400000 ms)
+        const CACHE_KEY = `gallery_cache_v2_${ext}`;
+        const cached = localStorage.getItem(CACHE_KEY);
+        const now = Date.now();
 
-        if (cachedData) {
-            // Parse dữ liệu từ string về object
-            const parsedData = JSON.parse(cachedData);
-
-            // (Tùy chọn) Kiểm tra thời hạn cache. Ví dụ: 1 giờ
-            const now = new Date().getTime();
-            if (now - parsedData.timestamp < 3600 * 1000) {
-                console.log("Load danh sách ảnh từ LocalStorage (Không tốn lượt gọi API)");
-                // Cập nhật biến global để code khác dùng
-                galleryCache = parsedData.files;
-                return parsedData.files;
+        if (cached) {
+            try {
+                const data = JSON.parse(cached);
+                // Nếu cache chưa quá 24h, dùng luôn
+                if (now - data.timestamp < 86400000) {
+                    console.log("Load ảnh từ Cache (Không tốn băng thông)");
+                    allImagesUrls = data.files; // Cập nhật biến global
+                    return data.files;
+                }
+            } catch (e) {
+                localStorage.removeItem(CACHE_KEY);
             }
         }
 
-        // 2. NẾU KHÔNG CÓ CACHE HOẶC HẾT HẠN -> GỌI API
+        // 2. Nếu không có cache, mới gọi API
         try {
-            console.log("Gọi API Vercel lấy danh sách...");
-            const apiUrl = `${VERCEL_BASE_URL}/api/gallery?ext=${ext}`;
-            const res = await fetch(apiUrl);
-
+            console.log("Gọi API lấy danh sách ảnh...");
+            // Lưu ý: Đã sửa đường dẫn API cho đúng chuẩn
+            const res = await fetch(`/api/gallery?ext=${ext}`); 
             if (!res.ok) throw new Error(`Status ${res.status}`);
+            
             const json = await res.json();
-
-            if (json.success && json.files.length > 0) {
-                // Cập nhật biến global
-                galleryCache = json.files;
-
-                // 3. LƯU VÀO LOCAL STORAGE (Kèm thời gian hiện tại)
+            if (json.success && Array.isArray(json.files)) {
+                // Lưu vào Global
+                allImagesUrls = json.files;
+                
+                // Lưu vào Cache
                 localStorage.setItem(CACHE_KEY, JSON.stringify({
                     files: json.files,
-                    timestamp: new Date().getTime()
+                    timestamp: now
                 }));
-
                 return json.files;
             }
             return [];
@@ -1219,67 +1231,6 @@ export const guest = (() => {
         }, 300);
     }
 
-    // --- Detail modal với swipe + pinch zoom ---
-    function openDetailModalSwipeZoom(index) {
-        const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
-        const imgEl = document.getElementById('detail-fullscreen-image');
-        imgEl.src = allImagesUrls[index];
-
-        let currentIndex = index;
-        let scale = 1, moveX = 0, moveY = 0;
-        let startDist = null, startX = 0, startY = 0;
-
-        imgEl.style.transform = 'scale(1) translate(0,0)';
-        imgEl.style.transition = 'transform 0.2s ease-out';
-
-        detailModal.show();
-
-        // Pinch & drag
-        imgEl.ontouchstart = (e) => {
-            if (e.touches.length === 2) {
-                const dx = e.touches[0].pageX - e.touches[1].pageX;
-                const dy = e.touches[0].pageY - e.touches[1].pageY;
-                startDist = Math.hypot(dx, dy);
-            } else if (e.touches.length === 1 && scale > 1) {
-                startX = e.touches[0].pageX - moveX;
-                startY = e.touches[0].pageY - moveY;
-            }
-        };
-
-        imgEl.ontouchmove = (e) => {
-            e.preventDefault();
-            if (e.touches.length === 2 && startDist) {
-                const dx = e.touches[0].pageX - e.touches[1].pageX;
-                const dy = e.touches[0].pageY - e.touches[1].pageY;
-                const dist = Math.hypot(dx, dy);
-                scale *= dist / startDist;
-                scale = Math.max(1, Math.min(scale, 4));
-                imgEl.style.transform = `scale(${scale}) translate(${moveX}px,${moveY}px)`;
-                startDist = dist;
-            } else if (e.touches.length === 1 && scale > 1) {
-                moveX = e.touches[0].pageX - startX;
-                moveY = e.touches[0].pageY - startY;
-                imgEl.style.transform = `scale(${scale}) translate(${moveX}px,${moveY}px)`;
-            }
-        };
-
-        imgEl.ontouchend = () => { startDist = null; };
-
-        // Swipe next/prev ảnh
-        let touchStartX = 0;
-        imgEl.addEventListener('touchstart', e => { if (e.touches.length === 1) touchStartX = e.touches[0].clientX; });
-        imgEl.addEventListener('touchend', e => {
-            const dx = e.changedTouches[0].clientX - touchStartX;
-            if (Math.abs(dx) > 50) {
-                if (dx < 0) currentIndex = Math.min(currentIndex + 1, allImagesUrls.length - 1);
-                else currentIndex = Math.max(currentIndex - 1, 0);
-                imgEl.src = allImagesUrls[currentIndex];
-                scale = 1; moveX = 0; moveY = 0;
-                imgEl.style.transform = 'scale(1) translate(0,0)';
-            }
-        });
-    }
-
     function forceRemoveBackdrop() {
         // 1. Xóa tất cả các lớp mờ đen (backdrop)
         const backdrops = document.querySelectorAll('.modal-backdrop');
@@ -1498,7 +1449,7 @@ export const guest = (() => {
                 showStory,
                 closeInformation,
                 openAlbum: initPageFlipAlbum, // Gán hàm khởi tạo Album vào API công khai
-                openDetail: openDetailModalSwipeZoom, // Export hàm mở chi tiết
+                //openDetail: openDetailModalSwipeZoom, // Export hàm mở chi tiết
                 closeDetailModal2,
                 openStoryTimeline,
                 openDetailModal,
