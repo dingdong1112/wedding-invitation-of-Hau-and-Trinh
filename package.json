@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "npx esbuild js/app/guest/guest.js --bundle --outdir=public/js --servedir=public",
-    "build": "rm -rf dist && mkdir -p dist && cp -r public/* dist/ && npx esbuild js/app/guest/guest.js --bundle --minify --outfile=dist/js/guest.js --external:page-flip"
+    "build": "npx esbuild js/app/guest/guest.js --bundle --minify --outfile=public/js/guest.js --external:page-flip"
   },
   "dependencies": {
     "esbuild": "^0.25.0",
