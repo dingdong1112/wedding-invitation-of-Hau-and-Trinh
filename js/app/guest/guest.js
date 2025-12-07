@@ -493,6 +493,11 @@ export const guest = (() => {
                 img.download(e.currentTarget.getAttribute('data-src'));
             });
         }
+
+        console.log("Ép chạy booting...");
+        setTimeout(() => {
+            booting(); 
+        }, 500); // Chờ 0.5s rồi ép mở màn hình
     };
 
 
@@ -1419,13 +1424,14 @@ export const guest = (() => {
         }
 
         window.addEventListener('load', () => {
-            pool.init(pageLoaded, [
+            /*pool.init(pageLoaded, [
                 'image',
                 'video',
                 'audio',
                 'libs',
                 'gif',
-            ]);
+            ]);*/
+            pageLoaded();
             // CHẠY HÀM TẠO LỊCH CỦA CHÚNG TA SAU KHI MỌI THỨ ĐÃ TẢI XONG
             initializeCalendarLinks();
             //setupParticleControls();

@@ -1,0 +1,86 @@
+@import url("common.css");
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(192, 192, 192, 0.8);
+    border-radius: 1rem;
+    border: 0.25rem solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(192, 192, 192, 1);
+}
+
+@media screen and (max-width: 768px) {
+    html {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+}
+
+html[data-bs-theme="light"] .btn-theme-auto {
+    color: var(--bs-dark);
+    background-color: var(--bs-gray-100);
+}
+
+html[data-bs-theme="dark"] .btn-theme-auto {
+    color: var(--bs-light);
+    background-color: var(--bs-gray-800);
+}
+
+html[data-bs-theme="dark"] .btn-theme-auto:hover:not(.nav-link.active) {
+    color: var(--bs-light);
+    background-color: var(--bs-gray-600);
+}
+
+html[data-bs-theme="light"] .btn-theme-auto:hover:not(.nav-link.active) {
+    color: var(--bs-dark);
+    background-color: var(--bs-gray-300);
+}
+
+.logout:hover {
+    color: var(--bs-light) !important;
+    background-color: var(--bs-danger) !important;
+}
+
+/* --- STYLE CHO LỜI CHÚC GỌN --- */
+.wish-message-truncate {
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* Số dòng muốn hiện */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer; /* Con trỏ tay để biết bấm được */
+    transition: color 0.2s;
+}
+
+.wish-message-truncate:hover {
+    color: var(--bs-primary) !important; /* Hover đổi màu xanh */
+}
+
+/* --- STYLE PHÂN TRANG --- */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+/* Fix input date trên mobile */
+input[type="date"] {
+    min-width: 0; /* Cho phép co nhỏ hơn mặc định của browser */
+    font-size: 0.85rem; /* Chữ nhỏ lại xíu cho vừa */
+}
+
+/* Tinh chỉnh khoảng cách */
+#filter-range-group .input-group {
+    background-color: #fff; /* Nền trắng cho cả cụm */
+    border-radius: 6px; /* Bo góc */
+    overflow: hidden; /* Cắt góc thừa */
+}
