@@ -3,6 +3,5 @@ SECURITY.md
 node_modules
 package-lock.json
 dist
-public
 .vercel
 .env*.local

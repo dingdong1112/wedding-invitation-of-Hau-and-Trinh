@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+
+<head>
+    <!-- Common -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Dashboard Ulems">
+    <title>Dashboard Quản Trị</title>
+
+    <!-- Appearance -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#f8f9fa">
+
+    <!-- Font & CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/admin.css">
+
+    <!-- JS Dependencies -->
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./dist/admin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<!-- Thay link Vercel của bạn vào đây -->
+
+<body data-url="https://wedding-invitation-of-hau-and-chin.vercel.app/">
+
+    <!-- Mobile Nav -->
+    <nav class="navbar navbar-expand fixed-bottom rounded-top-4 border-top d-md-none d-lg-none d-xl-none p-0">
+        <ul class="navbar-nav nav-justified w-100 align-items-center">
+            <li class="nav-item">
+                <button class="nav-link active" onclick="undangan.admin.navbar.buttonNavHome(this)">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="d-block" style="font-size: 0.4rem;">Thống Kê</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" onclick="undangan.admin.navbar.buttonNavComments(this)">
+                    <i class="fa-solid fa-comments"></i>
+                    <span class="d-block" style="font-size: 0.4rem;">Quản Lý Lời Chúc</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" onclick="undangan.admin.navbar.buttonNavSetting(this)">
+                    <i class="fa-solid fa-gear"></i>
+                    <span class="d-block" style="font-size: 0.4rem;">Cài Đặt Trang Khách</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" onclick="undangan.admin.navbar.buttonNavSecurity(this)">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span class="d-block" style="font-size: 0.4rem;">Bảo Mật & Token</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link logout" onclick="undangan.admin.logout()">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="d-block" style="font-size: 0.7rem;">Logout</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mt-4 mb-5">
+        <!-- Header -->
+        <div class="d-none d-sm-flex justify-content-between align-items-center mt-4 mb-5 pt-1">
+            <h4 class="m-0 p-0 flex-grow-1 fw-bold">Admin Panel <i class="fa-solid fa-fire text-danger ms-2"></i></h4>
+            <div class="m-0 p-0 flex-grow-1 text-end" id="dashboard-name" style="font-size: 1.4rem;">Admin</div>
+        </div>
+
+        <div class="row m-0 p-0">
+            <!-- MENU TRÁI (Desktop) -->
+            <div class="col-md-3 d-none d-md-block m-0 p-0">
+                <ul class="nav flex-column w-100 nav-pills pe-4" id="admin-tabs" role="tablist">
+                    <li class="nav-item pe-2" role="presentation">
+                        <button
+                            class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm active"
+                            data-bs-toggle="pill" data-bs-target="#pills-home" id="button-home" type="button" role="tab"
+                            aria-controls="pills-home" aria-selected="true">
+                            <i class="fa-solid fa-house ms-3 me-2"></i>Thống Kê
+                        </button>
+                    </li>
+                    <li class="nav-item pe-2" role="presentation">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold mb-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-wishes" id="button-wishes" type="button"
+                            role="tab" aria-controls="pills-wishes" aria-selected="true"
+                            onclick="undangan.admin.loadWishesManager()">
+                            <i class="fa-solid fa-comments ms-3 me-2"></i>Quản Lý Lời Chúc
+                        </button>
+                    </li>
+                    <!--li class="nav-item pe-2">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-setting">
+                            <i class="fa-solid fa-sliders ms-3 me-2"></i>Cài Đặt Trang Khách
+                        </button>
+                    </li-->
+                    <li class="nav-item pe-2" role="presentation">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-setting" id="button-setting" type="button"
+                            role="tab" aria-controls="pills-setting" aria-selected="false">
+                            <i class="fa-solid fa-gear ms-3 me-2"></i>Cài Đặt Trang Khách
+                        </button>
+                    </li>
+                    <li class="nav-item pe-2">
+                        <button class="btn-theme-auto nav-link w-100 text-start fw-semibold my-1 rounded-4 shadow-sm"
+                            data-bs-toggle="pill" data-bs-target="#pills-security" id="button-security" type="button"
+                            role="tab" aria-controls="pills-security" aria-selected="false">
+                            <i class="fa-solid fa-user-shield ms-3 me-2"></i>Bảo Mật & Token
+                        </button>
+                    </li>
+                    <li class="nav-item pe-2">
+                        <hr class="my-2">
+                    </li>
+                    <li class="nav-item pe-2">
+                        <button
+                            class="btn-theme-auto logout nav-link w-100 text-start fw-semibold mt-1 rounded-4 shadow-sm"
+                            onclick="undangan.admin.logout()">
+                            <i class="fa-solid fa-right-from-bracket ms-3 me-2"></i>Đăng Xuất
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- NỘI DUNG PHẢI -->
+            <div class="col-md-9 m-0 p-0">
+                <div class="tab-content">
+
+                    <!-- 1. HOME -->
+                    <section class="tab-pane fade show active" id="pills-home">
+                        <div class="rounded-4 p-3 mb-4 shadow bg-body-secondary">
+                            <h5 class="fw-bold m-0"><i class="fa-solid fa-home me-2"></i>Tổng Quan</h5>
+                        </div>
+
+                        <!-- Stats Cards -->
+                        <div class="row g-3">
+                            <div class="col-6 col-xl-3">
+                                <div class="rounded-4 shadow p-3 border-0 text-white" style="background: #8573F1;">
+                                    <p class="fw-bold m-0">Tổng Lời Chúc</p>
+                                    <h3 class="fw-bold m-0" id="count-comment">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-6 col-xl-3">
+                                <div class="rounded-4 shadow p-3 border-0 text-white" style="background: #7A5CD9;">
+                                    <p class="fw-bold m-0">Tham Dự</p>
+                                    <h3 class="fw-bold m-0" id="count-present">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-6 col-xl-3">
+                                <div class="rounded-4 shadow p-3 border-0 text-white" style="background: #6546B1;">
+                                    <p class="fw-bold m-0">Vắng Mặt</p>
+                                    <h3 class="fw-bold m-0" id="count-absent">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-6 col-xl-3">
+                                <div class="rounded-4 shadow p-3 border-0 text-white" style="background: #4F3392;">
+                                    <p class="fw-bold m-0">Thích</p>
+                                    <h3 class="fw-bold m-0" id="count-like">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- KHU VỰC MỚI: BIỂU ĐỒ VÀ CHI TIẾT -->
+                        <div class="row mt-4">
+                            <!-- Cột Trái: Biểu đồ Tỷ lệ Tham dự -->
+                            <div class="col-md-4 mb-4">
+                                <div class="card border-0 shadow-sm h-100 rounded-4">
+                                    <div class="card-body">
+                                        <h6 class="card-title fw-bold text-secondary"><i
+                                                class="fa-solid fa-chart-pie me-2"></i>Tỷ Lệ Tham Dự</h6>
+                                        <div style="height: 250px; position: relative;">
+                                            <canvas id="attendanceChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cột Giữa: Biểu đồ Lời chúc theo ngày -->
+                            <div class="col-md-8 mb-4">
+                                <div class="card border-0 shadow-sm h-100 rounded-4">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="fw-bold text-secondary mb-0"><i
+                                                    class="fa-solid fa-chart-bar me-2"></i>Xu Hướng</h6>
+                                            <select
+                                                class="form-select form-select-sm w-auto bg-dark text-light border-secondary"
+                                                id="chartFilter" onchange="updateTrendChart(this.value)">
+                                                <option value="week" selected>7 ngày qua</option>
+                                                <option value="month">30 ngày qua</option>
+                                                <option value="year">12 tháng qua</option>
+                                            </select>
+                                        </div>
+                                        <div style="height: 250px; width: 100%;">
+                                            <canvas id="wishesTrendChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hàng dưới: Lời chúc mới nhất -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm rounded-4">
+                                    <div class="card-header bg-white border-0 pt-3 pb-0">
+                                        <h6 class="fw-bold text-secondary"><i
+                                                class="fa-solid fa-clock-rotate-left me-2"></i>Lời Chúc Mới Nhất</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th scope="col">Tên</th>
+                                                        <th scope="col">Tham dự</th>
+                                                        <th scope="col">Lời chúc</th>
+                                                        <th scope="col">Thời gian</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="latest-wishes-table">
+                                                    <!-- JS sẽ điền dữ liệu vào đây -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 2. WISHES MANAGER -->
+                    <section class="tab-pane fade" id="pills-wishes">
+
+                        <!-- TIÊU ĐỀ LỚN (Giống Tổng Quan) -->
+                        <div class="rounded-4 p-3 mb-4 shadow bg-body-secondary">
+                            <h5 class="fw-bold m-0"><i class="fa-solid fa-comments me-2"></i>Danh Sách Lời Chúc</h5>
+                        </div>
+
+                        <!-- KHUNG BỘ LỌC (FILTER) -->
+                        <div class="card border-0 shadow-sm mb-3 bg-body-tertiary">
+                            <div class="card-body p-3">
+                                <!-- Dòng 1: Tìm kiếm & Trạng thái -->
+                                <div class="row g-3 mb-2">
+                                    <div class="col-12 col-md">
+                                        <div class="input-group">
+                                            <span class="input-group-text border-0 bg-white"><i
+                                                    class="fa-solid fa-search text-muted"></i></span>
+                                            <input type="text" class="form-control border-0 bg-white shadow-none"
+                                                id="filter-search" placeholder="Tìm tên, nội dung..."
+                                                oninput="undangan.admin.applyFilters()">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-auto">
+                                        <select class="form-select border-0 bg-white shadow-none" id="filter-presence"
+                                            onchange="undangan.admin.applyFilters()">
+                                            <option value="all">Tất cả trạng thái</option>
+                                            <option value="yes">✅ Tham dự</option>
+                                            <option value="no">❌ Vắng mặt</option>
+                                            <option value="other">❔ Khác</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Dòng 2: Bộ lọc Thời gian -->
+                                <div class="row g-2 align-items-center mt-1">
+                                    <!-- Thêm mt-1 hoặc mt-2 nếu cần giãn dòng -->
+                                    <div class="col-12 col-md-auto">
+                                        <select
+                                            class="form-select form-select-sm border-0 bg-white shadow-none text-primary fw-bold"
+                                            id="time-filter-type" onchange="undangan.admin.toggleTimeFilter()">
+                                            <option value="none">🕒 Tất cả thời gian</option>
+                                            <option value="month">📅 Lọc theo Tháng</option>
+                                            <option value="range">↔ Lọc theo Khoảng Ngày</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Input: Tháng & Năm -->
+                                    <div class="col-12 col-md-auto d-none" id="filter-month-group">
+                                        <div class="d-flex gap-2 mt-2 mt-md-0"> <!-- Thêm margin-top trên mobile -->
+                                            <select class="form-select form-select-sm border-0 bg-white shadow-none"
+                                                id="filter-month-val" onchange="undangan.admin.applyFilters()"
+                                                style="width: 80px;">
+                                                <!-- ... options giữ nguyên ... -->
+                                                <option value="">Tháng...</option>
+                                                <option value="01">Tháng 1</option>
+                                                <option value="02">Tháng 2</option>
+                                                <option value="03">Tháng 3</option>
+                                                <option value="04">Tháng 4</option>
+                                                <option value="05">Tháng 5</option>
+                                                <option value="06">Tháng 6</option>
+                                                <option value="07">Tháng 7</option>
+                                                <option value="08">Tháng 8</option>
+                                                <option value="09">Tháng 9</option>
+                                                <option value="10">Tháng 10</option>
+                                                <option value="11">Tháng 11</option>
+                                                <option value="12">Tháng 12</option>
+                                            </select>
+                                            <select class="form-select form-select-sm border-0 bg-white shadow-none"
+                                                id="filter-year-val" onchange="undangan.admin.applyFilters()"
+                                                style="width: 90px;">
+                                                <option value="2024">2024</option>
+                                                <option value="2025" selected>2025</option>
+                                                <option value="2026">2026</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Input: Khoảng Ngày (Đã sửa layout) -->
+                                    <div class="col-12 col-md-auto d-none" id="filter-range-group">
+                                        <div class="d-flex align-items-center gap-2 mt-2 mt-md-0 w-100">
+                                            <!-- Thêm margin top -->
+                                            <!-- Ô ngày bắt đầu (Chiếm 50% - khoảng cách) -->
+                                            <div class="input-group input-group-sm flex-grow-1">
+                                                <span class="input-group-text bg-white border-0 ps-2 pe-1"><i
+                                                        class="fa-solid fa-calendar small text-muted"></i></span>
+                                                <input type="date"
+                                                    class="form-control border-0 bg-white shadow-none ps-1"
+                                                    id="filter-date-start" onchange="undangan.admin.applyFilters()">
+                                            </div>
+
+                                            <span class="text-muted">-</span>
+
+                                            <!-- Ô ngày kết thúc (Chiếm 50% - khoảng cách) -->
+                                            <div class="input-group input-group-sm flex-grow-1">
+                                                <span class="input-group-text bg-white border-0 ps-2 pe-1"><i
+                                                        class="fa-solid fa-calendar small text-muted"></i></span>
+                                                <input type="date"
+                                                    class="form-control border-0 bg-white shadow-none ps-1"
+                                                    id="filter-date-end" onchange="undangan.admin.applyFilters()">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 text-end mt-2">
+                                        <!-- Đưa nút reset xuống dòng riêng và căn phải -->
+                                        <button class="btn btn-light btn-sm rounded-pill px-4 shadow-sm"
+                                            onclick="undangan.admin.resetFilters()">
+                                            <i class="fa-solid fa-rotate-right me-2"></i> Đặt lại
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NÚT THÊM MỚI (Nằm dưới Filter, căn phải) -->
+                        <div class="d-flex justify-content-end mb-3">
+                            <button class="btn btn-success btn-sm rounded-pill shadow-sm px-4 fw-bold"
+                                onclick="undangan.admin.openAddWishModal()">
+                                <i class="fa-solid fa-plus me-2"></i>Thêm Lời Chúc Mới
+                            </button>
+                        </div>
+
+                        <!-- DANH SÁCH -->
+                        <div id="wishes-manager-list" class="d-flex flex-column gap-3"></div>
+
+                        <!-- PHÂN TRANG -->
+                        <div id="pagination-controls" class="pagination-container d-none">
+                            <!-- ... (giữ nguyên phần phân trang cũ) ... -->
+                            <div class="d-flex align-items-center gap-2">
+                                <small class="text-muted">Hiển thị:</small>
+                                <select class="form-select form-select-sm rounded-3" style="width: 70px;"
+                                    id="per-page-select" onchange="undangan.admin.changePerPage(this.value)">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0" id="pagination-ul"></ul>
+                            </nav>
+                        </div>
+                    </section>
+
+                    <!-- 3. SETTINGS -->
+                    <section class="tab-pane fade" id="pills-setting" role="tabpanel" tabindex="0">
+                        <div class="card p-4 shadow-sm rounded-4 border-0 bg-theme-auto">
+                            <h5 class="mb-4 fw-bold border-bottom pb-2">Điều Khiển Giao Diện Khách</h5>
+
+                            <!-- Các nút Switch -->
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-confetti"
+                                    onchange="undangan.admin.updateConfig('confetti_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-confetti">Hiệu ứng Pháo hoa
+                                    (Confetti)</label>
+                            </div>
+                            <!--div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-particles"
+                                    onchange="undangan.admin.updateConfig('particle_control_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-particles">Hiển thị Đũa Thần (Chỉnh hiệu
+                                    ứng)</label>
+                            </div-->
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-vinyl"
+                                    onchange="undangan.admin.updateConfig('vinyl_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-vinyl">Hiệu ứng Đĩa Nhạc Quay</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-music"
+                                    onchange="undangan.admin.updateConfig('music_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-music">Tự động phát nhạc & Hiển thị
+                                    Player</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="toggle-popup"
+                                    onchange="undangan.admin.updateConfig('wishes_popup_enabled', this.checked)">
+                                <label class="form-check-label" for="toggle-popup">Popup Lời Chúc Chạy Ngẫu
+                                    Nhiên</label>
+                            </div>
+                            <hr>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input bg-danger border-danger" type="checkbox" id="toggle-lock"
+                                    onchange="undangan.admin.updateConfig('can_delete', this.checked)">
+                                <label class="form-check-label text-danger fw-bold" for="toggle-lock">KHÓA chức năng Gửi
+                                    Lời Chúc (Bảo Trì)</label>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 4. SECURITY -->
+                    <section class="tab-pane fade" id="pills-security">
+                        <div class="p-4 bg-theme-auto mb-3 rounded-4 shadow">
+                            <p class="fw-bold border-bottom pb-2"><i class="fa-solid fa-key me-2"></i>Access Key (Token)
+                            </p>
+                            <div class="input-group mb-3">
+                                <input type="password" class="form-control" id="dashboard-accesskey" readonly value="">
+                                <button class="btn btn-outline-secondary" type="button"
+                                    onclick="window.toggleTokenVisibility()">
+                                    <i class="fa-solid fa-eye" id="eye-icon"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="window.copyToken()">
+                                    <i class="fa-solid fa-copy"></i>
+                                </button>
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-warning btn-sm rounded-pill shadow-sm"
+                                    onclick="window.regenerateToken()">
+                                    <i class="fa-solid fa-rotate me-1"></i> Tạo Token Mới
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-theme-auto mb-3 rounded-4 shadow">
+                            <p class="fw-bold border-bottom pb-2"><i class="fa-solid fa-lock me-2"></i>Đổi Mật Khẩu
+                                Admin</p>
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Mật khẩu cũ</label>
+                                <input type="password" class="form-control rounded-4" id="old_password">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Mật khẩu mới</label>
+                                <input type="password" class="form-control rounded-4" id="new_password">
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-primary btn-sm rounded-pill shadow-sm"
+                                    onclick="undangan.admin.changePassword(this)">
+                                    Lưu Mật Khẩu
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL LOGIN -->
+    <div class="modal fade" id="mainModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow-lg">
+                <div class="modal-body p-4">
+                    <h4 class="text-center fw-bold mb-4">Đăng Nhập Admin</h4>
+                    <form id="admin-login-form"
+                        onsubmit="event.preventDefault(); undangan.admin.auth.login(this.querySelector('button[type=submit]'))">
+                        <div class="mb-4">
+                            <label for="admin-pass" class="form-label fw-bold">Mật khẩu</label>
+                            <input type="password" class="form-control form-control-lg rounded-4" id="admin-pass"
+                                placeholder="••••••••" required autocomplete="current-password">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-4 fw-bold">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SỬA/THÊM LỜI CHÚC -->
+    <div class="modal fade" id="editWishModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Thông Tin Lời Chúc</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-wish-id">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Tên Khách</label>
+                        <input type="text" class="form-control rounded-4" id="edit-wish-name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Lời Chúc</label>
+                        <textarea class="form-control rounded-4" id="edit-wish-msg" rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4"
+                        onclick="undangan.admin.saveWish()">Lưu Lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Xem Chi Tiết Lời Chúc -->
+    <div class="modal fade" id="viewWishModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Chi Tiết Lời Chúc</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fa-solid fa-user fa-xl text-secondary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0" id="view-wish-name">Tên Khách</h5>
+                            <small class="text-muted" id="view-wish-time">Thời gian</small>
+                            <div id="view-wish-presence" class="mt-1"></div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-light rounded-3">
+                        <p class="mb-0" id="view-wish-msg"
+                            style="white-space: pre-wrap; font-size: 1rem; line-height: 1.6;"></p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
