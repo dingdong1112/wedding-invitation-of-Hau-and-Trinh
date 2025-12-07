@@ -1347,6 +1347,8 @@ export const guest = (() => {
         const videoModal = document.getElementById('videoPlayerModal');
         const container = document.getElementById('youtubePlayerContainer');
         const titleEl = document.getElementById('playerTitle');
+        // Thêm class đánh dấu là Video đang mở
+        document.body.classList.add('video-active'); 
 
         // Set tiêu đề
         if (titleEl) titleEl.innerText = title;
@@ -1373,6 +1375,7 @@ export const guest = (() => {
     function closeVideoPlayer() {
         const videoModal = document.getElementById('videoPlayerModal');
         const container = document.getElementById('youtubePlayerContainer');
+         document.body.classList.remove('video-active');
 
         videoModal.classList.remove('active');
 
@@ -1381,15 +1384,21 @@ export const guest = (() => {
             container.innerHTML = '';
         }, 300);
 
-        // 1. GỌI HÀM TIẾP TỤC NHẠC NỀN
+        
+        // 3. Xử lý Logic Cuộn (QUAN TRỌNG)
+        const storyModal = document.getElementById('storyTimelineModal');
+        if (storyModal && storyModal.classList.contains('active')) {
+            storyModal.style.overflowY = 'auto'; 
+        } else {
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        }
+
+        // GỌI HÀM TIẾP TỤC NHẠC NỀN
         if (window.musicPlayer && typeof window.musicPlayer.resumeAfterVideo === 'function') {
             window.musicPlayer.resumeAfterVideo();
         }
 
-        const storyModal = document.getElementById('storyTimelineModal');
-        if (!storyModal.classList.contains('active')) {
-            document.body.classList.remove('modal-open');
-        }
     }
 
     /* --- PHÍM TẮT (ESC) --- */
