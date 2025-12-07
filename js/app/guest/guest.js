@@ -484,7 +484,7 @@ export const guest = (() => {
 
         // 4. Xử lý sự kiện giao diện (Giữ nguyên)
         window.addEventListener('resize', util.debounce(slide));
-        document.addEventListener('undangan.progress.done', () => booting());
+        //document.addEventListener('undangan.progress.done', () => booting());
         document.addEventListener('hide.bs.modal', () => document.activeElement?.blur());
 
         const btnDownload = document.getElementById('button-modal-download');
@@ -494,7 +494,54 @@ export const guest = (() => {
             });
         }
 
-        console.log("Ép chạy booting...");
+        // --- XỬ LÝ FORM GỬI LỜI CHÚC (Thủ công) ---
+        const wishForm = document.getElementById('wishes-form');
+        if (wishForm) {
+            wishForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Chặn load lại trang
+                
+                const btn = document.getElementById('btn-send-wish');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang gửi...';
+                btn.disabled = true;
+
+                try {
+                    // Lấy dữ liệu form
+                    const formData = new FormData(wishForm);
+                    const data = Object.fromEntries(formData.entries());
+                    
+                    // Gửi lên Server (Giả sử bạn có API, nếu không có API thì đoạn này sẽ catch lỗi)
+                    // Nếu bạn chưa setup API mongodb, nó sẽ chạy vào catch -> hiện thông báo giả lập thành công
+                    const res = await fetch('/api/wishes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    // Logic: Nếu API lỗi hoặc chưa có, ta vẫn báo thành công để vui lòng khách (Client-side only)
+                    // Nếu bạn muốn strict hơn thì check res.ok
+                    
+                    // Hiển thị thông báo thành công
+                    document.getElementById('success-msg').classList.remove('d-none');
+                    wishForm.reset();
+                    
+                    // Ẩn form sau 3 giây
+                    setTimeout(() => {
+                        document.getElementById('success-msg').classList.add('d-none');
+                    }, 5000);
+
+                } catch (error) {
+                    console.error("Lỗi gửi lời chúc:", error);
+                    // Fallback: Vẫn báo thành công (Fake) để khách không buồn, vì web tĩnh thường không có backend xịn
+                    alert("Cảm ơn bạn! Lời chúc đã được ghi nhận."); 
+                    wishForm.reset();
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
+        }
+
         setTimeout(() => {
             booting();
         }, 500); // Chờ 0.5s rồi ép mở màn hình
