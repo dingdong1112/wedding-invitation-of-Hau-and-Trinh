@@ -707,7 +707,6 @@ export const guest = (() => {
                     // Người dùng chuyển tab -> Dừng hiệu ứng
                     if (effectInterval) clearInterval(effectInterval);
                     if (durationTimeout) clearTimeout(durationTimeout);
-                    console.log("Tab ẩn -> Dừng hiệu ứng để tiết kiệm pin");
                 } else {
                     // Người dùng quay lại -> Nếu nút đang bật thì chạy lại
                     // (Logic tùy chọn, ở đây ta để user tự bật lại cho nhẹ)
@@ -743,7 +742,6 @@ export const guest = (() => {
             if (window.musicPlayer && typeof window.musicPlayer.closePanel === 'function') {
                 window.musicPlayer.closePanel();
             }
-            console.log("Toggling particle controls panel.");
 
             // Sau đó mới mở/đóng bảng pháo hoa
             controlsPanel.classList.toggle('show');
@@ -782,7 +780,6 @@ export const guest = (() => {
             // (Tùy chọn) Kiểm tra thời hạn cache. Ví dụ: 1 giờ
             const now = new Date().getTime();
             if (now - parsedData.timestamp < 3600 * 1000) {
-                console.log("Load danh sách ảnh từ LocalStorage (Không tốn lượt gọi API)");
                 // Cập nhật biến global để code khác dùng
                 galleryCache = parsedData.files;
                 return parsedData.files;
@@ -791,7 +788,6 @@ export const guest = (() => {
 
         // 2. NẾU KHÔNG CÓ CACHE HOẶC HẾT HẠN -> GỌI API
         try {
-            console.log("Gọi API Vercel lấy danh sách...");
             const apiUrl = `${VERCEL_BASE_URL}/api/gallery?ext=${ext}`;
             const res = await fetch(apiUrl);
 
