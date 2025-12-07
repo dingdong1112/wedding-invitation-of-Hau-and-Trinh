@@ -1770,3 +1770,19 @@ body.modal-open {
     overflow: hidden !important;
     height: 100vh;
 }
+
+/* --- FIX LỖI TOUCH TRÊN MOBILE --- */
+#videoPlayerModal {
+    /* Mặc định khi ẩn thì KHÔNG ĐƯỢC CHẶN cảm ứng */
+    pointer-events: none; 
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+#videoPlayerModal.active {
+    /* Khi hiện lên mới cho phép chạm vào */
+    pointer-events: auto; 
+    opacity: 1;
+    visibility: visible;
+}

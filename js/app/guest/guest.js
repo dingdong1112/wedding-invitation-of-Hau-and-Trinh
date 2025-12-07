@@ -499,7 +499,7 @@ export const guest = (() => {
         if (wishForm) {
             wishForm.addEventListener('submit', async (e) => {
                 e.preventDefault(); // Chặn load lại trang
-                
+
                 const btn = document.getElementById('btn-send-wish');
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang gửi...';
@@ -509,7 +509,7 @@ export const guest = (() => {
                     // Lấy dữ liệu form
                     const formData = new FormData(wishForm);
                     const data = Object.fromEntries(formData.entries());
-                    
+
                     // Gửi lên Server (Giả sử bạn có API, nếu không có API thì đoạn này sẽ catch lỗi)
                     // Nếu bạn chưa setup API mongodb, nó sẽ chạy vào catch -> hiện thông báo giả lập thành công
                     const res = await fetch('/api/wishes', {
@@ -520,11 +520,11 @@ export const guest = (() => {
 
                     // Logic: Nếu API lỗi hoặc chưa có, ta vẫn báo thành công để vui lòng khách (Client-side only)
                     // Nếu bạn muốn strict hơn thì check res.ok
-                    
+
                     // Hiển thị thông báo thành công
                     document.getElementById('success-msg').classList.remove('d-none');
                     wishForm.reset();
-                    
+
                     // Ẩn form sau 3 giây
                     setTimeout(() => {
                         document.getElementById('success-msg').classList.add('d-none');
@@ -533,7 +533,7 @@ export const guest = (() => {
                 } catch (error) {
                     console.error("Lỗi gửi lời chúc:", error);
                     // Fallback: Vẫn báo thành công (Fake) để khách không buồn, vì web tĩnh thường không có backend xịn
-                    alert("Cảm ơn bạn! Lời chúc đã được ghi nhận."); 
+                    alert("Cảm ơn bạn! Lời chúc đã được ghi nhận.");
                     wishForm.reset();
                 } finally {
                     btn.innerHTML = originalText;
@@ -1348,7 +1348,7 @@ export const guest = (() => {
         const container = document.getElementById('youtubePlayerContainer');
         const titleEl = document.getElementById('playerTitle');
         // Thêm class đánh dấu là Video đang mở
-        document.body.classList.add('video-active'); 
+        document.body.classList.add('video-active');
 
         // Set tiêu đề
         if (titleEl) titleEl.innerText = title;
@@ -1375,7 +1375,6 @@ export const guest = (() => {
     function closeVideoPlayer() {
         const videoModal = document.getElementById('videoPlayerModal');
         const container = document.getElementById('youtubePlayerContainer');
-         document.body.classList.remove('video-active');
 
         videoModal.classList.remove('active');
 
@@ -1384,21 +1383,40 @@ export const guest = (() => {
             container.innerHTML = '';
         }, 300);
 
-        
-        // 3. Xử lý Logic Cuộn (QUAN TRỌNG)
+
+        // 3. Xử lý Logic Cuộn
         const storyModal = document.getElementById('storyTimelineModal');
+
         if (storyModal && storyModal.classList.contains('active')) {
-            storyModal.style.overflowY = 'auto'; 
+            // Nếu đang ở trong Love Story
+            storyModal.style.overflowY = 'auto';
         } else {
+            // Nếu ở trang chủ
             document.body.classList.remove('modal-open');
             document.body.style.overflow = '';
+            document.documentElement.style.overflow = ''; // Fix thêm cho Firefox/Android
         }
 
-        // GỌI HÀM TIẾP TỤC NHẠC NỀN
+        document.body.classList.remove('video-active');
+
+        // 4. Tiếp tục nhạc nền
         if (window.musicPlayer && typeof window.musicPlayer.resumeAfterVideo === 'function') {
             window.musicPlayer.resumeAfterVideo();
         }
 
+        // ====> FIX LỖI KẸT SCROLL TRÊN MOBILE (QUAN TRỌNG) <====
+
+        // A. Xóa tiêu điểm khỏi mọi phần tử (để bỏ focus khỏi video vừa tắt)
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+
+        // B. Ép trình duyệt vẽ lại giao diện (Force Reflow/Repaint)
+        // Dòng này không làm gì cả nhưng bắt buộc trình duyệt tính toán lại layout -> Hết kẹt
+        void document.body.offsetHeight;
+
+        // C. Trả focus về cửa sổ chính
+        window.focus();
     }
 
     /* --- PHÍM TẮT (ESC) --- */
