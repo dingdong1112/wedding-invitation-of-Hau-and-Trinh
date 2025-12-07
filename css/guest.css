@@ -1630,3 +1630,47 @@ html, body {
 section {
     overflow-x: hidden; /* Đảm bảo từng section không bị tràn */
 }
+
+/* --- TÙY CHỈNH THANH CUỘN (SCROLLBAR) --- */
+/* Chỉ áp dụng cho Webkit (Chrome, Edge, Safari...) */
+
+::-webkit-scrollbar {
+    width: 6px; /* Chiều ngang thanh cuộn dọc */
+    height: 6px; /* Chiều cao thanh cuộn ngang */
+}
+
+/* Phần nền (Track) */
+::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 4px;
+}
+
+/* Phần thanh trượt (Thumb) */
+::-webkit-scrollbar-thumb {
+    background: indianred; /* Màu chủ đạo của bạn */
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+/* Khi di chuột vào thanh trượt */
+::-webkit-scrollbar-thumb:hover {
+    background: #c04e4e; /* Màu đậm hơn chút */
+}
+
+/* Ẩn thanh cuộn trên Mobile nhưng vẫn cuộn được (Cho gọn) */
+@media (max-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+    }
+}
+
+/* Hiệu ứng hiện dần */
+@keyframes fadeInSmooth {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-enter {
+    animation: fadeInSmooth 1s ease-out forwards;
+}
