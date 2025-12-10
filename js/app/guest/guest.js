@@ -1367,25 +1367,18 @@ export const guest = (() => {
             height: '1080',
             videoId: videoId,
             playerVars: {
-                autoplay: 0,
+                autoplay: 1,
                 controls: 1,
                 rel: 0,
                 modestbranding: 1,
                 playsinline: 1,
                 loop: 1,
-                playlist: videoId
+                playlist: videoId,
+                VideoPlaybackQuality: 720
             },
             events: {
-                onStateChange: (event) => {
-                    if (event.data === YT.PlayerState.PLAYING) {
-                        setTimeout(() => {
-                            event.target.pauseVideo();
-                            event.target.setPlaybackQuality('hd1080');   // hoặc 'highres' cho 4K
-                            setTimeout(() => {
-                                event.target.playVideo();
-                            }, 300);
-                        }, 1200);
-                    }
+                onReady: (e) => {
+                    e.target.setPlaybackQuality('hd720');
                 }
             }
         });
