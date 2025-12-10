@@ -1365,7 +1365,9 @@ export const guest = (() => {
         // Tạo iframe Youtube (Autoplay)
         const iframeHtml = `
         <iframe 
-            src="https://www.youtube-nocookie.com/embed/${cleanId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}&loop=1&playlist=${cleanId}" 
+            width="1920" 
+            height="1080"
+            src="https://www.youtube-nocookie.com/embed/${cleanId}?vq=hd1080&autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}&loop=1&playlist=${cleanId}" 
             title="YouTube video player" 
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
