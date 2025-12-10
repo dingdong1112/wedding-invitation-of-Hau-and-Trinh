@@ -1346,42 +1346,44 @@ export const guest = (() => {
     }
 
     /* --- QUẢN LÝ VIDEO PLAYER --- */
-    function playVideo(videoId, title) {
-        // 1. GỌI HÀM TẠM DỪNG NHẠC NỀN
-        if (window.musicPlayer && typeof window.musicPlayer.pauseForVideo === 'function') {
-            window.musicPlayer.pauseForVideo();
-        }
-        const videoModal = document.getElementById('videoPlayerModal');
-        const container = document.getElementById('youtubePlayerContainer');
-        const titleEl = document.getElementById('playerTitle');
-        // Thêm class đánh dấu là Video đang mở
+    let ytPlayer;
 
-        let cleanId = videoId.trim(); 
-        document.body.classList.add('video-active');
-
-        // Set tiêu đề
-        if (titleEl) titleEl.innerText = title;
-
-        // Tạo iframe Youtube (Autoplay)
-        const iframeHtml = `
-        <iframe 
-            width="1920" 
-            height="1080"
-            src="https://www.youtube-nocookie.com/embed/${cleanId}?vq=hd1080&autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}&loop=1&playlist=${cleanId}" 
-            title="YouTube video player" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            referrerpolicy="strict-origin-when-cross-origin" 
-            allowfullscreen 
-            class="w-100 h-100 position-absolute top-0 start-0">
-        </iframe>
-        `;
-
-        container.innerHTML = iframeHtml;
-        videoModal.classList.add('active');
-
-        document.body.classList.add('modal-open');
+function playVideo(videoId, title) {
+    if (window.musicPlayer && typeof window.musicPlayer.pauseForVideo === 'function') {
+        window.musicPlayer.pauseForVideo();
     }
+
+    document.body.classList.add('video-active');
+    document.body.classList.add('modal-open');
+
+    const titleEl = document.getElementById('playerTitle');
+    if (titleEl) titleEl.innerText = title;
+
+    const container = document.getElementById('youtubePlayerContainer');
+    container.innerHTML = ''; // clear old iframe
+
+    ytPlayer = new YT.Player('youtubePlayerContainer', {
+        width: '1920',
+        height: '1080',
+        videoId: videoId,
+        playerVars: {
+            autoplay: 1,
+            controls: 1,
+            rel: 0,
+            modestbranding: 1,
+            playsinline: 1,
+            loop: 1,
+            playlist: videoId
+        },
+        events: {
+            onReady: (e) => {
+                e.target.setPlaybackQuality('hd1080');
+            }
+        }
+    });
+
+    document.getElementById('videoPlayerModal').classList.add('active');
+}
 
     function closeVideoPlayer() {
         const videoModal = document.getElementById('videoPlayerModal');
