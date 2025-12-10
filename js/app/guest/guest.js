@@ -1022,7 +1022,7 @@ export const guest = (() => {
         let bookEl = document.getElementById('book'); // Container cố định
         // --- ĐOẠN SỬA ĐỔI: NẾU ĐÃ CÓ SÁCH THÌ KHÔNG TẠO LẠI ---
         if (pageFlipInstance) {
-             const bsModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            const bsModal = bootstrap.Modal.getOrCreateInstance(modalElement);
             bsModal.show();
 
             // QUAN TRỌNG: Đợi modal hiện xong (300ms) rồi ép sách tính lại vị trí
@@ -1032,7 +1032,7 @@ export const guest = (() => {
                     pageFlipInstance.update(); // Lệnh cập nhật kích thước
                 }
             }, 500); // Tăng lên 500ms cho chắc ăn trên mobile
-            return; 
+            return;
         }
 
         if (!bookEl) {
@@ -1348,42 +1348,50 @@ export const guest = (() => {
     /* --- QUẢN LÝ VIDEO PLAYER --- */
     let ytPlayer;
 
-function playVideo(videoId, title) {
-    if (window.musicPlayer && typeof window.musicPlayer.pauseForVideo === 'function') {
-        window.musicPlayer.pauseForVideo();
-    }
-
-    document.body.classList.add('video-active');
-    document.body.classList.add('modal-open');
-
-    const titleEl = document.getElementById('playerTitle');
-    if (titleEl) titleEl.innerText = title;
-
-    const container = document.getElementById('youtubePlayerContainer');
-    container.innerHTML = ''; // clear old iframe
-
-    ytPlayer = new YT.Player('youtubePlayerContainer', {
-        width: '1920',
-        height: '1080',
-        videoId: videoId,
-        playerVars: {
-            autoplay: 1,
-            controls: 1,
-            rel: 0,
-            modestbranding: 1,
-            playsinline: 1,
-            loop: 1,
-            playlist: videoId
-        },
-        events: {
-            onReady: (e) => {
-                e.target.setPlaybackQuality('hd1080');
-            }
+    function playVideo(videoId, title) {
+        if (window.musicPlayer && typeof window.musicPlayer.pauseForVideo === 'function') {
+            window.musicPlayer.pauseForVideo();
         }
-    });
 
-    document.getElementById('videoPlayerModal').classList.add('active');
-}
+        document.body.classList.add('video-active');
+        document.body.classList.add('modal-open');
+
+        const titleEl = document.getElementById('playerTitle');
+        if (titleEl) titleEl.innerText = title;
+
+        const container = document.getElementById('youtubePlayerContainer');
+        container.innerHTML = ''; // clear old iframe
+
+        ytPlayer = new YT.Player('youtubePlayerContainer', {
+            width: '1920',
+            height: '1080',
+            videoId: videoId,
+            playerVars: {
+                autoplay: 0,
+                controls: 1,
+                rel: 0,
+                modestbranding: 1,
+                playsinline: 1,
+                loop: 1,
+                playlist: videoId
+            },
+            events: {
+                onStateChange: (event) => {
+                    if (event.data === YT.PlayerState.PLAYING) {
+                        setTimeout(() => {
+                            event.target.pauseVideo();
+                            event.target.setPlaybackQuality('hd1080');   // hoặc 'highres' cho 4K
+                            setTimeout(() => {
+                                event.target.playVideo();
+                            }, 300);
+                        }, 1200);
+                    }
+                }
+            }
+        });
+
+        document.getElementById('videoPlayerModal').classList.add('active');
+    }
 
     function closeVideoPlayer() {
         const videoModal = document.getElementById('videoPlayerModal');
