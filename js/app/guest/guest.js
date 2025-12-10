@@ -1363,15 +1363,15 @@ export const guest = (() => {
         // Tạo iframe Youtube (Autoplay)
         const iframeHtml = `
         <iframe 
-            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}&loop=1&playlist=${videoId}" 
+            src="https://www.youtube-nocookie.com/embed/${cleanId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&origin=${window.location.origin}&loop=1&playlist=${cleanId}" 
             title="YouTube video player" 
-            frameborder="0"
+            frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            referrerpolicy="strict-origin-when-cross-origin"
+            referrerpolicy="strict-origin-when-cross-origin" 
             allowfullscreen 
-            class="w-100 h-100 absolute top-0 left-0">
+            class="w-100 h-100 position-absolute top-0 start-0">
         </iframe>
-    `;
+        `;
 
         container.innerHTML = iframeHtml;
         videoModal.classList.add('active');
