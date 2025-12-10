@@ -1355,6 +1355,8 @@ export const guest = (() => {
         const container = document.getElementById('youtubePlayerContainer');
         const titleEl = document.getElementById('playerTitle');
         // Thêm class đánh dấu là Video đang mở
+
+        let cleanId = videoId.trim(); 
         document.body.classList.add('video-active');
 
         // Set tiêu đề
